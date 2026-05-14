@@ -94,22 +94,20 @@ function PanelMoulding({ moldScale, moldScale2, ...props }: { moldScale: number;
   // The vertical sides are rotated [PI/2, 0, 0]    → local Z maps to world Y.
   // The horizontal sides are rotated [PI/2, ±PI/2, 0] → local Z maps to world X.
   const hSideY = vTip
-  const vSideX = hTip * 2
-  const hSideCenterX = hTip
 
   return (
     <group {...props}>
-      {/* Left vertical side — anchored at x=0; reports actual tip so horizontal sides track it */}
-      <Moulding moldScale={moldScale} onTipZ={setVTip} rotation={[Math.PI / 2, 0, 0]} />
+      {/* Left vertical side — symmetric at x=-hTip */}
+      <Moulding moldScale={moldScale} onTipZ={setVTip} position={[-hTip, 0, 0]} rotation={[Math.PI / 2, 0, 0]} />
 
-      {/* Right vertical side — x driven by actual horizontal-side tip */}
-      <Moulding moldScale={moldScale} position={[vSideX, 0, 0]} rotation={[Math.PI / 2, Math.PI, 0]} />
+      {/* Right vertical side — symmetric at x=+hTip */}
+      <Moulding moldScale={moldScale} position={[hTip, 0, 0]} rotation={[Math.PI / 2, Math.PI, 0]} />
 
-      {/* Bottom horizontal side — reports actual tip so vertical sides track it */}
-      <Moulding moldScale={moldScale2} onTipZ={setHTip} position={[hSideCenterX, -hSideY, 0]} rotation={[Math.PI / 2, Math.PI / 2, 0]} />
+      {/* Bottom horizontal side — centered at x=0; reports actual tip so vertical sides track it */}
+      <Moulding moldScale={moldScale2} onTipZ={setHTip} position={[0, -hSideY, 0]} rotation={[Math.PI / 2, Math.PI / 2, 0]} />
 
-      {/* Top horizontal side */}
-      <Moulding moldScale={moldScale2} position={[hSideCenterX, hSideY, 0]} rotation={[Math.PI / 2, -Math.PI / 2, 0]} />
+      {/* Top horizontal side — centered at x=0 */}
+      <Moulding moldScale={moldScale2} position={[0, hSideY, 0]} rotation={[Math.PI / 2, -Math.PI / 2, 0]} />
     </group>
   )
 }
@@ -126,7 +124,7 @@ function Door({ moldScale, moldScale2, moldScale3, moldScale4, ...props }: {
 
   // PanelMoulding at scale=1 spans X:[0, hTip*2≈7.84], Y:[-vTip≈-3.94, +3.94].
   // Shift left by the initial hTip so the frame is horizontally centered on the door.
-  const CENTER_X = -3.92
+  const CENTER_X = 0
   const PANEL_Z = DOOR_D / 2 + 0.01 // sit just in front of the door face
 
   return (
@@ -198,6 +196,8 @@ export default function App() {
       <Canvas shadows>
         <Suspense fallback={null}>
           <PerspectiveCamera makeDefault position={[0, 0, 28]} fov={50} />
+
+          <directionalLight position={[0, 0, 28]} intensity={1.5} />
 
           {/* Stage maneja automáticamente la iluminación y sombras de calidad */}
           <Stage intensity={0.5} environment="city" shadows={{ type: 'contact', opacity: 0.2 }}>
