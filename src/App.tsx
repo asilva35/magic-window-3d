@@ -3,20 +3,10 @@ import { OrbitControls, Stage, PerspectiveCamera, useGLTF } from '@react-three/d
 import { Suspense, useEffect, useState, useRef, useMemo } from 'react'
 import * as THREE from 'three'
 
-function WindowModel() {
-  // Aquí es donde luego usarás useGLTF para cargar los modelos de la empresa
-  return (
-    <mesh castShadow>
-      <boxGeometry args={[1, 1.5, 0.1]} />
-      <meshStandardMaterial color="#3498db" roughness={0.1} metalness={0.8} />
-    </mesh>
-  )
-}
-
 // Cached initial data to compute accurate displacements
 type InitData = { c1z: number; c2z: number; moldMin: number; moldMax: number }
 
-function DoorSide({ moldScale, onTipZ, ...props }: { moldScale: number; onTipZ?: (z: number) => void;[key: string]: any }) {
+function Moulding({ moldScale, onTipZ, ...props }: { moldScale: number; onTipZ?: (z: number) => void;[key: string]: any }) {
   const { scene } = useGLTF('/assets/models/test-bevels-door.glb')
 
   // Clone the scene so each instance can be manipulated independently
@@ -25,7 +15,7 @@ function DoorSide({ moldScale, onTipZ, ...props }: { moldScale: number; onTipZ?:
   const baseMoldRef = useRef<any>(null)
   const corner01Ref = useRef<any>(null)
   const corner02Ref = useRef<any>(null)
-  const initDataRef = useRef<InitData | null>(null)
+  const [initData, setInitData] = useState<InitData | null>(null)
 
   // Find all relevant meshes ONCE for THIS clone when the scene is loaded and cache initial positions
   useEffect(() => {
@@ -43,12 +33,25 @@ function DoorSide({ moldScale, onTipZ, ...props }: { moldScale: number; onTipZ?:
         corner01Ref.current = child
         c1z = child.position.z
       }
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh
+        if (mesh.material && !Array.isArray(mesh.material)) {
+          // Clone material to avoid affecting other instances
+          mesh.material = mesh.material.clone()
+
+          // Check if it's a material that supports these properties
+          const mat = mesh.material as THREE.MeshStandardMaterial
+          if (mat.color) mat.color.set('#2c2c2c')
+          if (mat.roughness !== undefined) mat.roughness = 0.3
+          if (mat.metalness !== undefined) mat.metalness = 0.1
+        }
+      }
       if (child.name === 'corner-02') {
         corner02Ref.current = child
         c2z = child.position.z
       }
     })
-    initDataRef.current = { c1z, c2z, moldMin, moldMax }
+    setInitData({ c1z, c2z, moldMin, moldMax })
   }, [clone])
 
   // Update scale and pin corners for THIS clone
@@ -56,7 +59,6 @@ function DoorSide({ moldScale, onTipZ, ...props }: { moldScale: number; onTipZ?:
     const baseMold = baseMoldRef.current
     const corner01 = corner01Ref.current
     const corner02 = corner02Ref.current
-    const initData = initDataRef.current
 
     if (!baseMold || !initData) return
 
@@ -79,29 +81,86 @@ function DoorSide({ moldScale, onTipZ, ...props }: { moldScale: number; onTipZ?:
       const currentPivot = INITIAL_PIVOT + initData.moldMax * (moldScale - 1)
       onTipZ(currentPivot)
     }
-  }, [moldScale, onTipZ])
+  }, [moldScale, onTipZ, initData])
 
   return <primitive object={clone} {...props} />
 }
 
+
+function PanelMoulding({ moldScale, moldScale2, ...props }: { moldScale: number; moldScale2: number;[key: string]: any }) {
+  const [vTip, setVTip] = useState(3.94)
+  const [hTip, setHTip] = useState(3.92)
+
+  // The vertical sides are rotated [PI/2, 0, 0]    → local Z maps to world Y.
+  // The horizontal sides are rotated [PI/2, ±PI/2, 0] → local Z maps to world X.
+  const hSideY = vTip
+  const vSideX = hTip * 2
+  const hSideCenterX = hTip
+
+  return (
+    <group {...props}>
+      {/* Left vertical side — anchored at x=0; reports actual tip so horizontal sides track it */}
+      <Moulding moldScale={moldScale} onTipZ={setVTip} rotation={[Math.PI / 2, 0, 0]} />
+
+      {/* Right vertical side — x driven by actual horizontal-side tip */}
+      <Moulding moldScale={moldScale} position={[vSideX, 0, 0]} rotation={[Math.PI / 2, Math.PI, 0]} />
+
+      {/* Bottom horizontal side — reports actual tip so vertical sides track it */}
+      <Moulding moldScale={moldScale2} onTipZ={setHTip} position={[hSideCenterX, -hSideY, 0]} rotation={[Math.PI / 2, Math.PI / 2, 0]} />
+
+      {/* Top horizontal side */}
+      <Moulding moldScale={moldScale2} position={[hSideCenterX, hSideY, 0]} rotation={[Math.PI / 2, -Math.PI / 2, 0]} />
+    </group>
+  )
+}
+
+function Door({ moldScale, moldScale2, moldScale3, moldScale4, ...props }: {
+  moldScale: number; moldScale2: number;
+  moldScale3: number; moldScale4: number;
+  [key: string]: any
+}) {
+  // Door slab is fixed — does not change with scale sliders.
+  const DOOR_W = 15
+  const DOOR_H = 30
+  const DOOR_D = 0.5
+
+  // PanelMoulding at scale=1 spans X:[0, hTip*2≈7.84], Y:[-vTip≈-3.94, +3.94].
+  // Shift left by the initial hTip so the frame is horizontally centered on the door.
+  const CENTER_X = -3.92
+  const PANEL_Z = DOOR_D / 2 + 0.01 // sit just in front of the door face
+
+  return (
+    <group {...props}>
+      {/* Fixed door slab */}
+      <mesh>
+        <boxGeometry args={[DOOR_W, DOOR_H, DOOR_D]} />
+        <meshStandardMaterial color="#2c2c2c" roughness={0.3} metalness={0.1} />
+      </mesh>
+
+      {/* Top decorative panel — larger */}
+      <PanelMoulding
+        moldScale={moldScale}
+        moldScale2={moldScale2}
+        position={[CENTER_X, 4.0, PANEL_Z]}
+      />
+
+      {/* Bottom decorative panel — independent scale */}
+      <PanelMoulding
+        moldScale={moldScale3}
+        moldScale2={moldScale4}
+        position={[CENTER_X, -7.5, PANEL_Z]}
+      />
+    </group>
+  )
+}
 
 useGLTF.preload('/assets/models/test-bevels-door.glb')
 
 export default function App() {
   const [moldScale, setMoldScale] = useState(1)
   const [moldScale2, setMoldScale2] = useState(1)
-
-  // Real tip Z values reported by the DoorSide instances after each scale update.
-  // Vertical tip  → used as the Y position of horizontal sides.
-  // Horizontal tip → used as the X offset of vertical sides.
-  const [vTip, setVTip] = useState(3.94)   // far corner of a vertical side in local Z
-  const [hTip, setHTip] = useState(3.92)   // far corner of a horizontal side in local Z
-
-  // The vertical sides are rotated [PI/2, 0, 0] → local Z maps to world Y.
-  // The horizontal sides are rotated [PI/2, ±PI/2, 0] → local Z maps to world X.
-  const hSideY = vTip                // horizontal sides sit at ±vTip in world Y
-  const vSideX = hTip * 2            // right vertical side sits at 2×hTip in world X
-  const hSideCenterX = hTip          // horizontal sides are centered at hTip in world X
+  const [moldScale3, setMoldScale3] = useState(0.5)
+  const [moldScale4, setMoldScale4] = useState(1)
 
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#f0f0f0', position: 'relative' }}>
@@ -119,45 +178,30 @@ export default function App() {
         flexDirection: 'column',
         gap: '10px'
       }}>
-        <label style={{ fontSize: '14px', fontWeight: 'bold' }}>Vertical Scale: {moldScale.toFixed(1)}</label>
-        <input
-          type="range"
-          min="0.1"
-          max="10"
-          step="0.1"
-          value={moldScale}
-          onChange={(e) => setMoldScale(parseFloat(e.target.value))}
-        />
-        <label style={{ fontSize: '14px', fontWeight: 'bold' }}>Horizontal Scale: {moldScale2.toFixed(1)}</label>
-        <input
-          type="range"
-          min="0.1"
-          max="10"
-          step="0.1"
-          value={moldScale2}
-          onChange={(e) => setMoldScale2(parseFloat(e.target.value))}
-        />
+        <label style={{ fontSize: '14px', fontWeight: 'bold' }}>— Top Panel —</label>
+        <label style={{ fontSize: '12px' }}>Vertical Scale: {moldScale.toFixed(1)}</label>
+        <input type="range" min="0.3" max="1.4" step="0.1" value={moldScale}
+          onChange={(e) => setMoldScale(parseFloat(e.target.value))} />
+        <label style={{ fontSize: '12px' }}>Horizontal Scale: {moldScale2.toFixed(1)}</label>
+        <input type="range" min="0.3" max="1.4" step="0.1" value={moldScale2}
+          onChange={(e) => setMoldScale2(parseFloat(e.target.value))} />
+
+        <label style={{ fontSize: '14px', fontWeight: 'bold', marginTop: '6px' }}>— Bottom Panel —</label>
+        <label style={{ fontSize: '12px' }}>Vertical Scale: {moldScale3.toFixed(1)}</label>
+        <input type="range" min="0.3" max="1.4" step="0.1" value={moldScale3}
+          onChange={(e) => setMoldScale3(parseFloat(e.target.value))} />
+        <label style={{ fontSize: '12px' }}>Horizontal Scale: {moldScale4.toFixed(1)}</label>
+        <input type="range" min="0.3" max="1.4" step="0.1" value={moldScale4}
+          onChange={(e) => setMoldScale4(parseFloat(e.target.value))} />
       </div>
 
       <Canvas shadows>
         <Suspense fallback={null}>
-          <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={50} />
+          <PerspectiveCamera makeDefault position={[0, 0, 28]} fov={50} />
 
           {/* Stage maneja automáticamente la iluminación y sombras de calidad */}
           <Stage intensity={0.5} environment="city" shadows={{ type: 'contact', opacity: 0.2 }}>
-            <group>
-              {/* Left vertical side — anchored at x=0; reports actual tip so horizontal sides track it */}
-              <DoorSide moldScale={moldScale} onTipZ={setVTip} rotation={[Math.PI / 2, 0, 0]} />
-
-              {/* Right vertical side — x driven by actual horizontal-side tip */}
-              <DoorSide moldScale={moldScale} position={[vSideX, 0, 0]} rotation={[Math.PI / 2, Math.PI, 0]} />
-
-              {/* Bottom horizontal side — reports actual tip so vertical sides track it */}
-              <DoorSide moldScale={moldScale2} onTipZ={setHTip} position={[hSideCenterX, -hSideY, 0]} rotation={[Math.PI / 2, Math.PI / 2, 0]} />
-
-              {/* Top horizontal side */}
-              <DoorSide moldScale={moldScale2} position={[hSideCenterX, hSideY, 0]} rotation={[Math.PI / 2, -Math.PI / 2, 0]} />
-            </group>
+            <Door moldScale={moldScale} moldScale2={moldScale2} moldScale3={moldScale3} moldScale4={moldScale4} />
           </Stage>
 
           <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} />
