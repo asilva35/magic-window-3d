@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Stage, PerspectiveCamera, useGLTF } from '@react-three/drei'
+import { OrbitControls, Stage, PerspectiveCamera, useGLTF, Stats } from '@react-three/drei'
 import { Suspense, useEffect, useState, useRef, useMemo } from 'react'
 import * as THREE from 'three'
 
@@ -112,6 +112,26 @@ function PanelMoulding({ moldScale, moldScale2, ...props }: { moldScale: number;
   )
 }
 
+function DoorHandler(props: any) {
+  const { scene } = useGLTF('/assets/models/HandleBerlinLeverHandle.glb')
+  const clone = useMemo(() => scene.clone(), [scene])
+
+  useEffect(() => {
+    clone.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh
+        mesh.material = new THREE.MeshStandardMaterial({
+          color: '#b5b5b5',
+          metalness: 1.0,
+          roughness: 0.35,
+        })
+      }
+    })
+  }, [clone])
+
+  return <primitive object={clone} {...props} />
+}
+
 function Door({ moldScale, moldScale2, moldScale3, moldScale4, ...props }: {
   moldScale: number; moldScale2: number;
   moldScale3: number; moldScale4: number;
@@ -148,11 +168,15 @@ function Door({ moldScale, moldScale2, moldScale3, moldScale4, ...props }: {
         moldScale2={moldScale4}
         position={[CENTER_X, -7.5, PANEL_Z]}
       />
+
+      {/* Door Handle */}
+      <DoorHandler position={[-6.5, 0, PANEL_Z]} rotation={[0, Math.PI, 0]} scale={0.1} />
     </group>
   )
 }
 
 useGLTF.preload('/assets/models/test-bevels-door.glb')
+useGLTF.preload('/assets/models/HandleBerlinLeverHandle.glb')
 
 export default function App() {
   const [moldScale, setMoldScale] = useState(1)
@@ -196,10 +220,10 @@ export default function App() {
       <Canvas shadows>
         <Suspense fallback={null}>
           <PerspectiveCamera makeDefault position={[0, 0, 28]} fov={50} />
+          <Stats />
 
           <directionalLight position={[0, 0, 28]} intensity={1.5} />
 
-          {/* Stage maneja automáticamente la iluminación y sombras de calidad */}
           <Stage intensity={0.5} environment="city" shadows={{ type: 'contact', opacity: 0.2 }}>
             <Door moldScale={moldScale} moldScale2={moldScale2} moldScale3={moldScale3} moldScale4={moldScale4} />
           </Stage>
