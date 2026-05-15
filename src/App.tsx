@@ -155,6 +155,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
           moldScale={panel.moldScale}
           moldScale2={panel.moldScale2}
           position={[panel.x ?? 0, panel.y, PANEL_Z]}
+          scale={[0.4, 0.4, 1]}
         />
       ))}
 
@@ -536,10 +537,10 @@ export default function App() {
   })
   const update = (patch: Partial<CfgState>) => setCfg(s => ({ ...s, ...patch }))
 
-  const [ms1, setMs1] = useState(30)
-  const [ms2, setMs2] = useState(10)
-  const [ms3, setMs3] = useState(5)
-  const [ms4, setMs4] = useState(10)
+  const [ms1, setMs1] = useState(112)
+  const [ms2, setMs2] = useState(55)
+  const [ms3, setMs3] = useState(19)
+  const [ms4, setMs4] = useState(55)
   const [doorModel, setDoorModel] = useState('orleans')
   const [stepIdx, setStepIdx] = useState(0)
 
@@ -703,14 +704,14 @@ export default function App() {
                     <>
                       <SectionTitle>Panel proportions (3D preview)</SectionTitle>
                       <div className="cfg-size">
-                        <ScaleField label="Top Vertical" value={ms1} min={3} max={30} step={0.1} onChange={setMs1} />
+                        <ScaleField label="Top Vertical" value={ms1} min={70} max={120} step={0.1} onChange={setMs1} />
                         <div className="cfg-size__by">×</div>
-                        <ScaleField label="Top Horizontal" value={ms2} min={6} max={20} step={0.1} onChange={handleHorizontalScale} />
+                        <ScaleField label="Top Horizontal" value={ms2} min={30} max={55} step={0.1} onChange={handleHorizontalScale} />
                       </div>
                       <div className="cfg-size">
-                        <ScaleField label="Bottom Vertical" value={ms3} min={4} max={7} step={0.1} onChange={setMs3} />
+                        <ScaleField label="Bottom Vertical" value={ms3} min={12} max={20} step={0.1} onChange={setMs3} />
                         <div className="cfg-size__by">×</div>
-                        <ScaleField label="Bottom Horizontal" value={ms4} min={6} max={20} step={0.1} onChange={handleHorizontalScale} />
+                        <ScaleField label="Bottom Horizontal" value={ms4} min={30} max={55} step={0.1} onChange={handleHorizontalScale} />
                       </div>
                     </>
                   )}
