@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, useGLTF } from '@react-three/drei'
 import { Suspense, useEffect, useState, useRef, useMemo } from 'react'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { LoadingScreen } from './LoadingScreen'
 
@@ -232,6 +233,23 @@ function GroupDoors({ ms1 = 1, ms2 = 1, ms3 = 0.5, ms4 = 1, ...props }: {
     </group>
   )
 }
+
+function Rotator({ isRotating, children }: { isRotating: boolean, children: React.ReactNode }) {
+  const groupRef = useRef<THREE.Group>(null)
+
+  useFrame((state, delta) => {
+    if (groupRef.current) {
+      if (isRotating) {
+        groupRef.current.rotation.y += delta * 0.5
+      } else {
+        groupRef.current.rotation.y = 0
+      }
+    }
+  })
+
+  return <group ref={groupRef}>{children}</group>
+}
+
 
 useGLTF.preload('/assets/models/MoldOrleansDoor.glb')
 useGLTF.preload('/assets/models/HandleBerlinLeverHandle.glb')
@@ -543,6 +561,14 @@ export default function App() {
   const [ms4, setMs4] = useState(55)
   const [doorModel, setDoorModel] = useState('orleans')
   const [stepIdx, setStepIdx] = useState(0)
+  const [isRotating, setIsRotating] = useState(false)
+
+  useEffect(() => {
+    if (!isRotating) return
+    const handleGlobalClick = () => setIsRotating(false)
+    window.addEventListener('click', handleGlobalClick)
+    return () => window.removeEventListener('click', handleGlobalClick)
+  }, [isRotating])
 
   const price = computePrice(cfg)
 
@@ -612,7 +638,11 @@ export default function App() {
                     const panels = doorModel === 'orleans'
                       ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
                       : model.panels
-                    return <Door color={model.color} panels={panels} />
+                    return (
+                      <Rotator isRotating={isRotating}>
+                        <Door color={model.color} panels={panels} />
+                      </Rotator>
+                    )
                   })()}
                   <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} enableZoom={false} />
                 </Suspense>
@@ -625,7 +655,14 @@ export default function App() {
               <button className="cfg__viewport-chip">Show Top View</button>
             </div> */}
             <div className="cfg__tools">
-              <button title="Rotate" className="cfg__tool">
+              <button
+                title="Rotate"
+                className={`cfg__tool ${isRotating ? 'is-active' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsRotating(!isRotating)
+                }}
+              >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
                   <path d="M21 12a9 9 0 1 1-3-6.7" /><path d="M21 4v5h-5" />
                 </svg>
