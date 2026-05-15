@@ -165,75 +165,6 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
   )
 }
 
-function GroupDoors({ ms1 = 1, ms2 = 1, ms3 = 0.5, ms4 = 1, ...props }: {
-  ms1?: number; ms2?: number; ms3?: number; ms4?: number;[key: string]: any
-}) {
-  const SPACING = 17
-
-  return (
-    <group {...props}>
-
-      {/* Uno — 1 large panel */}
-      <Door
-        color="#e86253"
-        panels={[{ y: 1, moldScale: 3.0, moldScale2: 1.2 }]}
-        position={[-2.5 * SPACING, 0, 0]}
-      />
-
-      {/* Orleans — 2 panels: top larger, bottom smaller */}
-      <Door
-        color="#2c2c2c"
-        panels={[
-          { y: 4.0, moldScale: ms1, moldScale2: ms2 },
-          { y: -7.5, moldScale: ms3, moldScale2: ms4 },
-        ]}
-        position={[-1.5 * SPACING, 0, 0]}
-      />
-
-      {/* London — 2 equal panels */}
-      <Door
-        color="#f0ede5"
-        panels={[
-          { y: 7, moldScale: 0.85, moldScale2: 1.0 },
-          { y: -2, moldScale: 0.85, moldScale2: 1.0 },
-        ]}
-        position={[-0.5 * SPACING, 0, 0]}
-      />
-
-      {/* Victoria — 3 evenly spaced panels */}
-      <Door
-        color="#9dbfb2"
-        panels={[
-          { y: 9, moldScale: 0.7, moldScale2: 1.0 },
-          { y: 1, moldScale: 0.7, moldScale2: 1.0 },
-          { y: -7, moldScale: 0.7, moldScale2: 1.0 },
-        ]}
-        position={[0.5 * SPACING, 0, 0]}
-      />
-
-      {/* Soho — 4 evenly spaced panels */}
-      <Door
-        color="#2d5448"
-        panels={[
-          { y: 10, moldScale: 0.5, moldScale2: 1.0 },
-          { y: 3, moldScale: 0.5, moldScale2: 1.0 },
-          { y: -4, moldScale: 0.5, moldScale2: 1.0 },
-          { y: -11, moldScale: 0.5, moldScale2: 1.0 },
-        ]}
-        position={[1.5 * SPACING, 0, 0]}
-      />
-
-      {/* Vog — no panels */}
-      <Door
-        color="#3d3d3d"
-        panels={[]}
-        position={[2.5 * SPACING, 0, 0]}
-      />
-
-    </group>
-  )
-}
-
 function Rotator({ isRotating, children }: { isRotating: boolean, children: React.ReactNode }) {
   const groupRef = useRef<THREE.Group>(null)
 
@@ -353,23 +284,23 @@ type DoorModelDef = {
 const DOOR_MODELS: DoorModelDef[] = [
   {
     id: 'orleans', label: 'Orleans', sub: '2 panels · top + bottom', color: '#2c2c2c',
-    panels: [{ y: 4.0, moldScale: 1, moldScale2: 1 }, { y: -7.5, moldScale: 0.5, moldScale2: 1 }],
+    panels: [{ y: 4.0, moldScale: 112, moldScale2: 55 }, { y: -7.5, moldScale: 19, moldScale2: 55 }],
   },
   {
     id: 'uno', label: 'Uno', sub: '1 large panel', color: '#e86253',
-    panels: [{ y: 1, moldScale: 3.0, moldScale2: 1.2 }],
+    panels: [{ y: 1, moldScale: 150.0, moldScale2: 55.0 }],
   },
   {
     id: 'london', label: 'London', sub: '2 equal panels', color: '#f0ede5',
-    panels: [{ y: 7, moldScale: 0.85, moldScale2: 1.0 }, { y: -2, moldScale: 0.85, moldScale2: 1.0 }],
+    panels: [{ y: 4, moldScale: 90, moldScale2: 55 }, { y: -7, moldScale: 35, moldScale2: 55 }],
   },
   {
     id: 'victoria', label: 'Victoria', sub: '3 panels', color: '#9dbfb2',
-    panels: [{ y: 9, moldScale: 0.7, moldScale2: 1.0 }, { y: 1, moldScale: 0.7, moldScale2: 1.0 }, { y: -7, moldScale: 0.7, moldScale2: 1.0 }],
+    panels: [{ y: 10, moldScale: 35, moldScale2: 55 }, { y: -2, x: 2.8, moldScale: 110, moldScale2: 15 }, { y: -2, x: -2.8, moldScale: 110, moldScale2: 15 }],
   },
   {
     id: 'soho', label: 'Soho', sub: '4 panels', color: '#2d5448',
-    panels: [{ y: 10, moldScale: 0.5, moldScale2: 1.0 }, { y: 3, moldScale: 0.5, moldScale2: 1.0 }, { y: -4, moldScale: 0.5, moldScale2: 1.0 }, { y: -11, moldScale: 0.5, moldScale2: 1.0 }],
+    panels: [{ y: 10, moldScale: 30, moldScale2: 55 }, { y: 3, moldScale: 30, moldScale2: 55 }, { y: -4, moldScale: 30, moldScale2: 55 }, { y: -11, moldScale: 30, moldScale2: 55 }],
   },
   {
     id: 'vog', label: 'Vog', sub: 'Solid · no panels', color: '#3d3d3d',
