@@ -161,7 +161,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
 }
 
 function GroupDoors({ ms1 = 1, ms2 = 1, ms3 = 0.5, ms4 = 1, ...props }: {
-  ms1?: number; ms2?: number; ms3?: number; ms4?: number; [key: string]: any
+  ms1?: number; ms2?: number; ms3?: number; ms4?: number;[key: string]: any
 }) {
   const SPACING = 17
 
@@ -268,106 +268,106 @@ const PRODUCT_TYPES = [
 
 const STYLES: Record<string, Array<{ id: string; label: string; sub: string }>> = {
   window: [
-    { id: 'casement',  label: 'Casement',       sub: 'Push-out, Parallex® hardware' },
-    { id: 'awning',    label: 'Awning',          sub: 'Top-hinged, opens outward' },
-    { id: 'hung',      label: 'Double Hung',     sub: 'Traditional vertical slide' },
-    { id: 'slider',    label: 'Slider',          sub: 'Horizontal glide' },
-    { id: 'picture',   label: 'Picture',         sub: 'Fixed, maximum view' },
-    { id: 'bay',       label: 'Bay',             sub: 'Three-panel projection' },
+    { id: 'casement', label: 'Casement', sub: 'Push-out, Parallex® hardware' },
+    { id: 'awning', label: 'Awning', sub: 'Top-hinged, opens outward' },
+    { id: 'hung', label: 'Double Hung', sub: 'Traditional vertical slide' },
+    { id: 'slider', label: 'Slider', sub: 'Horizontal glide' },
+    { id: 'picture', label: 'Picture', sub: 'Fixed, maximum view' },
+    { id: 'bay', label: 'Bay', sub: 'Three-panel projection' },
   ],
   patio: [
-    { id: 'slider2',   label: '2-Panel Slider',  sub: 'Ultra smooth glide' },
-    { id: 'slider3',   label: '3-Panel Slider',  sub: 'Wide opening' },
-    { id: 'slider4',   label: '4-Panel Slider',  sub: 'Maximum aperture' },
-    { id: 'french',    label: 'French',          sub: 'Centre-hinged double' },
+    { id: 'slider2', label: '2-Panel Slider', sub: 'Ultra smooth glide' },
+    { id: 'slider3', label: '3-Panel Slider', sub: 'Wide opening' },
+    { id: 'slider4', label: '4-Panel Slider', sub: 'Maximum aperture' },
+    { id: 'french', label: 'French', sub: 'Centre-hinged double' },
   ],
   front: [
-    { id: 'single',       label: 'Single',              sub: 'Standard residential' },
-    { id: 'single-side',  label: 'Single + Sidelite',   sub: 'One side panel' },
-    { id: 'double',       label: 'Double',              sub: 'Two equal panels' },
-    { id: 'double-side',  label: 'Double + Sidelites',  sub: 'Grand entry' },
+    { id: 'single', label: 'Single', sub: 'Standard residential' },
+    { id: 'single-side', label: 'Single + Sidelite', sub: 'One side panel' },
+    { id: 'double', label: 'Double', sub: 'Two equal panels' },
+    { id: 'double-side', label: 'Double + Sidelites', sub: 'Grand entry' },
   ],
   wall: [
-    { id: 'wall-3',      label: '3-Bay Wall',   sub: 'Slim frames, big views' },
-    { id: 'wall-4',      label: '4-Bay Wall',   sub: 'Floor-to-ceiling glass' },
-    { id: 'wall-corner', label: 'Corner Wall',  sub: 'Wraparound glass' },
+    { id: 'wall-3', label: '3-Bay Wall', sub: 'Slim frames, big views' },
+    { id: 'wall-4', label: '4-Bay Wall', sub: 'Floor-to-ceiling glass' },
+    { id: 'wall-corner', label: 'Corner Wall', sub: 'Wraparound glass' },
   ],
 }
 
 const FRAME_SWATCHES: Record<string, string> = {
-  white:    '#F4F5F7',
-  almond:   '#E5DCC9',
-  cobble:   '#888A8C',
-  black:    '#1B1B1F',
-  navy:     '#001B70',
+  white: '#F4F5F7',
+  almond: '#E5DCC9',
+  cobble: '#888A8C',
+  black: '#1B1B1F',
+  navy: '#001B70',
   espresso: '#3B2A1E',
 }
 
 const GLASS_PACKAGES = [
-  { id: 'double', label: 'Double Pane',     sub: 'Standard argon · ER 21',     price: 0   },
-  { id: 'triple', label: 'Triple Pane',     sub: '50% more argon · ER 38',     price: 480 },
-  { id: 'lowe',   label: 'Triple + Low-E',  sub: 'Best year-round comfort',    price: 720 },
+  { id: 'double', label: 'Double Pane', sub: 'Standard argon · ER 21', price: 0 },
+  { id: 'triple', label: 'Triple Pane', sub: '50% more argon · ER 38', price: 480 },
+  { id: 'lowe', label: 'Triple + Low-E', sub: 'Best year-round comfort', price: 720 },
 ]
 
 const HARDWARE = [
-  { id: 'parallex', label: 'Parallex® push-out',    sub: 'Patented · never crank again',       price: 0   },
-  { id: 'crank',    label: 'Traditional crank',     sub: 'Compatible with retrofit setups',    price: -90 },
+  { id: 'parallex', label: 'Parallex® push-out', sub: 'Patented · never crank again', price: 0 },
+  { id: 'crank', label: 'Traditional crank', sub: 'Compatible with retrofit setups', price: -90 },
 ]
 
 const SCREENS = [
   { id: 'retractable', label: 'Retractable Bug Screen', sub: 'Hidden when not in use', price: 220 },
-  { id: 'standard',    label: 'Standard Screen',        sub: 'Fixed, full-coverage',   price: 0   },
-  { id: 'none',        label: 'No Screen',              sub: 'Skip the screen',        price: -60 },
+  { id: 'standard', label: 'Standard Screen', sub: 'Fixed, full-coverage', price: 0 },
+  { id: 'none', label: 'No Screen', sub: 'Skip the screen', price: -60 },
 ]
 
 const LITE_PATTERNS: Record<string, Record<string, number[][]>> = {
   window: {
     casement: [[50, 4, 50, 96, 1.8]],
-    awning:   [[4, 50, 96, 50, 1.8]],
-    hung:     [[4, 50, 96, 50, 1.8]],
-    slider:   [[50, 4, 50, 96, 1.8]],
-    picture:  [],
-    bay:      [[33.3, 4, 33.3, 96, 1.8], [66.6, 4, 66.6, 96, 1.8]],
+    awning: [[4, 50, 96, 50, 1.8]],
+    hung: [[4, 50, 96, 50, 1.8]],
+    slider: [[50, 4, 50, 96, 1.8]],
+    picture: [],
+    bay: [[33.3, 4, 33.3, 96, 1.8], [66.6, 4, 66.6, 96, 1.8]],
   },
   patio: {
-    slider2: [[50,   4, 50,   96, 2.5]],
+    slider2: [[50, 4, 50, 96, 2.5]],
     slider3: [[33.3, 4, 33.3, 96, 2.5], [66.6, 4, 66.6, 96, 2.5]],
-    slider4: [[25,   4, 25,   96, 2.5], [50, 4, 50, 96, 2.5], [75, 4, 75, 96, 2.5]],
-    french:  [[50,   4, 50,   96, 2.5]],
+    slider4: [[25, 4, 25, 96, 2.5], [50, 4, 50, 96, 2.5], [75, 4, 75, 96, 2.5]],
+    french: [[50, 4, 50, 96, 2.5]],
   },
   front: {
-    'single':      [],
+    'single': [],
     'single-side': [[33.3, 4, 33.3, 96, 2.5]],
-    'double':      [[50,   4, 50,   96, 2.5]],
-    'double-side': [[20,   4, 20,   96, 2.5], [50, 4, 50, 96, 2.5], [80, 4, 80, 96, 2.5]],
+    'double': [[50, 4, 50, 96, 2.5]],
+    'double-side': [[20, 4, 20, 96, 2.5], [50, 4, 50, 96, 2.5], [80, 4, 80, 96, 2.5]],
   },
   wall: {
-    'wall-3':      [[33.3, 4, 33.3, 96, 1.5], [66.6, 4, 66.6, 96, 1.5]],
-    'wall-4':      [[25,   4, 25,   96, 1.5], [50, 4, 50, 96, 1.5], [75, 4, 75, 96, 1.5]],
-    'wall-corner': [[40,   4, 40,   96, 1.5]],
+    'wall-3': [[33.3, 4, 33.3, 96, 1.5], [66.6, 4, 66.6, 96, 1.5]],
+    'wall-4': [[25, 4, 25, 96, 1.5], [50, 4, 50, 96, 1.5], [75, 4, 75, 96, 1.5]],
+    'wall-corner': [[40, 4, 40, 96, 1.5]],
   },
 }
 
 function computePrice(state: CfgState) {
   const base: Record<string, number> = { window: 1180, patio: 3950, front: 4400, wall: 8600 }
   const sizeMult = (state.width * state.height) / (36 * 60)
-  const glass  = GLASS_PACKAGES.find(g => g.id === state.glass)?.price  ?? 0
-  const screen = SCREENS.find(s => s.id === state.screen)?.price        ?? 0
-  const hw     = HARDWARE.find(h => h.id === state.hardware)?.price     ?? 0
+  const glass = GLASS_PACKAGES.find(g => g.id === state.glass)?.price ?? 0
+  const screen = SCREENS.find(s => s.id === state.screen)?.price ?? 0
+  const hw = HARDWARE.find(h => h.id === state.hardware)?.price ?? 0
   return Math.round(((base[state.productType] ?? 1200) * sizeMult + glass + screen + hw) / 10) * 10
 }
 
 /* ── Step rail metadata ──────────────────────────────────────────── */
 
 const STEPS = [
-  { id: 'type',     label: 'Product\nType',     glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="0.5"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="12" x2="21" y2="12"/></svg>` },
-  { id: 'style',    label: 'Style\n& Opening',  glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18"/><path d="M3 12h18"/><path d="M16 12 12 8"/></svg>` },
-  { id: 'size',     label: 'Size',              glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 21V3M21 21V3M3 12h18"/></svg>` },
-  { id: 'frame',    label: 'Frame\nColour',     glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg>` },
-  { id: 'glass',    label: 'Glass\nPackage',    glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16"/><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/></svg>` },
-  { id: 'hardware', label: 'Hardware',          glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 4v3M12 17v3M4 12h3M17 12h3"/></svg>` },
-  { id: 'screen',   label: 'Screens\n& Extras', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18"/><path d="M3 8h18M3 13h18M3 18h18M8 3v18M13 3v18M18 3v18"/></svg>` },
-  { id: 'review',   label: 'Review\n& Quote',   glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m5 12 5 5L20 7"/></svg>` },
+  { id: 'type', label: 'Product\nType', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="0.5"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="12" x2="21" y2="12"/></svg>` },
+  { id: 'style', label: 'Style\n& Opening', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18"/><path d="M3 12h18"/><path d="M16 12 12 8"/></svg>` },
+  { id: 'size', label: 'Size', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 21V3M21 21V3M3 12h18"/></svg>` },
+  { id: 'frame', label: 'Frame\nColour', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg>` },
+  { id: 'glass', label: 'Glass\nPackage', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16"/><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/></svg>` },
+  { id: 'hardware', label: 'Hardware', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 4v3M12 17v3M4 12h3M17 12h3"/></svg>` },
+  { id: 'screen', label: 'Screens\n& Extras', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18"/><path d="M3 8h18M3 13h18M3 18h18M8 3v18M13 3v18M18 3v18"/></svg>` },
+  { id: 'review', label: 'Review\n& Quote', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m5 12 5 5L20 7"/></svg>` },
 ]
 
 /* ── Shared panel sub-components ─────────────────────────────────── */
@@ -393,7 +393,7 @@ function OptionTile({ active, label, swatch, thumb, dimensions, onClick }: {
     <button className={`cfg-tile${active ? ' is-active' : ''}`} onClick={onClick}>
       <div className="cfg-tile__media">
         {swatch && <div className="cfg-tile__swatch" style={{ background: swatch }} />}
-        {thumb  && <div className="cfg-tile__thumb"  dangerouslySetInnerHTML={{ __html: thumb }} />}
+        {thumb && <div className="cfg-tile__thumb" dangerouslySetInnerHTML={{ __html: thumb }} />}
       </div>
       <div className="cfg-tile__label">{label}</div>
       {dimensions && <div className="cfg-tile__dim">{dimensions}</div>}
@@ -452,8 +452,8 @@ function WindowSVG({ style, type }: { style: string; type: string }) {
       ))}
       <defs>
         <linearGradient id="cfg-glass" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%"   stopColor="#C7D2EC" stopOpacity="0.55" />
-          <stop offset="50%"  stopColor="#E8F1F8" stopOpacity="0.65" />
+          <stop offset="0%" stopColor="#C7D2EC" stopOpacity="0.55" />
+          <stop offset="50%" stopColor="#E8F1F8" stopOpacity="0.65" />
           <stop offset="100%" stopColor="#6AC3E7" stopOpacity="0.55" />
         </linearGradient>
       </defs>
@@ -462,11 +462,11 @@ function WindowSVG({ style, type }: { style: string; type: string }) {
 }
 
 function SVGViewport({ state }: { state: CfgState }) {
-  const isWall  = state.productType === 'wall'
-  const isDoor  = state.productType === 'patio'
+  const isWall = state.productType === 'wall'
+  const isDoor = state.productType === 'patio'
   const frameHex = FRAME_SWATCHES[state.frame] ?? '#F4F5F7'
-  const aspect   = isWall ? '2.2' : isDoor ? '0.55' : String(state.width / state.height)
-  const product  = PRODUCT_TYPES.find(t => t.id === state.productType)
+  const aspect = isWall ? '2.2' : isDoor ? '0.55' : String(state.width / state.height)
+  const product = PRODUCT_TYPES.find(t => t.id === state.productType)
   const styleLabel = STYLES[state.productType]?.find(s => s.id === state.style)?.label ?? ''
   return (
     <div className="cfg__stage">
@@ -633,12 +633,12 @@ export default function App() {
                     <>
                       <SectionTitle>Panel proportions (3D preview)</SectionTitle>
                       <div className="cfg-size">
-                        <ScaleField label="Top Vertical"    value={ms1} min={0.3} max={1.4} step={0.1} onChange={setMs1} />
+                        <ScaleField label="Top Vertical" value={ms1} min={0.3} max={1.4} step={0.1} onChange={setMs1} />
                         <div className="cfg-size__by">×</div>
-                        <ScaleField label="Top Horizontal"  value={ms2} min={0.3} max={1.4} step={0.1} onChange={setMs2} />
+                        <ScaleField label="Top Horizontal" value={ms2} min={0.3} max={1.4} step={0.1} onChange={setMs2} />
                       </div>
                       <div className="cfg-size">
-                        <ScaleField label="Bottom Vertical"   value={ms3} min={0.3} max={1.4} step={0.1} onChange={setMs3} />
+                        <ScaleField label="Bottom Vertical" value={ms3} min={0.3} max={1.4} step={0.1} onChange={setMs3} />
                         <div className="cfg-size__by">×</div>
                         <ScaleField label="Bottom Horizontal" value={ms4} min={0.3} max={1.4} step={0.1} onChange={setMs4} />
                       </div>
@@ -655,7 +655,7 @@ export default function App() {
                     sub="Width × height in inches. Final measurements taken on-site."
                   />
                   <div className="cfg-size">
-                    <SizeField label="Width"  value={cfg.width}  min={18} max={96}  step={2} onChange={v => update({ width: v })} />
+                    <SizeField label="Width" value={cfg.width} min={18} max={96} step={2} onChange={v => update({ width: v })} />
                     <div className="cfg-size__by">by</div>
                     <SizeField label="Height" value={cfg.height} min={24} max={120} step={2} onChange={v => update({ height: v })} />
                   </div>
@@ -664,7 +664,7 @@ export default function App() {
                     <div className="cfg-help__row">
                       <div className="cfg-help__diagram">
                         <div className="cfg-help__win" style={{
-                          width:  Math.min(200, cfg.width  * 2),
+                          width: Math.min(200, cfg.width * 2),
                           height: Math.min(240, cfg.height * 1.6),
                         }}>
                           <span className="cfg-help__dim cfg-help__dim--w">{cfg.width}"</span>
@@ -800,13 +800,13 @@ export default function App() {
                   />
                   <div className="cfg-summary">
                     {([
-                      ['Product',  PRODUCT_TYPES.find(t => t.id === cfg.productType)?.label ?? ''],
-                      ['Style',    STYLES[cfg.productType]?.find(s => s.id === cfg.style)?.label ?? ''],
-                      ['Size',     `${cfg.width}" × ${cfg.height}"`],
-                      ['Frame',    cfg.frame[0].toUpperCase() + cfg.frame.slice(1)],
-                      ['Glass',    GLASS_PACKAGES.find(g => g.id === cfg.glass)?.label   ?? ''],
-                      ['Hardware', HARDWARE.find(h => h.id === cfg.hardware)?.label      ?? ''],
-                      ['Screen',   SCREENS.find(s => s.id === cfg.screen)?.label         ?? ''],
+                      ['Product', PRODUCT_TYPES.find(t => t.id === cfg.productType)?.label ?? ''],
+                      ['Style', STYLES[cfg.productType]?.find(s => s.id === cfg.style)?.label ?? ''],
+                      ['Size', `${cfg.width}" × ${cfg.height}"`],
+                      ['Frame', cfg.frame[0].toUpperCase() + cfg.frame.slice(1)],
+                      ['Glass', GLASS_PACKAGES.find(g => g.id === cfg.glass)?.label ?? ''],
+                      ['Hardware', HARDWARE.find(h => h.id === cfg.hardware)?.label ?? ''],
+                      ['Screen', SCREENS.find(s => s.id === cfg.screen)?.label ?? ''],
                     ] as [string, string][]).map(([k, v]) => (
                       <div className="cfg-summary__row" key={k}>
                         <div className="cfg-summary__k">{k}</div>
@@ -832,7 +832,7 @@ export default function App() {
                 className={[
                   'cfg-steps__item',
                   i === stepIdx ? 'is-active' : '',
-                  i < stepIdx  ? 'is-done'   : '',
+                  i < stepIdx ? 'is-done' : '',
                 ].filter(Boolean).join(' ')}
                 onClick={() => setStepIdx(i)}
               >
