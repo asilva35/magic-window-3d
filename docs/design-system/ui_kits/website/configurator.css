@@ -1,55 +1,7 @@
 /* ──────────────────────────────────────────────────────────────────
-   Magic™ — Product configurator styles
-   Layered on top of tokens.css and components.css.
+   magic™ — Product configurator styles
+   Layered on top of ../../colors_and_type.css and ./styles.css.
    ────────────────────────────────────────────────────────────────── */
-
-/* ── Loading screen ──────────────────────────────────────────────── */
-.loading-screen {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ffffff;
-  will-change: transform;
-}
-
-.loading-screen__content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 32px;
-  width: 320px;
-}
-
-.loading-screen__logo {
-  width: 200px;
-  height: auto;
-}
-
-.loading-screen__track {
-  width: 100%;
-  height: 3px;
-  background: #e8eaf0;
-  border-radius: 99px;
-  overflow: hidden;
-}
-
-.loading-screen__fill {
-  height: 100%;
-  width: 0%;
-  background: var(--magic-dark-blue);
-  border-radius: 99px;
-}
-
-.loading-screen__label {
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: #8a90a4;
-  letter-spacing: 0.02em;
-  margin: -16px 0 0;
-}
 
 .cfg {
   display: flex; flex-direction: column;
@@ -109,16 +61,55 @@
     radial-gradient(80% 80% at 50% 60%, #FFFFFF 0%, #F4F6FA 60%, #E8ECF3 100%);
   border-right: 1px solid var(--magic-grey-line);
   overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
 }
+.cfg__stage {
+  position: relative; width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.cfg__stage-bg {
+  position: absolute; inset: 0;
+  background: url("../../assets/kitchen-hero.jpg") center / cover;
+  opacity: 0.18;
+  filter: saturate(0.6);
+}
+.cfg__product {
+  position: relative; z-index: 1;
+  max-width: 64%; max-height: 70%;
+  width: 540px;
+  display: flex;
+  filter: drop-shadow(0 24px 36px rgba(0,19,78,0.18));
+  --frame: #F4F5F7;
+  transition: aspect-ratio var(--dur-slow) var(--ease-emph);
+}
+.cfg__window {
+  width: 100%; height: 100%;
+  display: block;
+}
+.cfg__product-caption {
+  position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--magic-grey-line);
+  border-radius: 5px;
+  padding: 8px 16px;
+  font-family: var(--font-display); font-size: 13px;
+  color: var(--magic-dark-blue);
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+.cfg__product-caption strong { font-weight: 900; }
 
-/* R3F Canvas fills the viewport cell */
-.cfg__viewport > div,
-.cfg__viewport canvas {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
+.cfg__zip {
+  position: absolute; top: 18px; left: 20px; z-index: 2;
+  background: #fff; border: 1px solid var(--magic-grey-line);
+  border-radius: 5px; padding: 8px 14px;
+  box-shadow: 0 1px 2px rgba(0,27,112,0.04);
 }
+.cfg__zip-label {
+  font-family: var(--font-display); font-size: 9px;
+  letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.6;
+}
+.cfg__zip-value { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: var(--magic-dark-blue); }
 
 .cfg__tools {
   position: absolute; bottom: 22px; right: 20px;
@@ -129,7 +120,6 @@
   background: #fff; border: 1px solid var(--magic-grey-line);
   border-radius: 5px; color: var(--magic-dark-blue);
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
 }
 .cfg__tool svg { width: 16px; height: 16px; }
 .cfg__tool:hover { background: var(--magic-blue-shade-2); }
@@ -143,11 +133,10 @@
   font-family: var(--font-display); font-weight: 700; font-size: 11px;
   color: var(--magic-dark-blue);
   letter-spacing: 0.04em;
-  cursor: pointer;
 }
 .cfg__viewport-chip:hover { background: var(--magic-blue-shade-2); }
 
-/* ── Panel (centre) ─────────────────────────────────────────── */
+/* ── Panel (centre right) ───────────────────────────────────── */
 .cfg__panel {
   background: #fff;
   border-right: 1px solid var(--magic-grey-line);
@@ -227,7 +216,7 @@
   margin-top: 2px;
 }
 
-/* ── Size / scale controls ──────────────────────────────────── */
+/* ── Size step ──────────────────────────────────────────────── */
 .cfg-size {
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
   gap: 18px; margin-bottom: 28px;
@@ -249,7 +238,7 @@
   width: 28px; height: 28px; border-radius: 3px;
   border: 1px solid var(--magic-dark-blue); background: #fff;
   font-family: var(--font-display); font-weight: 900; font-size: 16px;
-  color: var(--magic-dark-blue); cursor: pointer;
+  color: var(--magic-dark-blue);
 }
 .cfg-size__btn:hover { background: var(--magic-dark-blue); color: #fff; }
 .cfg-size__value {
@@ -264,7 +253,33 @@
   color: var(--magic-dark-blue); padding-top: 26px;
 }
 
-/* ── Lists (option rows) ────────────────────────────────────── */
+.cfg-help__row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: center;
+}
+.cfg-help__diagram {
+  background: var(--magic-blue-shade-2);
+  border-radius: 5px; padding: 16px;
+  height: 220px;
+  display: flex; align-items: center; justify-content: center;
+}
+.cfg-help__win {
+  background: linear-gradient(135deg, #C7D2EC 0%, #E8F1F8 50%, #6AC3E7 100%);
+  border: 4px solid var(--magic-dark-blue);
+  border-radius: 3px;
+  position: relative;
+  transition: width var(--dur-slow) var(--ease-emph), height var(--dur-slow) var(--ease-emph);
+}
+.cfg-help__dim {
+  position: absolute;
+  font-family: var(--font-display); font-weight: 700; font-size: 11px;
+  letter-spacing: 0.06em; color: var(--magic-dark-blue);
+  background: #fff; padding: 2px 6px; border-radius: 3px;
+}
+.cfg-help__dim--w { top: -10px; left: 50%; transform: translateX(-50%); }
+.cfg-help__dim--h { left: -16px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
+.cfg-help__text p { font-size: 13px; line-height: 1.55; margin: 0 0 8px; }
+
+/* ── Lists (glass/hardware/screen rows) ─────────────────────── */
 .cfg-list { display: flex; flex-direction: column; gap: 8px; }
 .cfg-row {
   display: flex; gap: 14px; align-items: center;
@@ -335,7 +350,7 @@
   color: var(--magic-dark-blue);
 }
 
-/* ── Stepper rail (far right) ──────────────────────────────── */
+/* ── Stepper (far right rail) ──────────────────────────────── */
 .cfg-steps {
   background: #F8F9FB;
   border-left: 1px solid var(--magic-grey-line);
@@ -358,7 +373,9 @@
   border-left-color: var(--magic-dark-blue);
 }
 .cfg-steps__item.is-done { opacity: 0.85; }
-.cfg-steps__item.is-done .cfg-steps__glyph { background: var(--magic-blue-shade-2); }
+.cfg-steps__item.is-done .cfg-steps__glyph {
+  background: var(--magic-blue-shade-2);
+}
 .cfg-steps__glyph {
   width: 40px; height: 40px;
   display: flex; align-items: center; justify-content: center;
@@ -383,7 +400,7 @@
   border-top: 1px solid var(--magic-grey-line);
 }
 .cfg__back { padding: 11px 22px; font-size: 13px; }
-.cfg__back:disabled { opacity: 0.4; cursor: not-allowed; }
+.cfg__back[disabled] { opacity: 0.4; cursor: not-allowed; }
 .cfg__progress {
   flex: 1;
   font-family: var(--font-display); font-weight: 700; font-size: 12px;

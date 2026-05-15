@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Magic — Color: Primary</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: #fff; font-family: var(--font-body); color: var(--fg); }
+  .card { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; box-sizing: border-box; }
+  .swatch { border-radius: 6px; padding: 16px; min-height: 92px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; }
+  .swatch .name { font-family: var(--font-display); font-weight: 900; font-size: 14px; }
+  .swatch .hex  { font-family: var(--font-body); font-size: 11px; opacity: 0.85; letter-spacing: 0.04em; }
+  .on-dark  { color: #fff; }
+  .on-light { color: var(--magic-dark-blue); border: 1px solid var(--magic-grey-line); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="swatch on-dark" style="background:#001B70">
+      <div class="name">Dark Blue Magic</div>
+      <div class="hex">#001B70 · rgb(0, 27, 112)</div>
+    </div>
+    <div class="swatch on-dark" style="background:#00134E">
+      <div class="name">Deep Blue (pressed)</div>
+      <div class="hex">#00134E · rgb(0, 19, 78)</div>
+    </div>
+    <div class="swatch on-light" style="background:#6AC3E7">
+      <div class="name">Light Blue Magic</div>
+      <div class="hex">#6AC3E7 · rgb(106, 195, 231)</div>
+    </div>
+    <div class="swatch on-light" style="background:#FFFFFF">
+      <div class="name">White</div>
+      <div class="hex">#FFFFFF</div>
+    </div>
+  </div>
+</body>
+</html>

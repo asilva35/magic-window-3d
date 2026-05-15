@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Magic — Form inputs</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: #fff; color: var(--magic-dark-blue); }
+  .card { padding: 22px 28px; box-sizing: border-box; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  .group { display: flex; flex-direction: column; gap: 6px; }
+  .legend { font-family: var(--font-display); font-weight: 400; font-size: 16px; }
+  .field { border-radius: 3px; padding: 9px 12px; background: #fff; font-family: var(--font-body); font-size: 12px; color: var(--magic-dark-blue); }
+  .active { border: 0.5px solid #6AC3E7; }
+  .error  { border: 0.5px solid #FF0000; }
+  .label  { border: 0.5px solid #ADADAD; }
+  .help { font-family: var(--font-body); font-size: 10px; opacity: 0.55; margin-top: -2px; }
+  .err-help { color: #FF0000; opacity: 1; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="group">
+      <div class="legend">Active</div>
+      <input class="field active" value="Steven S." />
+      <div class="help">Border #6AC3E7 · 0.5 px</div>
+    </div>
+    <div class="group">
+      <div class="legend">Error</div>
+      <input class="field error" value="" placeholder="" />
+      <div class="help err-help">Please enter your name.</div>
+    </div>
+    <div class="group">
+      <div class="legend">Label</div>
+      <input class="field label" placeholder="Name" />
+      <div class="help">Border #ADADAD · 0.5 px</div>
+    </div>
+  </div>
+</body>
+</html>

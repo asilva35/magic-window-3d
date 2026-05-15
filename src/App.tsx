@@ -2,6 +2,7 @@ import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, useGLTF, Stats } from '@react-three/drei'
 import { Suspense, useEffect, useState, useRef, useMemo } from 'react'
 import * as THREE from 'three'
+import { LoadingScreen } from './LoadingScreen'
 
 type InitData = { c1z: number; c2z: number; moldMin: number; moldMax: number }
 
@@ -160,7 +161,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
 }
 
 function GroupDoors({ ms1 = 1, ms2 = 1, ms3 = 0.5, ms4 = 1, ...props }: {
-  ms1?: number; ms2?: number; ms3?: number; ms4?: number; [key: string]: any
+  ms1?: number; ms2?: number; ms3?: number; ms4?: number;[key: string]: any
 }) {
   const SPACING = 17
 
@@ -285,12 +286,12 @@ export default function App() {
 
   return (
     <div className="mw-app">
+      <LoadingScreen />
 
       {/* Nav */}
       <nav className="mw-nav">
         <div className="mw-nav__brand">
-          <span className="mw-wordmark">Magic</span>
-          <span className="mw-tm">™</span>
+          <img src="/assets/images/logo.png" alt="Magic" className="mw-nav__logo" />
         </div>
         <div className="mw-nav__cta">
           <button className="mw-btn mw-btn--ghost">Save Configuration</button>
@@ -324,7 +325,7 @@ export default function App() {
             <Canvas shadows>
               <Suspense fallback={null}>
                 <PerspectiveCamera makeDefault position={[10, 0, 60]} fov={60} />
-                <Stats />
+                {/* <Stats /> */}
                 <directionalLight position={[0, 5, 90]} intensity={1.5} />
                 <GroupDoors ms1={ms1} ms2={ms2} ms3={ms3} ms4={ms4} />
                 <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} />
@@ -337,12 +338,12 @@ export default function App() {
             <div className="cfg__tools">
               <button title="Rotate" className="cfg__tool">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-                  <path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/>
+                  <path d="M21 12a9 9 0 1 1-3-6.7" /><path d="M21 4v5h-5" />
                 </svg>
               </button>
               <button title="Fullscreen" className="cfg__tool">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-                  <path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6"/>
+                  <path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6" />
                 </svg>
               </button>
             </div>

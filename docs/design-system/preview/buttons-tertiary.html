@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Magic — Buttons: Tertiary "Give us a call"</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: #fff; color: var(--magic-dark-blue); }
+  .card { padding: 22px 28px; box-sizing: border-box; display: grid; grid-template-columns: auto auto auto; gap: 16px 20px; align-items: center; }
+  .label { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.55; }
+  .btn {
+    font-family: var(--font-display); font-weight: 700; font-size: 12px;
+    border-radius: 5px; padding: 12px 55px;
+    cursor: pointer; line-height: 1; text-decoration: underline;
+    background: #DDDEDF; border: 1px solid #001B70; color: #001B70;
+  }
+  .hover { background: #C7D2EC; }
+  .label-state { background: #DDDEDF; text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="label">Default</div>
+    <div class="label">Hover</div>
+    <div class="label">Label</div>
+    <button class="btn">Give us a call</button>
+    <button class="btn hover">Give us a call</button>
+    <button class="btn label-state">Give us a call</button>
+  </div>
+</body>
+</html>

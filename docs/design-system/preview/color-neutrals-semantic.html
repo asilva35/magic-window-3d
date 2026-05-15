@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Magic — Color: Neutrals & semantic</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: #fff; font-family: var(--font-body); }
+  .card { padding: 20px 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; box-sizing: border-box; }
+  .swatch { border-radius: 6px; padding: 12px; min-height: 84px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; border: 1px solid rgba(0,27,112,0.08); }
+  .swatch .name { font-family: var(--font-display); font-weight: 900; font-size: 12px; color: var(--magic-dark-blue); }
+  .swatch .hex  { font-family: var(--font-body); font-size: 10px; color: var(--magic-dark-blue); opacity: 0.7; }
+  .swatch.on-dark .name, .swatch.on-dark .hex { color: #fff; opacity: 1; }
+  .gradient {
+    background: linear-gradient(180deg, rgba(199,210,236,0.30) 0%, #E1E1E1 100%);
+    border: 1px solid #6581B8;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="swatch" style="background:#ADADAD">
+      <div class="name">Grey</div><div class="hex">#ADADAD</div>
+    </div>
+    <div class="swatch" style="background:#DDDEDF">
+      <div class="name">Grey Soft</div><div class="hex">#DDDEDF</div>
+    </div>
+    <div class="swatch" style="background:#E1E1E1">
+      <div class="name">Grey Line</div><div class="hex">#E1E1E1</div>
+    </div>
+    <div class="swatch on-dark" style="background:#FF0000">
+      <div class="name">Error</div><div class="hex">#FF0000</div>
+    </div>
+    <div class="swatch gradient" style="grid-column: span 2;">
+      <div class="name">Soft Gradient</div><div class="hex">#C7D2EC 30% → #E1E1E1 100%</div>
+    </div>
+    <div class="swatch" style="background:#FFFFFF; border: 1px solid #001B70;">
+      <div class="name">White</div><div class="hex">#FFFFFF · 1 px navy border</div>
+    </div>
+    <div class="swatch on-dark" style="background:#001B70">
+      <div class="name">Dark Blue</div><div class="hex">primary brand</div>
+    </div>
+  </div>
+</body>
+</html>

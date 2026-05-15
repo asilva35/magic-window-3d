@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>magic™ Windows &amp; Doors — UI kit</title>
+<link rel="stylesheet" href="../../colors_and_type.css" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="components/TopNav.jsx"></script>
+<script type="text/babel" src="components/Hero.jsx"></script>
+<script type="text/babel" src="components/ProductGrid.jsx"></script>
+<script type="text/babel" src="components/TrustStrip.jsx"></script>
+<script type="text/babel" src="components/FeatureBlock.jsx"></script>
+<script type="text/babel" src="components/QuoteForm.jsx"></script>
+<script type="text/babel" src="components/Footer.jsx"></script>
+
+<script type="text/babel">
+const ASSETS = "../../assets/";
+
+const PRODUCTS = [
+  { id: "windows", title: "Windows",      sub: "Trusted in Ontario since 1979.",      image: ASSETS + "kitchen-hero.jpg" },
+  { id: "walls",   title: "Window Walls", sub: "Canadian made for Canadian climate.", image: ASSETS + "patio-doors-hero.jpg" },
+  { id: "patio",   title: "Patio Doors",  sub: "The ultra smooth sliding door.",      image: ASSETS + "patio-doors-hero.jpg" },
+  { id: "front",   title: "Front Doors",  sub: "The ultimate entry door is here.",    image: ASSETS + "kitchen-hero.jpg" },
+];
+
+function App() {
+  const [active, setActive]   = React.useState("home");
+  const [quoteOpen, setQuote] = React.useState(false);
+
+  return (
+    <div className="mw-app">
+      <TopNav active={active} onNavigate={setActive} onQuote={() => setQuote(true)} />
+
+      <Hero
+        eyebrow="Revolutionary innovation"
+        title="Windows"
+        subtitle="Trusted in Ontario since 1979."
+        image={ASSETS + "kitchen-hero.jpg"}
+        ctaPrimary="Book a Quote"
+        ctaSecondary="Learn More"
+        onPrimary={() => setQuote(true)}
+        onSecondary={() => setActive("windows")}
+      />
+
+      <ProductGrid items={PRODUCTS} onSelect={(id) => setActive(id)} />
+
+      <TrustStrip />
+
+      <FeatureBlock
+        eyebrow="The hardware"
+        title="Never wrestle with a crank again."
+        body="Cranks are mechanically flawed. They strip, loosen and break over time. Our patented Parallex® hardware eliminates outdated cranks with a simple push out mechanism. No cranks, no problems."
+        image={ASSETS + "kitchen-hero.jpg"}
+        side="left"
+        action={{ label: "Book a Quote", onClick: () => setQuote(true) }}
+      />
+
+      <FeatureBlock
+        eyebrow="Made in Canada"
+        title="40 year warranty."
+        body="Magic windows and doors are built to last. Buy once, use them forever, and pass it down to the next generation with 40 years of coverage on all parts and labour."
+        image={ASSETS + "patio-doors-hero.jpg"}
+        side="right"
+        action={{ label: "Get my free estimate", onClick: () => setQuote(true) }}
+      />
+
+      <section className="mw-form-wrap">
+        <div className="mw-form-wrap__left">
+          <div className="mw-eyebrow">Call us now for a free quote</div>
+          <h2>Ready to see Magic?</h2>
+          <p>Drop your information and we'll contact you to book a free in-home consultation.</p>
+          <a className="mw-form-wrap__phone" href="tel:1-866-65-62442">1-866-OK-MAGIC</a>
+        </div>
+        <QuoteForm />
+      </section>
+
+      <Footer />
+
+      {quoteOpen && (
+        <div className="mw-modal" onClick={() => setQuote(false)}>
+          <div className="mw-modal__card" onClick={(e) => e.stopPropagation()}>
+            <button className="mw-modal__close" onClick={() => setQuote(false)}>×</button>
+            <QuoteForm onSubmit={() => setTimeout(() => setQuote(false), 1800)} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

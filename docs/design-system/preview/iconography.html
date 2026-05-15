@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Magic — Iconography</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: #fff; color: var(--magic-dark-blue); font-family: var(--font-body); }
+  .card { padding: 20px 24px; box-sizing: border-box; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .group { border: 1px solid #E1E1E1; border-radius: 5px; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .group img { display: block; }
+  .title { font-family: var(--font-display); font-weight: 700; font-size: 12px; }
+  .meta  { font-size: 10px; opacity: 0.6; text-align: center; }
+  .product-icons { display: flex; gap: 16px; align-items: center; justify-content: center; }
+  .product-icons img { height: 56px; width: auto; }
+  .glyphs { display: flex; gap: 18px; align-items: center; justify-content: center; height: 56px; }
+  .glyphs img { width: 26px; height: 26px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="group">
+      <div class="product-icons">
+        <img src="../assets/windows-icon.png" alt="windows" />
+        <img src="../assets/window-walls-icon.png" alt="walls" />
+        <img src="../assets/patio-doors-icon.png" alt="doors" />
+      </div>
+      <div class="title">Product icons</div>
+      <div class="meta">Photo-real product renders on transparent</div>
+    </div>
+    <div class="group">
+      <div class="glyphs">
+        <img src="../assets/photos-icon.svg" alt="photos" />
+        <img src="../assets/videos-icon.svg" alt="videos" />
+        <img src="../assets/discovery-icon.svg" alt="discover" />
+      </div>
+      <div class="title">UI glyphs</div>
+      <div class="meta">Thin-stroke SVG (Photos · Videos · Discover)</div>
+    </div>
+    <div class="group">
+      <div class="glyphs" style="gap:10px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#001B70" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#001B70" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#001B70" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#001B70" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </div>
+      <div class="title">Lucide (fallback)</div>
+      <div class="meta">Generic UI icons · stroke 1.75</div>
+    </div>
+  </div>
+</body>
+</html>

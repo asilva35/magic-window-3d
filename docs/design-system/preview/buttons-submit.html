@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Magic — Buttons: Submit</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: #fff; color: var(--magic-dark-blue); }
+  .card { padding: 22px 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; }
+  .row { display: flex; align-items: center; gap: 22px; }
+  .legend { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.55; width: 110px; }
+  .btn {
+    font-family: var(--font-display); font-weight: 700; font-size: 12px;
+    color: #fff; border: 0; border-radius: 3px; padding: 9px 50px;
+    cursor: pointer; line-height: 1; text-decoration: underline;
+    background: #00134E;
+  }
+  .btn--info { padding: 12px 41px; border-radius: 5px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="row">
+      <div class="legend">Submit C · 3 px</div>
+      <button class="btn">Call</button>
+      <button class="btn" style="padding: 9px 30px">Submit</button>
+    </div>
+    <div class="row">
+      <div class="legend">Submit Info · 5 px</div>
+      <button class="btn btn--info">Submit Information</button>
+    </div>
+  </div>
+</body>
+</html>

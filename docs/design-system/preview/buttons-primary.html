@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Magic — Buttons: Primary</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: #fff; color: var(--magic-dark-blue); }
+  .card { padding: 22px 28px; box-sizing: border-box; display: grid; grid-template-columns: auto auto auto; gap: 18px 22px; align-items: center; }
+  .label { font-family: var(--font-display); font-weight: 400; font-size: 14px; color: var(--magic-dark-blue); opacity: 0.85; }
+  .btn-quote {
+    font-family: var(--font-display); font-weight: 700; font-size: 16px;
+    color: #fff; border: 0; border-radius: 5px; padding: 12px 45px;
+    cursor: pointer; line-height: 1; text-decoration: underline;
+  }
+  .state-default { background: #00134E; }
+  .state-hover   { background: #001B70; }
+  .state-label   { background: #001B70; text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="label">Default</div>
+    <div class="label">Hover</div>
+    <div class="label">Label</div>
+    <button class="btn-quote state-default">Get a Quote</button>
+    <button class="btn-quote state-hover">Get a Quote</button>
+    <button class="btn-quote state-label">Get a Quote</button>
+  </div>
+</body>
+</html>

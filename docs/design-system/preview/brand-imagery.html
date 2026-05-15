@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Magic — Imagery</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: #fff; }
+  .card { padding: 18px 24px; box-sizing: border-box; display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+  .frame { border-radius: 5px; overflow: hidden; background: #001B70; }
+  .frame img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .right { display: flex; flex-direction: column; gap: 14px; }
+  .right .frame { aspect-ratio: 4 / 3; }
+  .meta { font-family: var(--font-body); font-size: 10px; color: var(--magic-dark-blue); opacity: 0.6; }
+  .row { display: flex; flex-direction: column; gap: 6px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="row">
+      <div class="frame" style="aspect-ratio: 16/9"><img src="../assets/kitchen-hero.jpg" alt="kitchen with Magic window" /></div>
+      <div class="meta">Editorial interiors · cool grade · window front-and-centre</div>
+    </div>
+    <div class="right">
+      <div class="frame"><img src="../assets/patio-doors-hero.jpg" alt="patio door" /></div>
+      <div class="frame" style="background:#001B70; display:flex; align-items:center; justify-content:center;">
+        <svg viewBox="0 0 480 180" width="80%" preserveAspectRatio="xMidYMid meet"><text x="0" y="138" style="font-family: 'Mulish', sans-serif; font-weight:900; font-size:138px; letter-spacing:-4px; fill:#fff;">magic</text></svg>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

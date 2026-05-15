@@ -1,0 +1,160 @@
+/* ──────────────────────────────────────────────────────────────────
+   Magic™ Windows & Doors — Colors & Type tokens
+   Source of truth: Style Guide.fig + magicwindow.ca
+   ──────────────────────────────────────────────────────────────────
+   FONT SUBSTITUTION FLAG:
+   The brand uses **Harmonia Sans Pro** (Monotype, paid). Until a
+   licensed copy is supplied, we substitute **Mulish** (Google Fonts) —
+   a geometric humanist sans with similar proportions, terminals and
+   x-height. Body type **Open Sans** is the real brand font.
+   ────────────────────────────────────────────────────────────────── */
+
+@import url("https://fonts.googleapis.com/css2?family=Mulish:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap");
+
+:root {
+  /* ── BRAND COLORS ────────────────────────────────────────────── */
+
+  /* Primary */
+  --magic-dark-blue:        #001B70;   /* "Dark Blue Magic"  — primary brand */
+  --magic-deep-blue:        #00134E;   /* clicked/pressed state              */
+
+  /* Secondary */
+  --magic-light-blue:       #6AC3E7;   /* "Light Blue Magic" — accent / line */
+
+  /* Blue scale (supporting) */
+  --magic-blue-shade-1:     #6581B8;   /* mid-tone (line dividers, secondary)*/
+  --magic-blue-shade-2:     #C7D2EC;   /* soft tint (chip bg, surfaces)      */
+  --magic-blue-shade-3:     #B7C5E7;   /* alt soft tint                      */
+
+  /* Neutrals */
+  --magic-white:            #FFFFFF;
+  --magic-grey:             #ADADAD;   /* form borders / disabled            */
+  --magic-grey-soft:        #DDDEDF;   /* tertiary button bg                 */
+  --magic-grey-line:        #E1E1E1;   /* subtle divider                     */
+
+  /* Semantic */
+  --magic-error:            #FF0000;   /* form error stroke                  */
+  --magic-success:          #2E8B57;   /* (system extension; not in fig)     */
+
+  /* Gradient — soft brand surface */
+  --magic-soft-gradient:    linear-gradient(180deg, rgba(199,210,236,0.30) 0%, #E1E1E1 100%);
+
+  /* ── SEMANTIC ROLES ──────────────────────────────────────────── */
+  --bg:                     var(--magic-white);
+  --bg-elevated:            var(--magic-white);
+  --bg-deep:                var(--magic-dark-blue);   /* navy hero / footer  */
+  --bg-soft:                var(--magic-blue-shade-2);
+
+  --fg:                     var(--magic-dark-blue);   /* nearly all text     */
+  --fg-on-dark:             var(--magic-white);
+  --fg-muted:               var(--magic-blue-shade-1);
+  --fg-disabled:            var(--magic-grey);
+
+  --border:                 var(--magic-grey);
+  --border-accent:          var(--magic-light-blue);  /* active inputs       */
+  --border-error:           var(--magic-error);
+  --divider:                var(--magic-grey-line);
+
+  /* ── TYPE FAMILIES ───────────────────────────────────────────── */
+  --font-display:           "Mulish", "Harmonia Sans Pro", "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body:              "Open Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Weights */
+  --fw-regular: 400;
+  --fw-bold:    700;
+  --fw-black:   900;
+
+  /* ── TYPE SCALE (from Figma Style Guide) ─────────────────────── */
+  /* Headings — Harmonia Sans Pro Black                              */
+  --fs-h1: 64px;  /* Mobile/Heading 1 */
+  --fs-h2: 50px;
+  --fs-h3: 40px;
+  --fs-h4: 34px;
+  --fs-h5: 24px;
+  --fs-h6: 16px;
+  --fs-h7: 14px;
+
+  /* Sub-Headings — Harmonia Sans Pro Regular */
+  --fs-sub-1: 60px;
+  --fs-sub-2: 34px;
+  --fs-sub-3: 28px;
+  --fs-sub-4: 20px;
+  --fs-sub-5: 16px;
+  --fs-sub-6: 14px;
+
+  /* Body — Open Sans Regular */
+  --fs-body-1: 16px;
+  --fs-body-2: 14px;
+  --fs-body-3: 12px;
+  --fs-body-4: 8px;   /* fine print / disclaimers only */
+
+  /* Line heights — Figma uses 100% across the board for headings;
+     we relax body slightly for readability. */
+  --lh-tight:  1;
+  --lh-snug:   1.15;
+  --lh-body:   1.55;
+
+  /* ── SPACING / RADII / SHADOW ────────────────────────────────── */
+  /* No spacing scale was defined in Figma; these match observed values. */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   21px;  /* button row gap from style guide */
+  --space-6:   24px;
+  --space-7:   31px;
+  --space-8:   40px;
+  --space-9:   48px;
+
+  /* Radii (from buttons + inputs in Figma) */
+  --radius-xs: 3px;   /* form inputs, Submit C button   */
+  --radius-sm: 5px;   /* primary buttons, swatches      */
+  --radius-md: 8px;   /* soft-gradient surface          */
+  --radius-pill: 999px;
+
+  /* Borders */
+  --border-hairline: 0.5px;   /* form inputs                 */
+  --border-thin:     0.7px;   /* form inputs (alt)           */
+  --border-standard: 1px;     /* button border, dividers     */
+
+  /* Shadows — the brand uses minimal shadow; reserved for elevation */
+  --shadow-sm: 0 1px 2px rgba(0,27,112,0.06), 0 1px 1px rgba(0,27,112,0.04);
+  --shadow-md: 0 4px 16px rgba(0,27,112,0.08), 0 1px 2px rgba(0,27,112,0.04);
+  --shadow-lg: 0 12px 40px rgba(0,27,112,0.14);
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --ease-emph:     cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast:      120ms;
+  --dur-base:      200ms;
+  --dur-slow:      360ms;
+}
+
+/* ── SEMANTIC TYPE CLASSES ─────────────────────────────────────── */
+.h1, h1 { font-family: var(--font-display); font-weight: var(--fw-black);   font-size: var(--fs-h1); line-height: var(--lh-snug); color: var(--fg); margin: 0; }
+.h2, h2 { font-family: var(--font-display); font-weight: var(--fw-black);   font-size: var(--fs-h2); line-height: var(--lh-snug); color: var(--fg); margin: 0; }
+.h3, h3 { font-family: var(--font-display); font-weight: var(--fw-black);   font-size: var(--fs-h3); line-height: var(--lh-snug); color: var(--fg); margin: 0; }
+.h4, h4 { font-family: var(--font-display); font-weight: var(--fw-black);   font-size: var(--fs-h4); line-height: var(--lh-snug); color: var(--fg); margin: 0; }
+.h5, h5 { font-family: var(--font-display); font-weight: var(--fw-black);   font-size: var(--fs-h5); line-height: var(--lh-snug); color: var(--fg); margin: 0; }
+.h6, h6 { font-family: var(--font-display); font-weight: var(--fw-black);   font-size: var(--fs-h6); line-height: var(--lh-snug); color: var(--fg); margin: 0; }
+
+.sub-1 { font-family: var(--font-display); font-weight: var(--fw-regular); font-size: var(--fs-sub-1); line-height: var(--lh-snug); color: var(--fg); }
+.sub-2 { font-family: var(--font-display); font-weight: var(--fw-regular); font-size: var(--fs-sub-2); line-height: var(--lh-snug); color: var(--fg); }
+.sub-3 { font-family: var(--font-display); font-weight: var(--fw-regular); font-size: var(--fs-sub-3); line-height: var(--lh-snug); color: var(--fg); }
+.sub-4 { font-family: var(--font-display); font-weight: var(--fw-regular); font-size: var(--fs-sub-4); line-height: var(--lh-snug); color: var(--fg); }
+.sub-5 { font-family: var(--font-display); font-weight: var(--fw-regular); font-size: var(--fs-sub-5); line-height: var(--lh-snug); color: var(--fg); }
+.sub-6 { font-family: var(--font-display); font-weight: var(--fw-regular); font-size: var(--fs-sub-6); line-height: var(--lh-snug); color: var(--fg); }
+
+.body-1, p { font-family: var(--font-body); font-weight: var(--fw-regular); font-size: var(--fs-body-1); line-height: var(--lh-body); color: var(--fg); margin: 0; }
+.body-2    { font-family: var(--font-body); font-weight: var(--fw-regular); font-size: var(--fs-body-2); line-height: var(--lh-body); color: var(--fg); }
+.body-3    { font-family: var(--font-body); font-weight: var(--fw-regular); font-size: var(--fs-body-3); line-height: var(--lh-body); color: var(--fg); }
+.fine      { font-family: var(--font-body); font-weight: var(--fw-regular); font-size: var(--fs-body-4); line-height: var(--lh-body); color: var(--fg-muted); }
+
+.eyebrow {
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg);
+}

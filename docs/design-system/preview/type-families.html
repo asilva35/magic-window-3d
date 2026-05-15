@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Magic — Type: Families</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: #fff; color: var(--magic-dark-blue); }
+  .card { padding: 24px 28px; box-sizing: border-box; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .pane { border: 1px solid #E1E1E1; border-radius: 5px; padding: 16px 18px; }
+  .label { font-family: var(--font-body); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.7; margin-bottom: 12px; }
+  .name  { font-family: var(--font-display); font-weight: 900; font-size: 28px; line-height: 1; }
+  .body-name { font-family: var(--font-body); font-weight: 400; font-size: 28px; line-height: 1; }
+  .meta  { margin-top: 10px; font-family: var(--font-body); font-size: 11px; opacity: 0.65; }
+  .weights { margin-top: 12px; display: flex; gap: 14px; flex-wrap: wrap; font-family: var(--font-display); }
+  .weights span { font-size: 14px; }
+  .flag { display: inline-block; background: #C7D2EC; color: #001B70; font-size: 10px; padding: 3px 7px; border-radius: 999px; margin-left: 6px; vertical-align: middle; letter-spacing: 0.04em; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="pane">
+      <div class="label">Display</div>
+      <div class="name">Aa — Mulish <span class="flag">substitute</span></div>
+      <div class="weights">
+        <span style="font-weight:400">Regular</span>
+        <span style="font-weight:700">Bold</span>
+        <span style="font-weight:900">Black</span>
+      </div>
+      <div class="meta">Brand uses Harmonia Sans Pro (paid). Mulish is the nearest Google Fonts match.</div>
+    </div>
+    <div class="pane">
+      <div class="label">Body</div>
+      <div class="body-name">Aa — Open Sans</div>
+      <div class="weights" style="font-family: var(--font-body)">
+        <span style="font-weight:400">Regular</span>
+        <span style="font-weight:600">Semibold</span>
+        <span style="font-weight:700">Bold</span>
+      </div>
+      <div class="meta">Used for paragraph text, labels, fine print. Genuine brand font.</div>
+    </div>
+  </div>
+</body>
+</html>
