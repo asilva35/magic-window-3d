@@ -35,22 +35,30 @@ function Moulding({ moldScale, onTipZ, color = '#2c2c2c', ...props }: {
         corner01Ref.current = child
         c1z = child.position.z
       }
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh
-        if (mesh.material && !Array.isArray(mesh.material)) {
-          mesh.material = mesh.material.clone()
-          const mat = mesh.material as THREE.MeshStandardMaterial
-          if (mat.color) mat.color.set(color)
-          if (mat.roughness !== undefined) mat.roughness = 0.3
-          if (mat.metalness !== undefined) mat.metalness = 0.1
-        }
-      }
       if (child.name === 'corner-02') {
         corner02Ref.current = child
         c2z = child.position.z
       }
     })
     setInitData({ c1z, c2z, moldMin, moldMax })
+  }, [clone])
+
+  useEffect(() => {
+    clone.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh
+        if (mesh.material && !Array.isArray(mesh.material)) {
+          if (!mesh.userData.materialCloned) {
+            mesh.material = mesh.material.clone()
+            mesh.userData.materialCloned = true
+          }
+          const mat = mesh.material as THREE.MeshStandardMaterial
+          if (mat.color) mat.color.set(color)
+          if (mat.roughness !== undefined) mat.roughness = 0.3
+          if (mat.metalness !== undefined) mat.metalness = 0.1
+        }
+      }
+    })
   }, [clone, color])
 
   useEffect(() => {
@@ -320,6 +328,41 @@ const SCREENS = [
   { id: 'none', label: 'No Screen', sub: 'Skip the screen', price: -60 },
 ]
 
+type DoorModelDef = {
+  id: string
+  label: string
+  sub: string
+  color: string
+  panels: PanelConfig[]
+}
+
+const DOOR_MODELS: DoorModelDef[] = [
+  {
+    id: 'orleans', label: 'Orleans', sub: '2 panels · top + bottom', color: '#2c2c2c',
+    panels: [{ y: 4.0, moldScale: 1, moldScale2: 1 }, { y: -7.5, moldScale: 0.5, moldScale2: 1 }],
+  },
+  {
+    id: 'uno', label: 'Uno', sub: '1 large panel', color: '#e86253',
+    panels: [{ y: 1, moldScale: 3.0, moldScale2: 1.2 }],
+  },
+  {
+    id: 'london', label: 'London', sub: '2 equal panels', color: '#f0ede5',
+    panels: [{ y: 7, moldScale: 0.85, moldScale2: 1.0 }, { y: -2, moldScale: 0.85, moldScale2: 1.0 }],
+  },
+  {
+    id: 'victoria', label: 'Victoria', sub: '3 panels', color: '#9dbfb2',
+    panels: [{ y: 9, moldScale: 0.7, moldScale2: 1.0 }, { y: 1, moldScale: 0.7, moldScale2: 1.0 }, { y: -7, moldScale: 0.7, moldScale2: 1.0 }],
+  },
+  {
+    id: 'soho', label: 'Soho', sub: '4 panels', color: '#2d5448',
+    panels: [{ y: 10, moldScale: 0.5, moldScale2: 1.0 }, { y: 3, moldScale: 0.5, moldScale2: 1.0 }, { y: -4, moldScale: 0.5, moldScale2: 1.0 }, { y: -11, moldScale: 0.5, moldScale2: 1.0 }],
+  },
+  {
+    id: 'vog', label: 'Vog', sub: 'Solid · no panels', color: '#3d3d3d',
+    panels: [],
+  },
+]
+
 const LITE_PATTERNS: Record<string, Record<string, number[][]>> = {
   window: {
     casement: [[50, 4, 50, 96, 1.8]],
@@ -502,6 +545,7 @@ export default function App() {
   const [ms2, setMs2] = useState(1)
   const [ms3, setMs3] = useState(0.5)
   const [ms4, setMs4] = useState(1)
+  const [doorModel, setDoorModel] = useState('orleans')
   const [stepIdx, setStepIdx] = useState(0)
 
   const price = computePrice(cfg)
@@ -547,9 +591,15 @@ export default function App() {
             {cfg.productType === 'front' ? (
               <Canvas shadows>
                 <Suspense fallback={null}>
-                  <PerspectiveCamera makeDefault position={[10, 0, 60]} fov={60} />
+                  <PerspectiveCamera makeDefault position={[0, 0, 50]} fov={60} />
                   <directionalLight position={[0, 5, 90]} intensity={1.5} />
-                  <GroupDoors ms1={ms1} ms2={ms2} ms3={ms3} ms4={ms4} />
+                  {(() => {
+                    const model = DOOR_MODELS.find(m => m.id === doorModel) ?? DOOR_MODELS[0]
+                    const panels = doorModel === 'orleans'
+                      ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
+                      : model.panels
+                    return <Door color={model.color} panels={panels} />
+                  })()}
                   <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} />
                 </Suspense>
               </Canvas>
@@ -628,8 +678,27 @@ export default function App() {
                     })}
                   </div>
 
-                  {/* Front Door: moulding panel fine-tune */}
+                  {/* Front Door: model selection */}
                   {cfg.productType === 'front' && (
+                    <>
+                      <SectionTitle>Door model</SectionTitle>
+                      <div className="cfg-grid cfg-grid--3col">
+                        {DOOR_MODELS.map(m => (
+                          <OptionTile
+                            key={m.id}
+                            active={doorModel === m.id}
+                            label={m.label}
+                            dimensions={m.sub}
+                            thumb={`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="54" height="54" fill="${m.color}" rx="1"/></svg>`}
+                            onClick={() => setDoorModel(m.id)}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  {/* Orleans: moulding panel fine-tune */}
+                  {cfg.productType === 'front' && doorModel === 'orleans' && (
                     <>
                       <SectionTitle>Panel proportions (3D preview)</SectionTitle>
                       <div className="cfg-size">
