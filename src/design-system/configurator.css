@@ -1,0 +1,85 @@
+/* ──────────────────────────────────────────────────────────────────
+   Magic™ — 3D Configurator shell styles
+   ────────────────────────────────────────────────────────────────── */
+
+.cfg-viewport {
+  width: 100vw;
+  height: 100vh;
+  background: #f0f0f0;
+  position: relative;
+}
+
+/* ── Control panel ───────────────────────────────────────────── */
+.cfg-panel {
+  position: absolute;
+  top: var(--space-5);
+  left: var(--space-5);
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.88);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 210px;
+}
+
+.cfg-panel__section {
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-body-2);
+  color: var(--fg);
+}
+
+.cfg-panel__section ~ .cfg-panel__section {
+  margin-top: var(--space-1);
+}
+
+.cfg-panel__label {
+  font-family: var(--font-body);
+  font-size: var(--fs-body-3);
+  color: var(--fg);
+}
+
+/* ── Range input ─────────────────────────────────────────────── */
+.cfg-panel input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--magic-blue-shade-2);
+  border-radius: var(--radius-pill);
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+}
+
+.cfg-panel input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--magic-dark-blue);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+
+.cfg-panel input[type="range"]::-webkit-slider-thumb:hover {
+  background: var(--magic-light-blue);
+}
+
+.cfg-panel input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--magic-dark-blue);
+  cursor: pointer;
+  border: none;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+
+.cfg-panel input[type="range"]::-moz-range-thumb:hover {
+  background: var(--magic-light-blue);
+}

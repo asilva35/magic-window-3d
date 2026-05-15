@@ -240,40 +240,32 @@ export default function App() {
   const [ms4, setMs4] = useState(1)
 
   return (
-    <div style={{ width: '100vw', height: '100vh', background: '#f0f0f0', position: 'relative' }}>
+    <div className="cfg-viewport">
 
-      <div style={{
-        position: 'absolute', top: 20, left: 20, zIndex: 100,
-        background: 'rgba(255,255,255,0.85)', padding: 15, borderRadius: 8,
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-        display: 'flex', flexDirection: 'column', gap: 8,
-      }}>
-        <label style={{ fontSize: 13, fontWeight: 'bold' }}>Orleans — Top Panel</label>
-        <label style={{ fontSize: 12 }}>Vertical: {ms1.toFixed(1)}</label>
+      <div className="cfg-panel">
+        <label className="cfg-panel__section">Orleans — Top Panel</label>
+        <label className="cfg-panel__label">Vertical: {ms1.toFixed(1)}</label>
         <input type="range" min="0.3" max="1.4" step="0.1" value={ms1}
           onChange={e => setMs1(parseFloat(e.target.value))} />
-        <label style={{ fontSize: 12 }}>Horizontal: {ms2.toFixed(1)}</label>
+        <label className="cfg-panel__label">Horizontal: {ms2.toFixed(1)}</label>
         <input type="range" min="0.3" max="1.4" step="0.1" value={ms2}
           onChange={e => setMs2(parseFloat(e.target.value))} />
 
-        <label style={{ fontSize: 13, fontWeight: 'bold', marginTop: 4 }}>Orleans — Bottom Panel</label>
-        <label style={{ fontSize: 12 }}>Vertical: {ms3.toFixed(1)}</label>
+        <label className="cfg-panel__section">Orleans — Bottom Panel</label>
+        <label className="cfg-panel__label">Vertical: {ms3.toFixed(1)}</label>
         <input type="range" min="0.3" max="1.4" step="0.1" value={ms3}
           onChange={e => setMs3(parseFloat(e.target.value))} />
-        <label style={{ fontSize: 12 }}>Horizontal: {ms4.toFixed(1)}</label>
+        <label className="cfg-panel__label">Horizontal: {ms4.toFixed(1)}</label>
         <input type="range" min="0.3" max="1.4" step="0.1" value={ms4}
           onChange={e => setMs4(parseFloat(e.target.value))} />
       </div>
 
       <Canvas shadows>
         <Suspense fallback={null}>
-          <PerspectiveCamera makeDefault position={[20, 0, 60]} fov={60} />
+          <PerspectiveCamera makeDefault position={[10, 0, 60]} fov={60} />
           <Stats />
           <directionalLight position={[0, 5, 90]} intensity={1.5} />
           <GroupDoors ms1={ms1} ms2={ms2} ms3={ms3} ms4={ms4} />
-          {/* <Stage intensity={0.5} environment="city" shadows={{ type: 'contact', opacity: 0.2 }}>
-            <GroupDoors ms1={ms1} ms2={ms2} ms3={ms3} ms4={ms4} />
-          </Stage> */}
           <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} />
         </Suspense>
       </Canvas>
