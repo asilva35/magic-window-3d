@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Stage, PerspectiveCamera, useGLTF, Stats } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera, useGLTF, Stats } from '@react-three/drei'
 import { Suspense, useEffect, useState, useRef, useMemo } from 'react'
 import * as THREE from 'three'
 
@@ -160,7 +160,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
 }
 
 function GroupDoors({ ms1 = 1, ms2 = 1, ms3 = 0.5, ms4 = 1, ...props }: {
-  ms1?: number; ms2?: number; ms3?: number; ms4?: number;[key: string]: any
+  ms1?: number; ms2?: number; ms3?: number; ms4?: number; [key: string]: any
 }) {
   const SPACING = 17
 
@@ -219,7 +219,7 @@ function GroupDoors({ ms1 = 1, ms2 = 1, ms3 = 0.5, ms4 = 1, ...props }: {
         position={[1.5 * SPACING, 0, 0]}
       />
 
-      {/* Vog — no panels (bevels omitted) */}
+      {/* Vog — no panels */}
       <Door
         color="#3d3d3d"
         panels={[]}
@@ -233,42 +233,209 @@ function GroupDoors({ ms1 = 1, ms2 = 1, ms3 = 0.5, ms4 = 1, ...props }: {
 useGLTF.preload('/assets/models/test-bevels-door.glb')
 useGLTF.preload('/assets/models/HandleBerlinLeverHandle.glb')
 
+/* ── Step definitions ───────────────────────────────────────────── */
+
+const STEPS = [
+  {
+    id: 'top-panel',
+    label: 'Top\nPanel',
+    glyph: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="0.5"/><line x1="3" y1="13" x2="21" y2="13"/><line x1="3" y1="8" x2="21" y2="8"/></svg>',
+  },
+  {
+    id: 'bottom-panel',
+    label: 'Bottom\nPanel',
+    glyph: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="0.5"/><line x1="3" y1="11" x2="21" y2="11"/><line x1="3" y1="16" x2="21" y2="16"/></svg>',
+  },
+]
+
+/* ── ScaleField ─────────────────────────────────────────────────── */
+
+function ScaleField({ label, value, min, max, step, onChange }: {
+  label: string
+  value: number
+  min: number
+  max: number
+  step: number
+  onChange: (v: number) => void
+}) {
+  const dec = () => onChange(Math.max(min, Math.round((value - step) * 10) / 10))
+  const inc = () => onChange(Math.min(max, Math.round((value + step) * 10) / 10))
+  return (
+    <div className="cfg-size__field">
+      <div className="cfg-size__label">{label}</div>
+      <div className="cfg-size__control">
+        <button className="cfg-size__btn" onClick={dec}>−</button>
+        <div className="cfg-size__value">{value.toFixed(1)}</div>
+        <button className="cfg-size__btn" onClick={inc}>+</button>
+      </div>
+      <input className="cfg-size__range" type="range" min={min} max={max} step={step} value={value}
+        onChange={e => onChange(parseFloat(e.target.value))} />
+    </div>
+  )
+}
+
+/* ── App ────────────────────────────────────────────────────────── */
+
 export default function App() {
   const [ms1, setMs1] = useState(1)
   const [ms2, setMs2] = useState(1)
   const [ms3, setMs3] = useState(0.5)
   const [ms4, setMs4] = useState(1)
+  const [stepIdx, setStepIdx] = useState(0)
 
   return (
-    <div className="cfg-viewport">
+    <div className="mw-app">
 
-      <div className="cfg-panel">
-        <label className="cfg-panel__section">Orleans — Top Panel</label>
-        <label className="cfg-panel__label">Vertical: {ms1.toFixed(1)}</label>
-        <input type="range" min="0.3" max="1.4" step="0.1" value={ms1}
-          onChange={e => setMs1(parseFloat(e.target.value))} />
-        <label className="cfg-panel__label">Horizontal: {ms2.toFixed(1)}</label>
-        <input type="range" min="0.3" max="1.4" step="0.1" value={ms2}
-          onChange={e => setMs2(parseFloat(e.target.value))} />
+      {/* Nav */}
+      <nav className="mw-nav">
+        <div className="mw-nav__brand">
+          <span className="mw-wordmark">Magic</span>
+          <span className="mw-tm">™</span>
+        </div>
+        <div className="mw-nav__cta">
+          <button className="mw-btn mw-btn--ghost">Save Configuration</button>
+          <button className="mw-btn mw-btn--primary">Book a Quote</button>
+        </div>
+      </nav>
 
-        <label className="cfg-panel__section">Orleans — Bottom Panel</label>
-        <label className="cfg-panel__label">Vertical: {ms3.toFixed(1)}</label>
-        <input type="range" min="0.3" max="1.4" step="0.1" value={ms3}
-          onChange={e => setMs3(parseFloat(e.target.value))} />
-        <label className="cfg-panel__label">Horizontal: {ms4.toFixed(1)}</label>
-        <input type="range" min="0.3" max="1.4" step="0.1" value={ms4}
-          onChange={e => setMs4(parseFloat(e.target.value))} />
+      {/* Configurator shell */}
+      <div className="cfg">
+
+        {/* Topbar */}
+        <div className="cfg__topbar">
+          <div className="cfg__chip">
+            <span className="cfg__chip-ribbon">Limited</span>
+            <span>Free in-home consultation · 40-year warranty</span>
+          </div>
+          <div className="cfg__topbar-right">
+            <div className="cfg__price">
+              <div className="cfg__price-label">Estimated</div>
+              <div className="cfg__price-amount">$4,950 <span>CAD</span></div>
+            </div>
+            <button className="mw-btn mw-btn--ghost cfg__details">Details</button>
+          </div>
+        </div>
+
+        {/* Body grid: viewport | panel | step rail */}
+        <div className="cfg__body">
+
+          {/* 3D Viewport */}
+          <div className="cfg__viewport">
+            <Canvas shadows>
+              <Suspense fallback={null}>
+                <PerspectiveCamera makeDefault position={[10, 0, 60]} fov={60} />
+                <Stats />
+                <directionalLight position={[0, 5, 90]} intensity={1.5} />
+                <GroupDoors ms1={ms1} ms2={ms2} ms3={ms3} ms4={ms4} />
+                <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} />
+              </Suspense>
+            </Canvas>
+            <div className="cfg__viewport-meta">
+              <button className="cfg__viewport-chip">Interior</button>
+              <button className="cfg__viewport-chip">Top View</button>
+            </div>
+            <div className="cfg__tools">
+              <button title="Rotate" className="cfg__tool">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                  <path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/>
+                </svg>
+              </button>
+              <button title="Fullscreen" className="cfg__tool">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                  <path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Configuration panel */}
+          <div className="cfg__panel">
+            <div className="cfg__panel-inner">
+
+              {stepIdx === 0 && (
+                <div className="cfg-step">
+                  <div className="cfg-step__head">
+                    <div className="cfg-step__h">Orleans — Top Panel</div>
+                    <div className="cfg-step__sub">Adjust the moulding proportions for the top decorative panel. Changes update the 3D preview in real time.</div>
+                  </div>
+                  <div className="cfg-section__title">Scale</div>
+                  <div className="cfg-size">
+                    <ScaleField label="Vertical" value={ms1} min={0.3} max={1.4} step={0.1} onChange={setMs1} />
+                    <div className="cfg-size__by">×</div>
+                    <ScaleField label="Horizontal" value={ms2} min={0.3} max={1.4} step={0.1} onChange={setMs2} />
+                  </div>
+                  <div className="cfg-callout">
+                    <span className="mw-eyebrow">Orleans style</span>
+                    <p>The Orleans door features two raised panel moulds with Hybrid Fusion® construction — 50% stronger than standard vinyl. The top panel is larger to emphasise the upper half of the door.</p>
+                  </div>
+                </div>
+              )}
+
+              {stepIdx === 1 && (
+                <div className="cfg-step">
+                  <div className="cfg-step__head">
+                    <div className="cfg-step__h">Orleans — Bottom Panel</div>
+                    <div className="cfg-step__sub">Adjust the moulding proportions for the bottom decorative panel.</div>
+                  </div>
+                  <div className="cfg-section__title">Scale</div>
+                  <div className="cfg-size">
+                    <ScaleField label="Vertical" value={ms3} min={0.3} max={1.4} step={0.1} onChange={setMs3} />
+                    <div className="cfg-size__by">×</div>
+                    <ScaleField label="Horizontal" value={ms4} min={0.3} max={1.4} step={0.1} onChange={setMs4} />
+                  </div>
+                  <div className="cfg-callout cfg-callout--final">
+                    <span className="mw-eyebrow">What happens next</span>
+                    <p>Click <strong>Book a Quote</strong> and we'll contact you within one business day to schedule a free in-home consultation. Final measurements confirmed on-site — no obligation.</p>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          </div>
+
+          {/* Step rail */}
+          <aside className="cfg-steps">
+            {STEPS.map((s, i) => (
+              <button
+                key={s.id}
+                className={[
+                  'cfg-steps__item',
+                  i === stepIdx && 'is-active',
+                  i < stepIdx && 'is-done',
+                ].filter(Boolean).join(' ')}
+                onClick={() => setStepIdx(i)}
+              >
+                <div className="cfg-steps__glyph" dangerouslySetInnerHTML={{ __html: s.glyph }} />
+                <div className="cfg-steps__label">{s.label}</div>
+              </button>
+            ))}
+          </aside>
+
+        </div>
+
+        {/* Footer */}
+        <div className="cfg__footer">
+          <button
+            className="mw-btn mw-btn--tertiary cfg__back"
+            onClick={() => setStepIdx(v => Math.max(0, v - 1))}
+            disabled={stepIdx === 0}
+          >
+            ← Back
+          </button>
+          <div className="cfg__progress">
+            Step {stepIdx + 1} of {STEPS.length} · {STEPS[stepIdx].label.replace('\n', ' ')}
+          </div>
+          <button className="mw-btn mw-btn--ghost">Save Configuration</button>
+          {stepIdx < STEPS.length - 1 ? (
+            <button className="mw-btn mw-btn--primary" onClick={() => setStepIdx(v => v + 1)}>
+              Next: {STEPS[stepIdx + 1].label.replace('\n', ' ')} →
+            </button>
+          ) : (
+            <button className="mw-btn mw-btn--primary">Book a Quote</button>
+          )}
+        </div>
+
       </div>
-
-      <Canvas shadows>
-        <Suspense fallback={null}>
-          <PerspectiveCamera makeDefault position={[10, 0, 60]} fov={60} />
-          <Stats />
-          <directionalLight position={[0, 5, 90]} intensity={1.5} />
-          <GroupDoors ms1={ms1} ms2={ms2} ms3={ms3} ms4={ms4} />
-          <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} />
-        </Suspense>
-      </Canvas>
     </div>
   )
 }
