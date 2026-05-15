@@ -551,6 +551,18 @@ export default function App() {
     setMs4(value)
   }
 
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const toggleFullscreen = () => {
+    if (!viewportRef.current) return
+    if (!document.fullscreenElement) {
+      viewportRef.current.requestFullscreen().catch(e => {
+        console.error("Fullscreen error:", e)
+      })
+    } else {
+      document.exitFullscreen()
+    }
+  }
+
   return (
     <div className="mw-app">
       <LoadingScreen />
@@ -572,7 +584,7 @@ export default function App() {
         {/* Topbar */}
         <div className="cfg__topbar">
           <div className="cfg__chip">
-            <span className="cfg__chip-ribbon">Limited</span>
+            <a className="cfg__chip-ribbon" href="tel:8666792732">CALL US</a>
             <span>Free in-home consultation · 40-year warranty</span>
           </div>
           <div className="cfg__topbar-right">
@@ -588,7 +600,7 @@ export default function App() {
         <div className="cfg__body">
 
           {/* Viewport */}
-          <div className="cfg__viewport">
+          <div className="cfg__viewport" ref={viewportRef}>
             {cfg.productType === 'front' ? (
               <Canvas shadows>
                 <Suspense fallback={null}>
@@ -602,23 +614,23 @@ export default function App() {
                       : model.panels
                     return <Door color={model.color} panels={panels} />
                   })()}
-                  <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} />
+                  <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} enableZoom={false} />
                 </Suspense>
               </Canvas>
             ) : (
               <SVGViewport state={cfg} />
             )}
-            <div className="cfg__viewport-meta">
+            {/* <div className="cfg__viewport-meta">
               <button className="cfg__viewport-chip">Show Interior</button>
               <button className="cfg__viewport-chip">Show Top View</button>
-            </div>
+            </div> */}
             <div className="cfg__tools">
               <button title="Rotate" className="cfg__tool">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
                   <path d="M21 12a9 9 0 1 1-3-6.7" /><path d="M21 4v5h-5" />
                 </svg>
               </button>
-              <button title="Fullscreen" className="cfg__tool">
+              <button title="Fullscreen" className="cfg__tool" onClick={toggleFullscreen}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
                   <path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6" />
                 </svg>
