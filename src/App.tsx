@@ -545,6 +545,11 @@ export default function App() {
 
   const price = computePrice(cfg)
 
+  const handleHorizontalScale = (value: number) => {
+    setMs2(value)
+    setMs4(value)
+  }
+
   return (
     <div className="mw-app">
       <LoadingScreen />
@@ -586,7 +591,7 @@ export default function App() {
             {cfg.productType === 'front' ? (
               <Canvas shadows>
                 <Suspense fallback={null}>
-                  <PerspectiveCamera makeDefault position={[0, 0, 50]} fov={60} />
+                  <PerspectiveCamera makeDefault position={[0, 0, 30]} fov={60} />
                   <directionalLight position={[0, 5, 90]} intensity={1.5} />
                   <directionalLight position={[0, 5, -90]} intensity={1.5} />
                   {(() => {
@@ -700,12 +705,12 @@ export default function App() {
                       <div className="cfg-size">
                         <ScaleField label="Top Vertical" value={ms1} min={3} max={30} step={0.1} onChange={setMs1} />
                         <div className="cfg-size__by">×</div>
-                        <ScaleField label="Top Horizontal" value={ms2} min={3} max={30} step={0.1} onChange={setMs2} />
+                        <ScaleField label="Top Horizontal" value={ms2} min={6} max={20} step={0.1} onChange={handleHorizontalScale} />
                       </div>
                       <div className="cfg-size">
-                        <ScaleField label="Bottom Vertical" value={ms3} min={3} max={30} step={0.1} onChange={setMs3} />
+                        <ScaleField label="Bottom Vertical" value={ms3} min={4} max={7} step={0.1} onChange={setMs3} />
                         <div className="cfg-size__by">×</div>
-                        <ScaleField label="Bottom Horizontal" value={ms4} min={3} max={30} step={0.1} onChange={setMs4} />
+                        <ScaleField label="Bottom Horizontal" value={ms4} min={6} max={20} step={0.1} onChange={handleHorizontalScale} />
                       </div>
                     </>
                   )}
