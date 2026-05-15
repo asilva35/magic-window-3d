@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, useGLTF } from '@react-three/drei'
 import { Suspense, useEffect, useState, useRef, useMemo } from 'react'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { LoadingScreen } from './LoadingScreen'
 
@@ -164,74 +165,22 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
   )
 }
 
-function GroupDoors({ ms1 = 1, ms2 = 1, ms3 = 0.5, ms4 = 1, ...props }: {
-  ms1?: number; ms2?: number; ms3?: number; ms4?: number;[key: string]: any
-}) {
-  const SPACING = 17
+function Rotator({ isRotating, children }: { isRotating: boolean, children: React.ReactNode }) {
+  const groupRef = useRef<THREE.Group>(null)
 
-  return (
-    <group {...props}>
+  useFrame((state, delta) => {
+    if (groupRef.current) {
+      if (isRotating) {
+        groupRef.current.rotation.y += delta * 0.5
+      } else {
+        groupRef.current.rotation.y = 0
+      }
+    }
+  })
 
-      {/* Uno — 1 large panel */}
-      <Door
-        color="#e86253"
-        panels={[{ y: 1, moldScale: 3.0, moldScale2: 1.2 }]}
-        position={[-2.5 * SPACING, 0, 0]}
-      />
-
-      {/* Orleans — 2 panels: top larger, bottom smaller */}
-      <Door
-        color="#2c2c2c"
-        panels={[
-          { y: 4.0, moldScale: ms1, moldScale2: ms2 },
-          { y: -7.5, moldScale: ms3, moldScale2: ms4 },
-        ]}
-        position={[-1.5 * SPACING, 0, 0]}
-      />
-
-      {/* London — 2 equal panels */}
-      <Door
-        color="#f0ede5"
-        panels={[
-          { y: 7, moldScale: 0.85, moldScale2: 1.0 },
-          { y: -2, moldScale: 0.85, moldScale2: 1.0 },
-        ]}
-        position={[-0.5 * SPACING, 0, 0]}
-      />
-
-      {/* Victoria — 3 evenly spaced panels */}
-      <Door
-        color="#9dbfb2"
-        panels={[
-          { y: 9, moldScale: 0.7, moldScale2: 1.0 },
-          { y: 1, moldScale: 0.7, moldScale2: 1.0 },
-          { y: -7, moldScale: 0.7, moldScale2: 1.0 },
-        ]}
-        position={[0.5 * SPACING, 0, 0]}
-      />
-
-      {/* Soho — 4 evenly spaced panels */}
-      <Door
-        color="#2d5448"
-        panels={[
-          { y: 10, moldScale: 0.5, moldScale2: 1.0 },
-          { y: 3, moldScale: 0.5, moldScale2: 1.0 },
-          { y: -4, moldScale: 0.5, moldScale2: 1.0 },
-          { y: -11, moldScale: 0.5, moldScale2: 1.0 },
-        ]}
-        position={[1.5 * SPACING, 0, 0]}
-      />
-
-      {/* Vog — no panels */}
-      <Door
-        color="#3d3d3d"
-        panels={[]}
-        position={[2.5 * SPACING, 0, 0]}
-      />
-
-    </group>
-  )
+  return <group ref={groupRef}>{children}</group>
 }
+
 
 useGLTF.preload('/assets/models/MoldOrleansDoor.glb')
 useGLTF.preload('/assets/models/HandleBerlinLeverHandle.glb')
@@ -335,23 +284,23 @@ type DoorModelDef = {
 const DOOR_MODELS: DoorModelDef[] = [
   {
     id: 'orleans', label: 'Orleans', sub: '2 panels · top + bottom', color: '#2c2c2c',
-    panels: [{ y: 4.0, moldScale: 1, moldScale2: 1 }, { y: -7.5, moldScale: 0.5, moldScale2: 1 }],
+    panels: [{ y: 4.0, moldScale: 112, moldScale2: 55 }, { y: -7.5, moldScale: 19, moldScale2: 55 }],
   },
   {
     id: 'uno', label: 'Uno', sub: '1 large panel', color: '#e86253',
-    panels: [{ y: 1, moldScale: 3.0, moldScale2: 1.2 }],
+    panels: [{ y: 1, moldScale: 150.0, moldScale2: 55.0 }],
   },
   {
     id: 'london', label: 'London', sub: '2 equal panels', color: '#f0ede5',
-    panels: [{ y: 7, moldScale: 0.85, moldScale2: 1.0 }, { y: -2, moldScale: 0.85, moldScale2: 1.0 }],
+    panels: [{ y: 4, moldScale: 90, moldScale2: 55 }, { y: -7, moldScale: 35, moldScale2: 55 }],
   },
   {
     id: 'victoria', label: 'Victoria', sub: '3 panels', color: '#9dbfb2',
-    panels: [{ y: 9, moldScale: 0.7, moldScale2: 1.0 }, { y: 1, moldScale: 0.7, moldScale2: 1.0 }, { y: -7, moldScale: 0.7, moldScale2: 1.0 }],
+    panels: [{ y: 10, moldScale: 35, moldScale2: 55 }, { y: -2, x: 2.8, moldScale: 110, moldScale2: 15 }, { y: -2, x: -2.8, moldScale: 110, moldScale2: 15 }],
   },
   {
     id: 'soho', label: 'Soho', sub: '4 panels', color: '#2d5448',
-    panels: [{ y: 10, moldScale: 0.5, moldScale2: 1.0 }, { y: 3, moldScale: 0.5, moldScale2: 1.0 }, { y: -4, moldScale: 0.5, moldScale2: 1.0 }, { y: -11, moldScale: 0.5, moldScale2: 1.0 }],
+    panels: [{ y: 10, moldScale: 30, moldScale2: 55 }, { y: 3, moldScale: 30, moldScale2: 55 }, { y: -4, moldScale: 30, moldScale2: 55 }, { y: -11, moldScale: 30, moldScale2: 55 }],
   },
   {
     id: 'vog', label: 'Vog', sub: 'Solid · no panels', color: '#3d3d3d',
@@ -543,12 +492,32 @@ export default function App() {
   const [ms4, setMs4] = useState(55)
   const [doorModel, setDoorModel] = useState('orleans')
   const [stepIdx, setStepIdx] = useState(0)
+  const [isRotating, setIsRotating] = useState(false)
+
+  useEffect(() => {
+    if (!isRotating) return
+    const handleGlobalClick = () => setIsRotating(false)
+    window.addEventListener('click', handleGlobalClick)
+    return () => window.removeEventListener('click', handleGlobalClick)
+  }, [isRotating])
 
   const price = computePrice(cfg)
 
   const handleHorizontalScale = (value: number) => {
     setMs2(value)
     setMs4(value)
+  }
+
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const toggleFullscreen = () => {
+    if (!viewportRef.current) return
+    if (!document.fullscreenElement) {
+      viewportRef.current.requestFullscreen().catch(e => {
+        console.error("Fullscreen error:", e)
+      })
+    } else {
+      document.exitFullscreen()
+    }
   }
 
   return (
@@ -572,7 +541,7 @@ export default function App() {
         {/* Topbar */}
         <div className="cfg__topbar">
           <div className="cfg__chip">
-            <span className="cfg__chip-ribbon">Limited</span>
+            <a className="cfg__chip-ribbon" href="tel:8666792732">CALL US</a>
             <span>Free in-home consultation · 40-year warranty</span>
           </div>
           <div className="cfg__topbar-right">
@@ -588,7 +557,7 @@ export default function App() {
         <div className="cfg__body">
 
           {/* Viewport */}
-          <div className="cfg__viewport">
+          <div className="cfg__viewport" ref={viewportRef}>
             {cfg.productType === 'front' ? (
               <Canvas shadows>
                 <Suspense fallback={null}>
@@ -600,25 +569,36 @@ export default function App() {
                     const panels = doorModel === 'orleans'
                       ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
                       : model.panels
-                    return <Door color={model.color} panels={panels} />
+                    return (
+                      <Rotator isRotating={isRotating}>
+                        <Door color={model.color} panels={panels} />
+                      </Rotator>
+                    )
                   })()}
-                  <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} />
+                  <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} enableZoom={false} />
                 </Suspense>
               </Canvas>
             ) : (
               <SVGViewport state={cfg} />
             )}
-            <div className="cfg__viewport-meta">
+            {/* <div className="cfg__viewport-meta">
               <button className="cfg__viewport-chip">Show Interior</button>
               <button className="cfg__viewport-chip">Show Top View</button>
-            </div>
+            </div> */}
             <div className="cfg__tools">
-              <button title="Rotate" className="cfg__tool">
+              <button
+                title="Rotate"
+                className={`cfg__tool ${isRotating ? 'is-active' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsRotating(!isRotating)
+                }}
+              >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
                   <path d="M21 12a9 9 0 1 1-3-6.7" /><path d="M21 4v5h-5" />
                 </svg>
               </button>
-              <button title="Fullscreen" className="cfg__tool">
+              <button title="Fullscreen" className="cfg__tool" onClick={toggleFullscreen}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
                   <path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6" />
                 </svg>
