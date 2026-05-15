@@ -12,7 +12,7 @@ function Moulding({ moldScale, onTipZ, color = '#2c2c2c', ...props }: {
   color?: string
   [key: string]: any
 }) {
-  const { scene } = useGLTF('/assets/models/test-bevels-door.glb')
+  const { scene } = useGLTF('/assets/models/MoldOrleansDoor.glb')
   const clone = useMemo(() => scene.clone(), [scene])
 
   const baseMoldRef = useRef<any>(null)
@@ -47,16 +47,11 @@ function Moulding({ moldScale, onTipZ, color = '#2c2c2c', ...props }: {
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh
-        if (mesh.material && !Array.isArray(mesh.material)) {
-          if (!mesh.userData.materialCloned) {
-            mesh.material = mesh.material.clone()
-            mesh.userData.materialCloned = true
-          }
-          const mat = mesh.material as THREE.MeshStandardMaterial
-          if (mat.color) mat.color.set(color)
-          if (mat.roughness !== undefined) mat.roughness = 0.3
-          if (mat.metalness !== undefined) mat.metalness = 0.1
-        }
+        mesh.material = new THREE.MeshStandardMaterial({
+          color: color,
+          metalness: 0.1,
+          roughness: 0.3,
+        })
       }
     })
   }, [clone, color])
@@ -73,12 +68,12 @@ function Moulding({ moldScale, onTipZ, color = '#2c2c2c', ...props }: {
       const c1IsMin = Math.abs(initData.c1z - initData.moldMin) < Math.abs(initData.c1z - initData.moldMax)
       const c1Delta = (c1IsMin ? initData.moldMin : initData.moldMax) * (moldScale - 1)
       const c2Delta = (!c1IsMin ? initData.moldMin : initData.moldMax) * (moldScale - 1)
-      corner01.position.z = initData.c1z + c2Delta
-      corner02.position.z = initData.c2z + c1Delta
+      corner01.position.z = initData.c1z + c1Delta
+      corner02.position.z = initData.c2z + c2Delta
     }
 
     if (onTipZ && initData) {
-      const INITIAL_PIVOT = 3.92
+      const INITIAL_PIVOT = 1.17
       const currentPivot = INITIAL_PIVOT + initData.moldMax * (moldScale - 1)
       onTipZ(currentPivot)
     }
@@ -99,10 +94,10 @@ function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', ...props }: {
 
   return (
     <group {...props}>
-      <Moulding color={color} moldScale={moldScale} onTipZ={setVTip} position={[-hTip, 0, 0]} rotation={[Math.PI / 2, 0, 0]} />
-      <Moulding color={color} moldScale={moldScale} position={[hTip, 0, 0]} rotation={[Math.PI / 2, Math.PI, 0]} />
-      <Moulding color={color} moldScale={moldScale2} onTipZ={setHTip} position={[0, -hSideY, 0]} rotation={[Math.PI / 2, Math.PI / 2, 0]} />
-      <Moulding color={color} moldScale={moldScale2} position={[0, hSideY, 0]} rotation={[Math.PI / 2, -Math.PI / 2, 0]} />
+      <Moulding color={color} moldScale={moldScale} onTipZ={setVTip} position={[-hTip, 0, 0.1]} rotation={[Math.PI / 2, 0, 0]} />
+      <Moulding color={color} moldScale={moldScale} position={[hTip, 0, 0.1]} rotation={[Math.PI / 2, Math.PI, 0.1]} />
+      <Moulding color={color} moldScale={moldScale2} onTipZ={setHTip} position={[0, -hSideY, 0.1]} rotation={[Math.PI / 2, Math.PI / 2, 0.1]} />
+      <Moulding color={color} moldScale={moldScale2} position={[0, hSideY, 0.1]} rotation={[Math.PI / 2, -Math.PI / 2, 0.1]} />
     </group>
   )
 }
@@ -148,7 +143,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
 
   return (
     <group {...props}>
-      <mesh>
+      <mesh visible={true}>
         <boxGeometry args={[DOOR_W, DOOR_H, DOOR_D]} />
         <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
       </mesh>
@@ -237,7 +232,7 @@ function GroupDoors({ ms1 = 1, ms2 = 1, ms3 = 0.5, ms4 = 1, ...props }: {
   )
 }
 
-useGLTF.preload('/assets/models/test-bevels-door.glb')
+useGLTF.preload('/assets/models/MoldOrleansDoor.glb')
 useGLTF.preload('/assets/models/HandleBerlinLeverHandle.glb')
 
 /* ── Types ──────────────────────────────────────────────────────── */
@@ -541,10 +536,10 @@ export default function App() {
   })
   const update = (patch: Partial<CfgState>) => setCfg(s => ({ ...s, ...patch }))
 
-  const [ms1, setMs1] = useState(1)
-  const [ms2, setMs2] = useState(1)
-  const [ms3, setMs3] = useState(0.5)
-  const [ms4, setMs4] = useState(1)
+  const [ms1, setMs1] = useState(30)
+  const [ms2, setMs2] = useState(10)
+  const [ms3, setMs3] = useState(5)
+  const [ms4, setMs4] = useState(10)
   const [doorModel, setDoorModel] = useState('orleans')
   const [stepIdx, setStepIdx] = useState(0)
 
@@ -593,6 +588,7 @@ export default function App() {
                 <Suspense fallback={null}>
                   <PerspectiveCamera makeDefault position={[0, 0, 50]} fov={60} />
                   <directionalLight position={[0, 5, 90]} intensity={1.5} />
+                  <directionalLight position={[0, 5, -90]} intensity={1.5} />
                   {(() => {
                     const model = DOOR_MODELS.find(m => m.id === doorModel) ?? DOOR_MODELS[0]
                     const panels = doorModel === 'orleans'
@@ -702,14 +698,14 @@ export default function App() {
                     <>
                       <SectionTitle>Panel proportions (3D preview)</SectionTitle>
                       <div className="cfg-size">
-                        <ScaleField label="Top Vertical" value={ms1} min={0.3} max={1.4} step={0.1} onChange={setMs1} />
+                        <ScaleField label="Top Vertical" value={ms1} min={3} max={30} step={0.1} onChange={setMs1} />
                         <div className="cfg-size__by">×</div>
-                        <ScaleField label="Top Horizontal" value={ms2} min={0.3} max={1.4} step={0.1} onChange={setMs2} />
+                        <ScaleField label="Top Horizontal" value={ms2} min={3} max={30} step={0.1} onChange={setMs2} />
                       </div>
                       <div className="cfg-size">
-                        <ScaleField label="Bottom Vertical" value={ms3} min={0.3} max={1.4} step={0.1} onChange={setMs3} />
+                        <ScaleField label="Bottom Vertical" value={ms3} min={3} max={30} step={0.1} onChange={setMs3} />
                         <div className="cfg-size__by">×</div>
-                        <ScaleField label="Bottom Horizontal" value={ms4} min={0.3} max={1.4} step={0.1} onChange={setMs4} />
+                        <ScaleField label="Bottom Horizontal" value={ms4} min={3} max={30} step={0.1} onChange={setMs4} />
                       </div>
                     </>
                   )}
