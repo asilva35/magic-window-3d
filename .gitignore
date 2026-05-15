@@ -9,7 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
-doc
+docs
 dist-ssr
 *.local
 hotinject.txt
