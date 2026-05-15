@@ -375,6 +375,53 @@
   line-height: 1.2; white-space: pre-line; letter-spacing: 0.04em;
 }
 
+/* ── SVG viewport stage (non-Front-Door products) ─────────── */
+.cfg__stage {
+  position: relative; width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.cfg__product {
+  position: relative; z-index: 1;
+  max-width: 64%; max-height: 70%;
+  width: 360px;
+  display: flex;
+  filter: drop-shadow(0 24px 36px rgba(0,19,78,0.18));
+}
+.cfg__window { width: 100%; height: 100%; display: block; }
+.cfg__product-caption {
+  position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--magic-grey-line); border-radius: 5px;
+  padding: 8px 16px;
+  font-family: var(--font-display); font-size: 13px; color: var(--magic-dark-blue);
+  white-space: nowrap; backdrop-filter: blur(4px);
+}
+.cfg__product-caption strong { font-weight: 900; }
+
+/* ── Size step visual helper ────────────────────────────────── */
+.cfg-help__row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: center;
+}
+.cfg-help__diagram {
+  background: var(--magic-blue-shade-2); border-radius: 5px; padding: 16px;
+  height: 220px; display: flex; align-items: center; justify-content: center;
+}
+.cfg-help__win {
+  background: linear-gradient(135deg, #C7D2EC 0%, #E8F1F8 50%, #6AC3E7 100%);
+  border: 4px solid var(--magic-dark-blue); border-radius: 3px;
+  position: relative;
+  transition: width var(--dur-slow) var(--ease-emph), height var(--dur-slow) var(--ease-emph);
+}
+.cfg-help__dim {
+  position: absolute;
+  font-family: var(--font-display); font-weight: 700; font-size: 11px;
+  letter-spacing: 0.06em; color: var(--magic-dark-blue);
+  background: #fff; padding: 2px 6px; border-radius: 3px;
+}
+.cfg-help__dim--w { top: -10px; left: 50%; transform: translateX(-50%); }
+.cfg-help__dim--h { left: -16px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
+.cfg-help__text p { font-size: 13px; line-height: 1.55; margin: 0 0 8px; }
+
 /* ── Footer (bottom action bar) ───────────────────────────── */
 .cfg__footer {
   display: flex; align-items: center; gap: 12px;
