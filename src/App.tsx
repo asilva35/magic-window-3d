@@ -137,8 +137,8 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
   panels?: PanelConfig[]
   [key: string]: any
 }) {
-  const DOOR_W = 15
-  const DOOR_H = 30
+  const DOOR_W = 12 // Equivalent to a 32 Inches
+  const DOOR_H = 30 // Equivalent to a 80 Inches
   const DOOR_D = 0.5
   const PANEL_Z = DOOR_D / 2 + 0.01
   const mc = mouldingColor ?? color
@@ -161,7 +161,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
         />
       ))}
 
-      <DoorHandler position={[-6.5, 0, PANEL_Z]} rotation={[0, Math.PI, 0]} scale={0.1} />
+      <DoorHandler position={[-5.6, 0, PANEL_Z]} rotation={[0, Math.PI, 0]} scale={0.1} />
     </group>
   )
 }
@@ -236,10 +236,14 @@ const STYLES: Record<string, Array<{ id: string; label: string; sub: string }>> 
     { id: 'french', label: 'French', sub: 'Centre-hinged double' },
   ],
   front: [
-    { id: 'single', label: 'Single', sub: 'Standard residential' },
-    { id: 'single-side', label: 'Single + Sidelite', sub: 'One side panel' },
-    { id: 'double', label: 'Double', sub: 'Two equal panels' },
-    { id: 'double-side', label: 'Double + Sidelites', sub: 'Grand entry' },
+    { id: 'single',               label: 'Single Door',              sub: 'Standard residential' },
+    { id: 'single-right',         label: '+ Right Side Lite',        sub: 'Right sidelite panel' },
+    { id: 'single-left',          label: '+ Left Side Lite',         sub: 'Left sidelite panel' },
+    { id: 'single-double-side',   label: '+ Double Side Lite',       sub: 'Both sidelite panels' },
+    { id: 'single-transom',       label: '+ Transom',                sub: 'Transom panel above' },
+    { id: 'single-transom-right', label: '+ Transom & Right Lite',   sub: 'Transom + right sidelite' },
+    { id: 'single-transom-left',  label: '+ Transom & Left Lite',    sub: 'Transom + left sidelite' },
+    { id: 'single-transom-double',label: '+ Transom & Both Lites',   sub: 'Transom + both sidelites' },
   ],
   wall: [
     { id: 'wall-3', label: '3-Bay Wall', sub: 'Slim frames, big views' },
@@ -285,23 +289,23 @@ type DoorModelDef = {
 const DOOR_MODELS: DoorModelDef[] = [
   {
     id: 'orleans', label: 'Orleans', sub: '2 panels · top + bottom', color: '#2c2c2c',
-    panels: [{ y: 4.0, moldScale: 112, moldScale2: 55 }, { y: -7.5, moldScale: 19, moldScale2: 55 }],
+    panels: [{ y: 4.0, moldScale: 112, moldScale2: 50 }, { y: -7.5, moldScale: 19, moldScale2: 50 }],
   },
   {
     id: 'uno', label: 'Uno', sub: '1 large panel', color: '#e86253',
-    panels: [{ y: 1, moldScale: 150.0, moldScale2: 55.0 }],
+    panels: [{ y: 1, moldScale: 150.0, moldScale2: 50.0 }],
   },
   {
     id: 'london', label: 'London', sub: '2 equal panels', color: '#f0ede5',
-    panels: [{ y: 4, moldScale: 90, moldScale2: 55 }, { y: -7, moldScale: 35, moldScale2: 55 }],
+    panels: [{ y: 4, moldScale: 90, moldScale2: 50 }, { y: -7, moldScale: 35, moldScale2: 50 }],
   },
   {
     id: 'victoria', label: 'Victoria', sub: '3 panels', color: '#9dbfb2',
-    panels: [{ y: 10, moldScale: 35, moldScale2: 55 }, { y: -2, x: 2.8, moldScale: 110, moldScale2: 15 }, { y: -2, x: -2.8, moldScale: 110, moldScale2: 15 }],
+    panels: [{ y: 10, moldScale: 35, moldScale2: 50 }, { y: -2, x: 2.7, moldScale: 110, moldScale2: 10 }, { y: -2, x: -2.7, moldScale: 110, moldScale2: 10 }],
   },
   {
     id: 'soho', label: 'Soho', sub: '4 panels', color: '#2d5448',
-    panels: [{ y: 10, moldScale: 30, moldScale2: 55 }, { y: 3, moldScale: 30, moldScale2: 55 }, { y: -4, moldScale: 30, moldScale2: 55 }, { y: -11, moldScale: 30, moldScale2: 55 }],
+    panels: [{ y: 10, moldScale: 30, moldScale2: 45 }, { y: 3, moldScale: 30, moldScale2: 45 }, { y: -4, moldScale: 30, moldScale2: 45 }, { y: -11, moldScale: 30, moldScale2: 45 }],
   },
   {
     id: 'vog', label: 'Vog', sub: 'Solid · no panels', color: '#3d3d3d',
@@ -325,10 +329,14 @@ const LITE_PATTERNS: Record<string, Record<string, number[][]>> = {
     french: [[50, 4, 50, 96, 2.5]],
   },
   front: {
-    'single': [],
-    'single-side': [[33.3, 4, 33.3, 96, 2.5]],
-    'double': [[50, 4, 50, 96, 2.5]],
-    'double-side': [[20, 4, 20, 96, 2.5], [50, 4, 50, 96, 2.5], [80, 4, 80, 96, 2.5]],
+    'single':                [],
+    'single-right':          [[70, 4, 70, 96, 2.5]],
+    'single-left':           [[30, 4, 30, 96, 2.5]],
+    'single-double-side':    [[24, 4, 24, 96, 2.5], [76, 4, 76, 96, 2.5]],
+    'single-transom':        [[4, 20, 96, 20, 2.5]],
+    'single-transom-right':  [[70, 4, 70, 96, 2.5], [4, 20, 70, 20, 2.5]],
+    'single-transom-left':   [[30, 4, 30, 96, 2.5], [30, 20, 96, 20, 2.5]],
+    'single-transom-double': [[24, 4, 24, 96, 2.5], [76, 4, 76, 96, 2.5], [24, 20, 76, 20, 2.5]],
   },
   wall: {
     'wall-3': [[33.3, 4, 33.3, 96, 1.5], [66.6, 4, 66.6, 96, 1.5]],
@@ -405,6 +413,31 @@ function SizeField({ label, value, onChange, min, max, step }: {
       </div>
       <input className="cfg-size__range" type="range" min={min} max={max} step={step} value={value}
         onChange={e => onChange(+e.target.value)} />
+    </div>
+  )
+}
+
+function PickField({ label, value, options, onChange }: {
+  label: string
+  value: number
+  options: { value: number; label: string; disabled?: boolean }[]
+  onChange: (v: number) => void
+}) {
+  return (
+    <div className="cfg-pick__field">
+      <div className="cfg-size__label">{label}</div>
+      <div className="cfg-pick__options">
+        {options.map(opt => (
+          <button
+            key={opt.value}
+            className={`cfg-pick__btn${value === opt.value ? ' is-active' : ''}`}
+            onClick={() => onChange(opt.value)}
+            disabled={opt.disabled}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }
@@ -489,12 +522,27 @@ export default function App() {
   const update = (patch: Partial<CfgState>) => setCfg(s => ({ ...s, ...patch }))
 
   const [ms1, setMs1] = useState(112)
-  const [ms2, setMs2] = useState(55)
+  const [ms2, setMs2] = useState(50)
   const [ms3, setMs3] = useState(19)
-  const [ms4, setMs4] = useState(55)
+  const [ms4, setMs4] = useState(50)
   const [doorModel, setDoorModel] = useState('orleans')
   const [stepIdx, setStepIdx] = useState(0)
   const [isRotating, setIsRotating] = useState(false)
+
+  // Snap to valid front-door sizes when switching product type
+  useEffect(() => {
+    if (cfg.productType !== 'front') return
+    const validWidths = [32, 34, 36]
+    const validHeights = [80, 95]
+    const w = validWidths.includes(cfg.width) ? cfg.width : 36
+    const h = validHeights.includes(cfg.height) ? cfg.height : 80
+    if (w !== cfg.width || h !== cfg.height) update({ width: w, height: h })
+  }, [cfg.productType])
+
+  // Vog is not available in 32" — bump up to 34"
+  useEffect(() => {
+    if (doorModel === 'vog' && cfg.width === 32) update({ width: 34 })
+  }, [doorModel])
 
   useEffect(() => {
     if (!isRotating) return
@@ -679,7 +727,7 @@ export default function App() {
                         ))}
                       </div>
 
-                      {doorModel === 'orleans' && (
+                      {/* {doorModel === 'orleans' && (
                         <>
                           <SectionTitle>Panel proportions (3D preview)</SectionTitle>
                           <div className="cfg-size">
@@ -693,7 +741,7 @@ export default function App() {
                             <ScaleField label="Bottom Horizontal" value={ms4} min={30} max={55} step={0.1} onChange={handleHorizontalScale} />
                           </div>
                         </>
-                      )}
+                      )} */}
                     </>
                   ) : (
                     <div className="cfg-callout">
@@ -732,34 +780,91 @@ export default function App() {
               {/* Step 4 — Size */}
               {stepIdx === 3 && (
                 <div className="cfg-step">
-                  <StepHeader
-                    title="Rough opening"
-                    sub="Width × height in inches. Final measurements taken on-site."
-                  />
-                  <div className="cfg-size">
-                    <SizeField label="Width" value={cfg.width} min={18} max={96} step={2} onChange={v => update({ width: v })} />
-                    <div className="cfg-size__by">by</div>
-                    <SizeField label="Height" value={cfg.height} min={24} max={120} step={2} onChange={v => update({ height: v })} />
-                  </div>
-                  <div className="cfg-help">
-                    <SectionTitle>Visual size reference</SectionTitle>
-                    <div className="cfg-help__row">
-                      <div className="cfg-help__diagram">
-                        <div className="cfg-help__win" style={{
-                          width: Math.min(200, cfg.width * 2),
-                          height: Math.min(240, cfg.height * 1.6),
-                        }}>
-                          <span className="cfg-help__dim cfg-help__dim--w">{cfg.width}"</span>
-                          <span className="cfg-help__dim cfg-help__dim--h">{cfg.height}"</span>
+                  {cfg.productType === 'front' ? (
+                    <>
+                      <StepHeader
+                        title="Door size"
+                        sub="Standard sizes. Final measurements confirmed on-site."
+                      />
+                      <div className="cfg-pick">
+                        <PickField
+                          label="Width (inches)"
+                          value={cfg.width}
+                          onChange={v => update({ width: v })}
+                          options={[
+                            { value: 32, label: '32"', disabled: doorModel === 'vog' },
+                            { value: 34, label: '34"' },
+                            { value: 36, label: '36"' },
+                          ]}
+                        />
+                        <PickField
+                          label="Height (inches)"
+                          value={cfg.height}
+                          onChange={v => update({ height: v })}
+                          options={[
+                            { value: 80, label: '80"' },
+                            { value: 95, label: '95"' },
+                          ]}
+                        />
+                      </div>
+                      {doorModel === 'vog' && (
+                        <div className="cfg-callout">
+                          <span className="mw-eyebrow">Note</span>
+                          <p>The <strong>Vog</strong> model is only available in <strong>34"</strong> and <strong>36"</strong> widths.</p>
+                        </div>
+                      )}
+                      <div className="cfg-help">
+                        <SectionTitle>Visual size reference</SectionTitle>
+                        <div className="cfg-help__row">
+                          <div className="cfg-help__diagram">
+                            <div className="cfg-help__win" style={{
+                              width: Math.min(200, cfg.width * 2),
+                              height: Math.min(240, cfg.height * 1.6),
+                            }}>
+                              <span className="cfg-help__dim cfg-help__dim--w">{cfg.width}"</span>
+                              <span className="cfg-help__dim cfg-help__dim--h">{cfg.height}"</span>
+                            </div>
+                          </div>
+                          <div className="cfg-help__text">
+                            <p><strong>Available widths:</strong> 32" · 34" · 36"</p>
+                            <p><strong>Available heights:</strong> 80" · 95"</p>
+                            <p>Custom sizes outside this range available on request during consultation.</p>
+                          </div>
                         </div>
                       </div>
-                      <div className="cfg-help__text">
-                        <p><strong>Minimum:</strong> 18" × 24"</p>
-                        <p><strong>Maximum:</strong> 96" × 120"</p>
-                        <p>Custom sizes available outside this range — request during consultation.</p>
+                    </>
+                  ) : (
+                    <>
+                      <StepHeader
+                        title="Rough opening"
+                        sub="Width × height in inches. Final measurements taken on-site."
+                      />
+                      <div className="cfg-size">
+                        <SizeField label="Width" value={cfg.width} min={18} max={96} step={2} onChange={v => update({ width: v })} />
+                        <div className="cfg-size__by">by</div>
+                        <SizeField label="Height" value={cfg.height} min={24} max={120} step={2} onChange={v => update({ height: v })} />
                       </div>
-                    </div>
-                  </div>
+                      <div className="cfg-help">
+                        <SectionTitle>Visual size reference</SectionTitle>
+                        <div className="cfg-help__row">
+                          <div className="cfg-help__diagram">
+                            <div className="cfg-help__win" style={{
+                              width: Math.min(200, cfg.width * 2),
+                              height: Math.min(240, cfg.height * 1.6),
+                            }}>
+                              <span className="cfg-help__dim cfg-help__dim--w">{cfg.width}"</span>
+                              <span className="cfg-help__dim cfg-help__dim--h">{cfg.height}"</span>
+                            </div>
+                          </div>
+                          <div className="cfg-help__text">
+                            <p><strong>Minimum:</strong> 18" × 24"</p>
+                            <p><strong>Maximum:</strong> 96" × 120"</p>
+                            <p>Custom sizes available outside this range — request during consultation.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 
