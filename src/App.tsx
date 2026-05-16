@@ -350,6 +350,7 @@ function computePrice(state: CfgState) {
 
 const STEPS = [
   { id: 'type', label: 'Product\nType', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="0.5"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="12" x2="21" y2="12"/></svg>` },
+  { id: 'model', label: 'Select\nModel', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="15.5" cy="12" r="1" fill="currentColor" stroke="none"/></svg>` },
   { id: 'style', label: 'Style\n& Opening', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18"/><path d="M3 12h18"/><path d="M16 12 12 8"/></svg>` },
   { id: 'size', label: 'Size', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 21V3M21 21V3M3 12h18"/></svg>` },
   { id: 'frame', label: 'Frame\nColour', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg>` },
@@ -647,8 +648,63 @@ export default function App() {
                 </div>
               )}
 
-              {/* Step 2 — Style & Opening */}
+              {/* Step 2 — Select a Model */}
               {stepIdx === 1 && (
+                <div className="cfg-step">
+                  <StepHeader
+                    title="Select a model"
+                    sub={cfg.productType === 'front'
+                      ? 'Choose the door design that suits your home.'
+                      : `Model selection applies to Front Doors. Continue to configure your ${PRODUCT_TYPES.find(t => t.id === cfg.productType)?.label}.`}
+                  />
+
+                  {cfg.productType === 'front' ? (
+                    <>
+                      <div className="cfg-grid cfg-grid--2col">
+                        {DOOR_MODELS.map(m => (
+                          <button
+                            key={m.id}
+                            className={`cfg-card${doorModel === m.id ? ' is-active' : ''}`}
+                            onClick={() => setDoorModel(m.id)}
+                          >
+                            <div
+                              className="cfg-card__glyph"
+                              style={{ background: m.color, borderRadius: 3 }}
+                            />
+                            <div>
+                              <div className="cfg-card__label">{m.label}</div>
+                              <div className="cfg-card__sub">{m.sub}</div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+
+                      {doorModel === 'orleans' && (
+                        <>
+                          <SectionTitle>Panel proportions (3D preview)</SectionTitle>
+                          <div className="cfg-size">
+                            <ScaleField label="Top Vertical" value={ms1} min={70} max={120} step={0.1} onChange={setMs1} />
+                            <div className="cfg-size__by">×</div>
+                            <ScaleField label="Top Horizontal" value={ms2} min={30} max={55} step={0.1} onChange={handleHorizontalScale} />
+                          </div>
+                          <div className="cfg-size">
+                            <ScaleField label="Bottom Vertical" value={ms3} min={12} max={20} step={0.1} onChange={setMs3} />
+                            <div className="cfg-size__by">×</div>
+                            <ScaleField label="Bottom Horizontal" value={ms4} min={30} max={55} step={0.1} onChange={handleHorizontalScale} />
+                          </div>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <div className="cfg-callout">
+                      <p>Model selection is only available for <strong>Front Doors</strong>. Click <strong>Next</strong> to continue.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Step 3 — Style & Opening */}
+              {stepIdx === 2 && (
                 <div className="cfg-step">
                   <StepHeader
                     title="Pick a style"
@@ -670,47 +726,11 @@ export default function App() {
                       )
                     })}
                   </div>
-
-                  {/* Front Door: model selection */}
-                  {cfg.productType === 'front' && (
-                    <>
-                      <SectionTitle>Door model</SectionTitle>
-                      <div className="cfg-grid cfg-grid--3col">
-                        {DOOR_MODELS.map(m => (
-                          <OptionTile
-                            key={m.id}
-                            active={doorModel === m.id}
-                            label={m.label}
-                            dimensions={m.sub}
-                            thumb={`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="54" height="54" fill="${m.color}" rx="1"/></svg>`}
-                            onClick={() => setDoorModel(m.id)}
-                          />
-                        ))}
-                      </div>
-                    </>
-                  )}
-
-                  {/* Orleans: moulding panel fine-tune */}
-                  {cfg.productType === 'front' && doorModel === 'orleans' && (
-                    <>
-                      <SectionTitle>Panel proportions (3D preview)</SectionTitle>
-                      <div className="cfg-size">
-                        <ScaleField label="Top Vertical" value={ms1} min={70} max={120} step={0.1} onChange={setMs1} />
-                        <div className="cfg-size__by">×</div>
-                        <ScaleField label="Top Horizontal" value={ms2} min={30} max={55} step={0.1} onChange={handleHorizontalScale} />
-                      </div>
-                      <div className="cfg-size">
-                        <ScaleField label="Bottom Vertical" value={ms3} min={12} max={20} step={0.1} onChange={setMs3} />
-                        <div className="cfg-size__by">×</div>
-                        <ScaleField label="Bottom Horizontal" value={ms4} min={30} max={55} step={0.1} onChange={handleHorizontalScale} />
-                      </div>
-                    </>
-                  )}
                 </div>
               )}
 
-              {/* Step 3 — Size */}
-              {stepIdx === 2 && (
+              {/* Step 4 — Size */}
+              {stepIdx === 3 && (
                 <div className="cfg-step">
                   <StepHeader
                     title="Rough opening"
@@ -743,8 +763,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* Step 4 — Frame Colour */}
-              {stepIdx === 3 && (
+              {/* Step 5 — Frame Colour */}
+              {stepIdx === 4 && (
                 <div className="cfg-step">
                   <StepHeader
                     title="Frame finish"
@@ -768,8 +788,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* Step 5 — Glass Package */}
-              {stepIdx === 4 && (
+              {/* Step 6 — Glass Package */}
+              {stepIdx === 5 && (
                 <div className="cfg-step">
                   <StepHeader
                     title="Choose your glass package"
@@ -796,8 +816,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* Step 6 — Hardware */}
-              {stepIdx === 5 && (
+              {/* Step 7 — Hardware */}
+              {stepIdx === 6 && (
                 <div className="cfg-step">
                   <StepHeader title="Hardware" sub="Operation and lock mechanism." />
                   <div className="cfg-list">
@@ -825,8 +845,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* Step 7 — Screens & Extras */}
-              {stepIdx === 6 && (
+              {/* Step 8 — Screens & Extras */}
+              {stepIdx === 7 && (
                 <div className="cfg-step">
                   <StepHeader
                     title="Screen system"
@@ -853,8 +873,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* Step 8 — Review & Quote */}
-              {stepIdx === 7 && (
+              {/* Step 9 — Review & Quote */}
+              {stepIdx === 8 && (
                 <div className="cfg-step">
                   <StepHeader
                     title="Your configuration"
