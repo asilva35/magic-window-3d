@@ -1,8 +1,9 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, useGLTF } from '@react-three/drei'
-import { Suspense, useEffect, useState, useRef, useMemo } from 'react'
+import { Suspense, useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import gsap from 'gsap'
 import { LoadingScreen } from './LoadingScreen'
 
 type InitData = { c1z: number; c2z: number; moldMin: number; moldMax: number }
@@ -509,6 +510,13 @@ export default function App() {
   }
 
   const viewportRef = useRef<HTMLDivElement>(null)
+  const cameraRef = useRef<THREE.PerspectiveCamera>(null)
+
+  const handleLoaded = useCallback(() => {
+    if (!cameraRef.current) return
+    gsap.to(cameraRef.current.position, { z: 30, duration: 1, ease: 'power2.out' })
+  }, [])
+
   const toggleFullscreen = () => {
     if (!viewportRef.current) return
     if (!document.fullscreenElement) {
@@ -522,7 +530,7 @@ export default function App() {
 
   return (
     <div className="mw-app">
-      <LoadingScreen />
+      <LoadingScreen onDismiss={handleLoaded} />
 
       {/* Nav */}
       <nav className="mw-nav">
@@ -561,7 +569,7 @@ export default function App() {
             {cfg.productType === 'front' ? (
               <Canvas shadows>
                 <Suspense fallback={null}>
-                  <PerspectiveCamera makeDefault position={[0, 0, 30]} fov={60} />
+                  <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 0, 120]} fov={60} />
                   <directionalLight position={[0, 5, 90]} intensity={1.5} />
                   <directionalLight position={[0, 5, -90]} intensity={1.5} />
                   {(() => {
