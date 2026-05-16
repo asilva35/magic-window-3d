@@ -514,7 +514,7 @@ export default function App() {
 
   const handleLoaded = useCallback(() => {
     if (!cameraRef.current) return
-    gsap.to(cameraRef.current.position, { z: 30, duration: 1, ease: 'power2.out' })
+    gsap.fromTo(cameraRef.current.position, { z: 90 }, { z: 30, duration: 1, ease: 'power2.out' })
   }, [])
 
   const toggleFullscreen = () => {
@@ -569,7 +569,7 @@ export default function App() {
             {cfg.productType === 'front' ? (
               <Canvas shadows>
                 <Suspense fallback={null}>
-                  <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 0, 120]} fov={60} />
+                  <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 0, 30]} fov={60} />
                   <directionalLight position={[0, 5, 90]} intensity={1.5} />
                   <directionalLight position={[0, 5, -90]} intensity={1.5} />
                   {(() => {
@@ -640,6 +640,9 @@ export default function App() {
                         </div>
                       </button>
                     ))}
+                  </div>
+                  <div className="cfg-step__footer">
+                    <button className="mw-btn mw-btn--primary" onClick={() => setStepIdx(1)}>Next</button>
                   </div>
                 </div>
               )}

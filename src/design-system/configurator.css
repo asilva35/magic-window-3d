@@ -92,6 +92,7 @@
   padding: 6px 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
+  text-decoration: none;
 }
 
 .cfg__chip>span:last-child {
@@ -251,6 +252,12 @@
   color: var(--magic-dark-blue);
   opacity: 0.78;
   margin-top: 8px;
+}
+
+.cfg-step__footer {
+  margin-top: 12px;
+  padding-top: 24px;
+  border-top: 1px solid var(--magic-light-grey, #e8eaf0);
 }
 
 .cfg-section__title {
