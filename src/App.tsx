@@ -236,14 +236,14 @@ const STYLES: Record<string, Array<{ id: string; label: string; sub: string }>> 
     { id: 'french', label: 'French', sub: 'Centre-hinged double' },
   ],
   front: [
-    { id: 'single',               label: 'Single Door',              sub: 'Standard residential' },
-    { id: 'single-right',         label: '+ Right Side Lite',        sub: 'Right sidelite panel' },
-    { id: 'single-left',          label: '+ Left Side Lite',         sub: 'Left sidelite panel' },
-    { id: 'single-double-side',   label: '+ Double Side Lite',       sub: 'Both sidelite panels' },
-    { id: 'single-transom',       label: '+ Transom',                sub: 'Transom panel above' },
-    { id: 'single-transom-right', label: '+ Transom & Right Lite',   sub: 'Transom + right sidelite' },
-    { id: 'single-transom-left',  label: '+ Transom & Left Lite',    sub: 'Transom + left sidelite' },
-    { id: 'single-transom-double',label: '+ Transom & Both Lites',   sub: 'Transom + both sidelites' },
+    { id: 'single', label: 'Single Door', sub: 'Standard residential' },
+    { id: 'single-right', label: '+ Right Side Lite', sub: 'Right sidelite panel' },
+    { id: 'single-left', label: '+ Left Side Lite', sub: 'Left sidelite panel' },
+    { id: 'single-double-side', label: '+ Double Side Lite', sub: 'Both sidelite panels' },
+    { id: 'single-transom', label: '+ Transom', sub: 'Transom panel above' },
+    { id: 'single-transom-right', label: '+ Transom & Right Lite', sub: 'Transom + right sidelite' },
+    { id: 'single-transom-left', label: '+ Transom & Left Lite', sub: 'Transom + left sidelite' },
+    { id: 'single-transom-double', label: '+ Transom & Both Lites', sub: 'Transom + both sidelites' },
   ],
   wall: [
     { id: 'wall-3', label: '3-Bay Wall', sub: 'Slim frames, big views' },
@@ -253,12 +253,17 @@ const STYLES: Record<string, Array<{ id: string; label: string; sub: string }>> 
 }
 
 const FRAME_SWATCHES: Record<string, string> = {
-  white: '#F4F5F7',
-  almond: '#E5DCC9',
-  cobble: '#888A8C',
-  black: '#1B1B1F',
-  navy: '#001B70',
-  espresso: '#3B2A1E',
+  white:      '#F4F5F7',
+  cream:      '#f0ede5',
+  almond:     '#E5DCC9',
+  sage:       '#9dbfb2',
+  cobble:     '#888A8C',
+  charcoal:   '#2c2c2c',
+  black:      '#1B1B1F',
+  navy:       '#001B70',
+  forest:     '#2d5448',
+  espresso:   '#3B2A1E',
+  terracotta: '#e86253',
 }
 
 const GLASS_PACKAGES = [
@@ -329,13 +334,13 @@ const LITE_PATTERNS: Record<string, Record<string, number[][]>> = {
     french: [[50, 4, 50, 96, 2.5]],
   },
   front: {
-    'single':                [],
-    'single-right':          [[70, 4, 70, 96, 2.5]],
-    'single-left':           [[30, 4, 30, 96, 2.5]],
-    'single-double-side':    [[24, 4, 24, 96, 2.5], [76, 4, 76, 96, 2.5]],
-    'single-transom':        [[4, 20, 96, 20, 2.5]],
-    'single-transom-right':  [[70, 4, 70, 96, 2.5], [4, 20, 70, 20, 2.5]],
-    'single-transom-left':   [[30, 4, 30, 96, 2.5], [30, 20, 96, 20, 2.5]],
+    'single': [],
+    'single-right': [[70, 4, 70, 96, 2.5]],
+    'single-left': [[30, 4, 30, 96, 2.5]],
+    'single-double-side': [[24, 4, 24, 96, 2.5], [76, 4, 76, 96, 2.5]],
+    'single-transom': [[4, 20, 96, 20, 2.5]],
+    'single-transom-right': [[70, 4, 70, 96, 2.5], [4, 20, 70, 20, 2.5]],
+    'single-transom-left': [[30, 4, 30, 96, 2.5], [30, 20, 96, 20, 2.5]],
     'single-transom-double': [[24, 4, 24, 96, 2.5], [76, 4, 76, 96, 2.5], [24, 20, 76, 20, 2.5]],
   },
   wall: {
@@ -361,7 +366,7 @@ const STEPS = [
   { id: 'model', label: 'Select\nModel', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="15.5" cy="12" r="1" fill="currentColor" stroke="none"/></svg>` },
   { id: 'style', label: 'Style\n& Opening', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18"/><path d="M3 12h18"/><path d="M16 12 12 8"/></svg>` },
   { id: 'size', label: 'Size', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 21V3M21 21V3M3 12h18"/></svg>` },
-  { id: 'frame', label: 'Frame\nColour', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg>` },
+  { id: 'frame', label: 'Colour', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg>` },
   { id: 'glass', label: 'Glass\nPackage', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16"/><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/></svg>` },
   { id: 'hardware', label: 'Hardware', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 4v3M12 17v3M4 12h3M17 12h3"/></svg>` },
   { id: 'screen', label: 'Screens\n& Extras', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18"/><path d="M3 8h18M3 13h18M3 18h18M8 3v18M13 3v18M18 3v18"/></svg>` },
@@ -514,7 +519,7 @@ export default function App() {
     style: 'single',
     width: 36,
     height: 80,
-    frame: 'white',
+    frame: 'charcoal',
     glass: 'triple',
     hardware: 'parallex',
     screen: 'retractable',
@@ -628,7 +633,7 @@ export default function App() {
                       : model.panels
                     return (
                       <Rotator isRotating={isRotating}>
-                        <Door color={model.color} panels={panels} />
+                        <Door color={FRAME_SWATCHES[cfg.frame] ?? model.color} panels={panels} />
                       </Rotator>
                     )
                   })()}
