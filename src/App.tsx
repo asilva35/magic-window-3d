@@ -173,22 +173,23 @@ function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, ...props }: {
   [key: string]: any
 }) {
   const FRAME_THICKNESS = 0.5
-  const FRAME_DEPTH = 3
+  const FRAME_DEPTH = 1.5
+  const Z_POS = 0.75
 
   return (
     <group {...props}>
       {/* Left jamb */}
-      <mesh position={[-(width / 2 + FRAME_THICKNESS / 2), 0, 0]}>
+      <mesh position={[-(width / 2 + FRAME_THICKNESS / 2), 0, Z_POS]}>
         <boxGeometry args={[FRAME_THICKNESS, height, FRAME_DEPTH]} />
         <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
       </mesh>
       {/* Right jamb */}
-      <mesh position={[(width / 2 + FRAME_THICKNESS / 2), 0, 0]}>
+      <mesh position={[(width / 2 + FRAME_THICKNESS / 2), 0, Z_POS]}>
         <boxGeometry args={[FRAME_THICKNESS, height, FRAME_DEPTH]} />
         <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
       </mesh>
       {/* Top header */}
-      <mesh position={[0, height / 2 + FRAME_THICKNESS / 2, 0]}>
+      <mesh position={[0, height / 2 + FRAME_THICKNESS / 2, Z_POS]}>
         <boxGeometry args={[width + FRAME_THICKNESS * 2, FRAME_THICKNESS, FRAME_DEPTH]} />
         <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
       </mesh>
