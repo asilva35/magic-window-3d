@@ -447,24 +447,24 @@ function PickField({ label, value, options, onChange }: {
   )
 }
 
-function ScaleField({ label, value, min, max, step, onChange }: {
-  label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void
-}) {
-  const dec = () => onChange(Math.max(min, Math.round((value - step) * 10) / 10))
-  const inc = () => onChange(Math.min(max, Math.round((value + step) * 10) / 10))
-  return (
-    <div className="cfg-size__field">
-      <div className="cfg-size__label">{label}</div>
-      <div className="cfg-size__control">
-        <button className="cfg-size__btn" onClick={dec}>−</button>
-        <div className="cfg-size__value">{value.toFixed(1)}</div>
-        <button className="cfg-size__btn" onClick={inc}>+</button>
-      </div>
-      <input className="cfg-size__range" type="range" min={min} max={max} step={step} value={value}
-        onChange={e => onChange(parseFloat(e.target.value))} />
-    </div>
-  )
-}
+// function ScaleField({ label, value, min, max, step, onChange }: {
+//   label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void
+// }) {
+//   const dec = () => onChange(Math.max(min, Math.round((value - step) * 10) / 10))
+//   const inc = () => onChange(Math.min(max, Math.round((value + step) * 10) / 10))
+//   return (
+//     <div className="cfg-size__field">
+//       <div className="cfg-size__label">{label}</div>
+//       <div className="cfg-size__control">
+//         <button className="cfg-size__btn" onClick={dec}>−</button>
+//         <div className="cfg-size__value">{value.toFixed(1)}</div>
+//         <button className="cfg-size__btn" onClick={inc}>+</button>
+//       </div>
+//       <input className="cfg-size__range" type="range" min={min} max={max} step={step} value={value}
+//         onChange={e => onChange(parseFloat(e.target.value))} />
+//     </div>
+//   )
+// }
 
 /* ── SVG viewport placeholder (Window / Patio / Wall) ───────────── */
 
@@ -526,10 +526,14 @@ export default function App() {
   })
   const update = (patch: Partial<CfgState>) => setCfg(s => ({ ...s, ...patch }))
 
-  const [ms1, setMs1] = useState(112)
-  const [ms2, setMs2] = useState(50)
-  const [ms3, setMs3] = useState(19)
-  const [ms4, setMs4] = useState(50)
+  // const [ms1, setMs1] = useState(112)
+  // const [ms2, setMs2] = useState(50)
+  // const [ms3, setMs3] = useState(19)
+  // const [ms4, setMs4] = useState(50)
+  const ms1 = 112
+  const ms2 = 50
+  const ms3 = 19
+  const ms4 = 50
   const [doorModel, setDoorModel] = useState('orleans')
   const [stepIdx, setStepIdx] = useState(0)
   const [isRotating, setIsRotating] = useState(false)
@@ -558,10 +562,10 @@ export default function App() {
 
   const price = computePrice(cfg)
 
-  const handleHorizontalScale = (value: number) => {
-    setMs2(value)
-    setMs4(value)
-  }
+  // const handleHorizontalScale = (value: number) => {
+  //   setMs2(value)
+  //   setMs4(value)
+  // }
 
   const viewportRef = useRef<HTMLDivElement>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera>(null)
