@@ -161,7 +161,37 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
         />
       ))}
 
-      <DoorHandler position={[-5.6, 0, PANEL_Z]} rotation={[0, 0, 0]} />
+      <DoorHandler position={[-5.1, 0, PANEL_Z]} rotation={[0, 0, 0]} />
+    </group>
+  )
+}
+
+function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, ...props }: {
+  color?: string
+  width?: number
+  height?: number
+  [key: string]: any
+}) {
+  const FRAME_THICKNESS = 0.5
+  const FRAME_DEPTH = 3
+
+  return (
+    <group {...props}>
+      {/* Left jamb */}
+      <mesh position={[-(width / 2 + FRAME_THICKNESS / 2), 0, 0]}>
+        <boxGeometry args={[FRAME_THICKNESS, height, FRAME_DEPTH]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
+      {/* Right jamb */}
+      <mesh position={[(width / 2 + FRAME_THICKNESS / 2), 0, 0]}>
+        <boxGeometry args={[FRAME_THICKNESS, height, FRAME_DEPTH]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
+      {/* Top header */}
+      <mesh position={[0, height / 2 + FRAME_THICKNESS / 2, 0]}>
+        <boxGeometry args={[width + FRAME_THICKNESS * 2, FRAME_THICKNESS, FRAME_DEPTH]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
     </group>
   )
 }
@@ -638,6 +668,7 @@ export default function App() {
                       : model.panels
                     return (
                       <Rotator isRotating={isRotating}>
+                        <FrameDoor color={currentUserColorSelected ?? model.color} width={12} height={30} />
                         <Door color={currentUserColorSelected ?? model.color} panels={panels} />
                       </Rotator>
                     )
