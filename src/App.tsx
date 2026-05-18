@@ -1,8 +1,9 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, useGLTF } from '@react-three/drei'
-import { Suspense, useEffect, useState, useRef, useMemo } from 'react'
+import { Suspense, useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import gsap from 'gsap'
 import { LoadingScreen } from './LoadingScreen'
 
 type InitData = { c1z: number; c2z: number; moldMin: number; moldMax: number }
@@ -136,10 +137,10 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
   panels?: PanelConfig[]
   [key: string]: any
 }) {
-  const DOOR_W = 15
-  const DOOR_H = 30
-  const DOOR_D = 0.5
-  const PANEL_Z = DOOR_D / 2 + 0.01
+  const DOOR_W = 12 // Equivalent to a 32 Inches
+  const DOOR_H = 30 // Equivalent to a 80 Inches
+  const DOOR_D = 0.25
+  const PANEL_Z = DOOR_D / 2 - 0.1
   const mc = mouldingColor ?? color
 
   return (
@@ -160,7 +161,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
         />
       ))}
 
-      <DoorHandler position={[-6.5, 0, PANEL_Z]} rotation={[0, Math.PI, 0]} scale={0.1} />
+      <DoorHandler position={[-5.6, 0, PANEL_Z]} rotation={[0, Math.PI, 0]} scale={0.1} />
     </group>
   )
 }
@@ -235,10 +236,14 @@ const STYLES: Record<string, Array<{ id: string; label: string; sub: string }>> 
     { id: 'french', label: 'French', sub: 'Centre-hinged double' },
   ],
   front: [
-    { id: 'single', label: 'Single', sub: 'Standard residential' },
-    { id: 'single-side', label: 'Single + Sidelite', sub: 'One side panel' },
-    { id: 'double', label: 'Double', sub: 'Two equal panels' },
-    { id: 'double-side', label: 'Double + Sidelites', sub: 'Grand entry' },
+    { id: 'single', label: 'Single Door', sub: 'Standard residential' },
+    { id: 'single-right', label: '+ Right Side Lite', sub: 'Right sidelite panel' },
+    { id: 'single-left', label: '+ Left Side Lite', sub: 'Left sidelite panel' },
+    { id: 'single-double-side', label: '+ Double Side Lite', sub: 'Both sidelite panels' },
+    { id: 'single-transom', label: '+ Transom', sub: 'Transom panel above' },
+    { id: 'single-transom-right', label: '+ Transom & Right Lite', sub: 'Transom + right sidelite' },
+    { id: 'single-transom-left', label: '+ Transom & Left Lite', sub: 'Transom + left sidelite' },
+    { id: 'single-transom-double', label: '+ Transom & Both Lites', sub: 'Transom + both sidelites' },
   ],
   wall: [
     { id: 'wall-3', label: '3-Bay Wall', sub: 'Slim frames, big views' },
@@ -249,11 +254,16 @@ const STYLES: Record<string, Array<{ id: string; label: string; sub: string }>> 
 
 const FRAME_SWATCHES: Record<string, string> = {
   white: '#F4F5F7',
+  cream: '#f0ede5',
   almond: '#E5DCC9',
+  sage: '#9dbfb2',
   cobble: '#888A8C',
+  charcoal: '#2c2c2c',
   black: '#1B1B1F',
   navy: '#001B70',
+  forest: '#2d5448',
   espresso: '#3B2A1E',
+  terracotta: '#e86253',
 }
 
 const GLASS_PACKAGES = [
@@ -284,23 +294,23 @@ type DoorModelDef = {
 const DOOR_MODELS: DoorModelDef[] = [
   {
     id: 'orleans', label: 'Orleans', sub: '2 panels · top + bottom', color: '#2c2c2c',
-    panels: [{ y: 4.0, moldScale: 112, moldScale2: 55 }, { y: -7.5, moldScale: 19, moldScale2: 55 }],
+    panels: [{ y: 4.0, moldScale: 112, moldScale2: 50 }, { y: -7.5, moldScale: 19, moldScale2: 50 }],
   },
   {
     id: 'uno', label: 'Uno', sub: '1 large panel', color: '#e86253',
-    panels: [{ y: 1, moldScale: 150.0, moldScale2: 55.0 }],
+    panels: [{ y: 1, moldScale: 150.0, moldScale2: 50.0 }],
   },
   {
     id: 'london', label: 'London', sub: '2 equal panels', color: '#f0ede5',
-    panels: [{ y: 4, moldScale: 90, moldScale2: 55 }, { y: -7, moldScale: 35, moldScale2: 55 }],
+    panels: [{ y: 4, moldScale: 90, moldScale2: 50 }, { y: -7, moldScale: 35, moldScale2: 50 }],
   },
   {
     id: 'victoria', label: 'Victoria', sub: '3 panels', color: '#9dbfb2',
-    panels: [{ y: 10, moldScale: 35, moldScale2: 55 }, { y: -2, x: 2.8, moldScale: 110, moldScale2: 15 }, { y: -2, x: -2.8, moldScale: 110, moldScale2: 15 }],
+    panels: [{ y: 10, moldScale: 35, moldScale2: 50 }, { y: -2, x: 2.7, moldScale: 110, moldScale2: 10 }, { y: -2, x: -2.7, moldScale: 110, moldScale2: 10 }],
   },
   {
     id: 'soho', label: 'Soho', sub: '4 panels', color: '#2d5448',
-    panels: [{ y: 10, moldScale: 30, moldScale2: 55 }, { y: 3, moldScale: 30, moldScale2: 55 }, { y: -4, moldScale: 30, moldScale2: 55 }, { y: -11, moldScale: 30, moldScale2: 55 }],
+    panels: [{ y: 10, moldScale: 30, moldScale2: 45 }, { y: 3, moldScale: 30, moldScale2: 45 }, { y: -4, moldScale: 30, moldScale2: 45 }, { y: -11, moldScale: 30, moldScale2: 45 }],
   },
   {
     id: 'vog', label: 'Vog', sub: 'Solid · no panels', color: '#3d3d3d',
@@ -325,9 +335,13 @@ const LITE_PATTERNS: Record<string, Record<string, number[][]>> = {
   },
   front: {
     'single': [],
-    'single-side': [[33.3, 4, 33.3, 96, 2.5]],
-    'double': [[50, 4, 50, 96, 2.5]],
-    'double-side': [[20, 4, 20, 96, 2.5], [50, 4, 50, 96, 2.5], [80, 4, 80, 96, 2.5]],
+    'single-right': [[70, 4, 70, 96, 2.5]],
+    'single-left': [[30, 4, 30, 96, 2.5]],
+    'single-double-side': [[24, 4, 24, 96, 2.5], [76, 4, 76, 96, 2.5]],
+    'single-transom': [[4, 20, 96, 20, 2.5]],
+    'single-transom-right': [[70, 4, 70, 96, 2.5], [4, 20, 70, 20, 2.5]],
+    'single-transom-left': [[30, 4, 30, 96, 2.5], [30, 20, 96, 20, 2.5]],
+    'single-transom-double': [[24, 4, 24, 96, 2.5], [76, 4, 76, 96, 2.5], [24, 20, 76, 20, 2.5]],
   },
   wall: {
     'wall-3': [[33.3, 4, 33.3, 96, 1.5], [66.6, 4, 66.6, 96, 1.5]],
@@ -349,9 +363,10 @@ function computePrice(state: CfgState) {
 
 const STEPS = [
   { id: 'type', label: 'Product\nType', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="0.5"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="12" x2="21" y2="12"/></svg>` },
+  { id: 'model', label: 'Select\nModel', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="15.5" cy="12" r="1" fill="currentColor" stroke="none"/></svg>` },
   { id: 'style', label: 'Style\n& Opening', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18"/><path d="M3 12h18"/><path d="M16 12 12 8"/></svg>` },
   { id: 'size', label: 'Size', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 21V3M21 21V3M3 12h18"/></svg>` },
-  { id: 'frame', label: 'Frame\nColour', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg>` },
+  { id: 'frame', label: 'Colour', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg>` },
   { id: 'glass', label: 'Glass\nPackage', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16"/><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/></svg>` },
   { id: 'hardware', label: 'Hardware', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 4v3M12 17v3M4 12h3M17 12h3"/></svg>` },
   { id: 'screen', label: 'Screens\n& Extras', glyph: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18"/><path d="M3 8h18M3 13h18M3 18h18M8 3v18M13 3v18M18 3v18"/></svg>` },
@@ -407,24 +422,49 @@ function SizeField({ label, value, onChange, min, max, step }: {
   )
 }
 
-function ScaleField({ label, value, min, max, step, onChange }: {
-  label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void
+function PickField({ label, value, options, onChange }: {
+  label: string
+  value: number
+  options: { value: number; label: string; disabled?: boolean }[]
+  onChange: (v: number) => void
 }) {
-  const dec = () => onChange(Math.max(min, Math.round((value - step) * 10) / 10))
-  const inc = () => onChange(Math.min(max, Math.round((value + step) * 10) / 10))
   return (
-    <div className="cfg-size__field">
+    <div className="cfg-pick__field">
       <div className="cfg-size__label">{label}</div>
-      <div className="cfg-size__control">
-        <button className="cfg-size__btn" onClick={dec}>−</button>
-        <div className="cfg-size__value">{value.toFixed(1)}</div>
-        <button className="cfg-size__btn" onClick={inc}>+</button>
+      <div className="cfg-pick__options">
+        {options.map(opt => (
+          <button
+            key={opt.value}
+            className={`cfg-pick__btn${value === opt.value ? ' is-active' : ''}`}
+            onClick={() => onChange(opt.value)}
+            disabled={opt.disabled}
+          >
+            {opt.label}
+          </button>
+        ))}
       </div>
-      <input className="cfg-size__range" type="range" min={min} max={max} step={step} value={value}
-        onChange={e => onChange(parseFloat(e.target.value))} />
     </div>
   )
 }
+
+// function ScaleField({ label, value, min, max, step, onChange }: {
+//   label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void
+// }) {
+//   const dec = () => onChange(Math.max(min, Math.round((value - step) * 10) / 10))
+//   const inc = () => onChange(Math.min(max, Math.round((value + step) * 10) / 10))
+//   return (
+//     <div className="cfg-size__field">
+//       <div className="cfg-size__label">{label}</div>
+//       <div className="cfg-size__control">
+//         <button className="cfg-size__btn" onClick={dec}>−</button>
+//         <div className="cfg-size__value">{value.toFixed(1)}</div>
+//         <button className="cfg-size__btn" onClick={inc}>+</button>
+//       </div>
+//       <input className="cfg-size__range" type="range" min={min} max={max} step={step} value={value}
+//         onChange={e => onChange(parseFloat(e.target.value))} />
+//     </div>
+//   )
+// }
 
 /* ── SVG viewport placeholder (Window / Patio / Wall) ───────────── */
 
@@ -479,20 +519,40 @@ export default function App() {
     style: 'single',
     width: 36,
     height: 80,
-    frame: 'white',
+    frame: 'charcoal',
     glass: 'triple',
     hardware: 'parallex',
     screen: 'retractable',
   })
   const update = (patch: Partial<CfgState>) => setCfg(s => ({ ...s, ...patch }))
 
-  const [ms1, setMs1] = useState(112)
-  const [ms2, setMs2] = useState(55)
-  const [ms3, setMs3] = useState(19)
-  const [ms4, setMs4] = useState(55)
+  // const [ms1, setMs1] = useState(112)
+  // const [ms2, setMs2] = useState(50)
+  // const [ms3, setMs3] = useState(19)
+  // const [ms4, setMs4] = useState(50)
+  const ms1 = 112
+  const ms2 = 50
+  const ms3 = 19
+  const ms4 = 50
   const [doorModel, setDoorModel] = useState('orleans')
   const [stepIdx, setStepIdx] = useState(0)
   const [isRotating, setIsRotating] = useState(false)
+  const [currentUserColorSelected, setCurrentUserColorSelected] = useState<string | null>(null)
+
+  // Snap to valid front-door sizes when switching product type
+  useEffect(() => {
+    if (cfg.productType !== 'front') return
+    const validWidths = [32, 34, 36]
+    const validHeights = [80, 95]
+    const w = validWidths.includes(cfg.width) ? cfg.width : 36
+    const h = validHeights.includes(cfg.height) ? cfg.height : 80
+    if (w !== cfg.width || h !== cfg.height) update({ width: w, height: h })
+  }, [cfg.productType])
+
+  // Vog is not available in 32" — bump up to 34"
+  useEffect(() => {
+    if (doorModel === 'vog' && cfg.width === 32) update({ width: 34 })
+  }, [doorModel])
 
   useEffect(() => {
     if (!isRotating) return
@@ -503,12 +563,19 @@ export default function App() {
 
   const price = computePrice(cfg)
 
-  const handleHorizontalScale = (value: number) => {
-    setMs2(value)
-    setMs4(value)
-  }
+  // const handleHorizontalScale = (value: number) => {
+  //   setMs2(value)
+  //   setMs4(value)
+  // }
 
   const viewportRef = useRef<HTMLDivElement>(null)
+  const cameraRef = useRef<THREE.PerspectiveCamera>(null)
+
+  const handleLoaded = useCallback(() => {
+    if (!cameraRef.current) return
+    gsap.fromTo(cameraRef.current.position, { z: 90 }, { z: 30, duration: 1, ease: 'power2.out' })
+  }, [])
+
   const toggleFullscreen = () => {
     if (!viewportRef.current) return
     if (!document.fullscreenElement) {
@@ -522,7 +589,7 @@ export default function App() {
 
   return (
     <div className="mw-app">
-      <LoadingScreen />
+      <LoadingScreen onDismiss={handleLoaded} />
 
       {/* Nav */}
       <nav className="mw-nav">
@@ -561,7 +628,7 @@ export default function App() {
             {cfg.productType === 'front' ? (
               <Canvas shadows>
                 <Suspense fallback={null}>
-                  <PerspectiveCamera makeDefault position={[0, 0, 30]} fov={60} />
+                  <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 0, 30]} fov={60} />
                   <directionalLight position={[0, 5, 90]} intensity={1.5} />
                   <directionalLight position={[0, 5, -90]} intensity={1.5} />
                   {(() => {
@@ -571,7 +638,7 @@ export default function App() {
                       : model.panels
                     return (
                       <Rotator isRotating={isRotating}>
-                        <Door color={model.color} panels={panels} />
+                        <Door color={currentUserColorSelected ?? model.color} panels={panels} />
                       </Rotator>
                     )
                   })()}
@@ -633,11 +700,69 @@ export default function App() {
                       </button>
                     ))}
                   </div>
+                  <div className="cfg-step__footer">
+                    <button className="mw-btn mw-btn--primary" onClick={() => setStepIdx(1)}>Next</button>
+                  </div>
                 </div>
               )}
 
-              {/* Step 2 — Style & Opening */}
+              {/* Step 2 — Select a Model */}
               {stepIdx === 1 && (
+                <div className="cfg-step">
+                  <StepHeader
+                    title="Select a model"
+                    sub={cfg.productType === 'front'
+                      ? 'Choose the door design that suits your home.'
+                      : `Model selection applies to Front Doors. Continue to configure your ${PRODUCT_TYPES.find(t => t.id === cfg.productType)?.label}.`}
+                  />
+
+                  {cfg.productType === 'front' ? (
+                    <>
+                      <div className="cfg-grid cfg-grid--2col">
+                        {DOOR_MODELS.map(m => (
+                          <button
+                            key={m.id}
+                            className={`cfg-card${doorModel === m.id ? ' is-active' : ''}`}
+                            onClick={() => setDoorModel(m.id)}
+                          >
+                            <div
+                              className="cfg-card__glyph"
+                              style={{ background: m.color, borderRadius: 3 }}
+                            />
+                            <div>
+                              <div className="cfg-card__label">{m.label}</div>
+                              <div className="cfg-card__sub">{m.sub}</div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* {doorModel === 'orleans' && (
+                        <>
+                          <SectionTitle>Panel proportions (3D preview)</SectionTitle>
+                          <div className="cfg-size">
+                            <ScaleField label="Top Vertical" value={ms1} min={70} max={120} step={0.1} onChange={setMs1} />
+                            <div className="cfg-size__by">×</div>
+                            <ScaleField label="Top Horizontal" value={ms2} min={30} max={55} step={0.1} onChange={handleHorizontalScale} />
+                          </div>
+                          <div className="cfg-size">
+                            <ScaleField label="Bottom Vertical" value={ms3} min={12} max={20} step={0.1} onChange={setMs3} />
+                            <div className="cfg-size__by">×</div>
+                            <ScaleField label="Bottom Horizontal" value={ms4} min={30} max={55} step={0.1} onChange={handleHorizontalScale} />
+                          </div>
+                        </>
+                      )} */}
+                    </>
+                  ) : (
+                    <div className="cfg-callout">
+                      <p>Model selection is only available for <strong>Front Doors</strong>. Click <strong>Next</strong> to continue.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Step 3 — Style & Opening */}
+              {stepIdx === 2 && (
                 <div className="cfg-step">
                   <StepHeader
                     title="Pick a style"
@@ -659,81 +784,102 @@ export default function App() {
                       )
                     })}
                   </div>
-
-                  {/* Front Door: model selection */}
-                  {cfg.productType === 'front' && (
-                    <>
-                      <SectionTitle>Door model</SectionTitle>
-                      <div className="cfg-grid cfg-grid--3col">
-                        {DOOR_MODELS.map(m => (
-                          <OptionTile
-                            key={m.id}
-                            active={doorModel === m.id}
-                            label={m.label}
-                            dimensions={m.sub}
-                            thumb={`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="54" height="54" fill="${m.color}" rx="1"/></svg>`}
-                            onClick={() => setDoorModel(m.id)}
-                          />
-                        ))}
-                      </div>
-                    </>
-                  )}
-
-                  {/* Orleans: moulding panel fine-tune */}
-                  {cfg.productType === 'front' && doorModel === 'orleans' && (
-                    <>
-                      <SectionTitle>Panel proportions (3D preview)</SectionTitle>
-                      <div className="cfg-size">
-                        <ScaleField label="Top Vertical" value={ms1} min={70} max={120} step={0.1} onChange={setMs1} />
-                        <div className="cfg-size__by">×</div>
-                        <ScaleField label="Top Horizontal" value={ms2} min={30} max={55} step={0.1} onChange={handleHorizontalScale} />
-                      </div>
-                      <div className="cfg-size">
-                        <ScaleField label="Bottom Vertical" value={ms3} min={12} max={20} step={0.1} onChange={setMs3} />
-                        <div className="cfg-size__by">×</div>
-                        <ScaleField label="Bottom Horizontal" value={ms4} min={30} max={55} step={0.1} onChange={handleHorizontalScale} />
-                      </div>
-                    </>
-                  )}
                 </div>
               )}
 
-              {/* Step 3 — Size */}
-              {stepIdx === 2 && (
+              {/* Step 4 — Size */}
+              {stepIdx === 3 && (
                 <div className="cfg-step">
-                  <StepHeader
-                    title="Rough opening"
-                    sub="Width × height in inches. Final measurements taken on-site."
-                  />
-                  <div className="cfg-size">
-                    <SizeField label="Width" value={cfg.width} min={18} max={96} step={2} onChange={v => update({ width: v })} />
-                    <div className="cfg-size__by">by</div>
-                    <SizeField label="Height" value={cfg.height} min={24} max={120} step={2} onChange={v => update({ height: v })} />
-                  </div>
-                  <div className="cfg-help">
-                    <SectionTitle>Visual size reference</SectionTitle>
-                    <div className="cfg-help__row">
-                      <div className="cfg-help__diagram">
-                        <div className="cfg-help__win" style={{
-                          width: Math.min(200, cfg.width * 2),
-                          height: Math.min(240, cfg.height * 1.6),
-                        }}>
-                          <span className="cfg-help__dim cfg-help__dim--w">{cfg.width}"</span>
-                          <span className="cfg-help__dim cfg-help__dim--h">{cfg.height}"</span>
+                  {cfg.productType === 'front' ? (
+                    <>
+                      <StepHeader
+                        title="Door size"
+                        sub="Standard sizes. Final measurements confirmed on-site."
+                      />
+                      <div className="cfg-pick">
+                        <PickField
+                          label="Width (inches)"
+                          value={cfg.width}
+                          onChange={v => update({ width: v })}
+                          options={[
+                            { value: 32, label: '32"', disabled: doorModel === 'vog' },
+                            { value: 34, label: '34"' },
+                            { value: 36, label: '36"' },
+                          ]}
+                        />
+                        <PickField
+                          label="Height (inches)"
+                          value={cfg.height}
+                          onChange={v => update({ height: v })}
+                          options={[
+                            { value: 80, label: '80"' },
+                            { value: 95, label: '95"' },
+                          ]}
+                        />
+                      </div>
+                      {doorModel === 'vog' && (
+                        <div className="cfg-callout">
+                          <span className="mw-eyebrow">Note</span>
+                          <p>The <strong>Vog</strong> model is only available in <strong>34"</strong> and <strong>36"</strong> widths.</p>
+                        </div>
+                      )}
+                      <div className="cfg-help">
+                        <SectionTitle>Visual size reference</SectionTitle>
+                        <div className="cfg-help__row">
+                          <div className="cfg-help__diagram">
+                            <div className="cfg-help__win" style={{
+                              width: Math.min(200, cfg.width * 2),
+                              height: Math.min(240, cfg.height * 1.6),
+                            }}>
+                              <span className="cfg-help__dim cfg-help__dim--w">{cfg.width}"</span>
+                              <span className="cfg-help__dim cfg-help__dim--h">{cfg.height}"</span>
+                            </div>
+                          </div>
+                          <div className="cfg-help__text">
+                            <p><strong>Available widths:</strong> 32" · 34" · 36"</p>
+                            <p><strong>Available heights:</strong> 80" · 95"</p>
+                            <p>Custom sizes outside this range available on request during consultation.</p>
+                          </div>
                         </div>
                       </div>
-                      <div className="cfg-help__text">
-                        <p><strong>Minimum:</strong> 18" × 24"</p>
-                        <p><strong>Maximum:</strong> 96" × 120"</p>
-                        <p>Custom sizes available outside this range — request during consultation.</p>
+                    </>
+                  ) : (
+                    <>
+                      <StepHeader
+                        title="Rough opening"
+                        sub="Width × height in inches. Final measurements taken on-site."
+                      />
+                      <div className="cfg-size">
+                        <SizeField label="Width" value={cfg.width} min={18} max={96} step={2} onChange={v => update({ width: v })} />
+                        <div className="cfg-size__by">by</div>
+                        <SizeField label="Height" value={cfg.height} min={24} max={120} step={2} onChange={v => update({ height: v })} />
                       </div>
-                    </div>
-                  </div>
+                      <div className="cfg-help">
+                        <SectionTitle>Visual size reference</SectionTitle>
+                        <div className="cfg-help__row">
+                          <div className="cfg-help__diagram">
+                            <div className="cfg-help__win" style={{
+                              width: Math.min(200, cfg.width * 2),
+                              height: Math.min(240, cfg.height * 1.6),
+                            }}>
+                              <span className="cfg-help__dim cfg-help__dim--w">{cfg.width}"</span>
+                              <span className="cfg-help__dim cfg-help__dim--h">{cfg.height}"</span>
+                            </div>
+                          </div>
+                          <div className="cfg-help__text">
+                            <p><strong>Minimum:</strong> 18" × 24"</p>
+                            <p><strong>Maximum:</strong> 96" × 120"</p>
+                            <p>Custom sizes available outside this range — request during consultation.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 
-              {/* Step 4 — Frame Colour */}
-              {stepIdx === 3 && (
+              {/* Step 5 — Frame Colour */}
+              {stepIdx === 4 && (
                 <div className="cfg-step">
                   <StepHeader
                     title="Frame finish"
@@ -746,7 +892,7 @@ export default function App() {
                         active={cfg.frame === id}
                         label={id[0].toUpperCase() + id.slice(1)}
                         swatch={hex}
-                        onClick={() => update({ frame: id })}
+                        onClick={() => { update({ frame: id }); setCurrentUserColorSelected(hex) }}
                       />
                     ))}
                   </div>
@@ -757,8 +903,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* Step 5 — Glass Package */}
-              {stepIdx === 4 && (
+              {/* Step 6 — Glass Package */}
+              {stepIdx === 5 && (
                 <div className="cfg-step">
                   <StepHeader
                     title="Choose your glass package"
@@ -785,8 +931,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* Step 6 — Hardware */}
-              {stepIdx === 5 && (
+              {/* Step 7 — Hardware */}
+              {stepIdx === 6 && (
                 <div className="cfg-step">
                   <StepHeader title="Hardware" sub="Operation and lock mechanism." />
                   <div className="cfg-list">
@@ -814,8 +960,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* Step 7 — Screens & Extras */}
-              {stepIdx === 6 && (
+              {/* Step 8 — Screens & Extras */}
+              {stepIdx === 7 && (
                 <div className="cfg-step">
                   <StepHeader
                     title="Screen system"
@@ -842,8 +988,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* Step 8 — Review & Quote */}
-              {stepIdx === 7 && (
+              {/* Step 9 — Review & Quote */}
+              {stepIdx === 8 && (
                 <div className="cfg-step">
                   <StepHeader
                     title="Your configuration"

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useProgress } from '@react-three/drei'
 import gsap from 'gsap'
 
-export function LoadingScreen() {
+export function LoadingScreen({ onDismiss }: { onDismiss?: () => void } = {}) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const barFillRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -35,7 +35,7 @@ export function LoadingScreen() {
       gsap.timeline()
         .to(barFillRef.current, { width: '100%', duration: 0.25, ease: 'power2.out' })
         .to(contentRef.current, { opacity: 0, y: -16, duration: 0.35, ease: 'power2.in' }, '+=0.25')
-        .to(overlayRef.current, { yPercent: -100, duration: 0.75, ease: 'expo.inOut' }, '-=0.1')
+        .to(overlayRef.current, { yPercent: -100, duration: 0.75, ease: 'expo.inOut', onStart: onDismiss }, '-=0.1')
         .set(overlayRef.current, { display: 'none' })
     }
   }, [active, progress, minTimePassed])

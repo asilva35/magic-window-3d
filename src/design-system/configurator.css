@@ -92,6 +92,7 @@
   padding: 6px 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
+  text-decoration: none;
 }
 
 .cfg__chip>span:last-child {
@@ -251,6 +252,12 @@
   color: var(--magic-dark-blue);
   opacity: 0.78;
   margin-top: 8px;
+}
+
+.cfg-step__footer {
+  margin-top: 12px;
+  padding-top: 24px;
+  border-top: 1px solid var(--magic-light-grey, #e8eaf0);
 }
 
 .cfg-section__title {
@@ -472,6 +479,56 @@
   font-size: 14px;
   color: var(--magic-dark-blue);
   padding-top: 26px;
+}
+
+/* ── Discrete pick (front door sizes) ──────────────────────── */
+.cfg-pick {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.cfg-pick__field {
+  background: var(--magic-blue-shade-2);
+  border-radius: 5px;
+  padding: 14px 16px;
+}
+
+.cfg-pick__options {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.cfg-pick__btn {
+  flex: 1;
+  padding: 10px 8px;
+  border: 1.5px solid var(--magic-dark-blue);
+  border-radius: 4px;
+  background: #fff;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 15px;
+  color: var(--magic-dark-blue);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard),
+              color var(--dur-fast) var(--ease-standard);
+}
+
+.cfg-pick__btn:hover:not(:disabled) {
+  background: var(--magic-blue-shade-2);
+}
+
+.cfg-pick__btn.is-active {
+  background: var(--magic-dark-blue);
+  color: #fff;
+}
+
+.cfg-pick__btn:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+  border-color: var(--magic-grey-line);
 }
 
 /* ── Lists (option rows) ────────────────────────────────────── */

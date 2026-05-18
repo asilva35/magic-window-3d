@@ -15,58 +15,73 @@
   /* ── BRAND COLORS ────────────────────────────────────────────── */
 
   /* Primary */
-  --magic-dark-blue:        #001B70;   /* "Dark Blue Magic"  — primary brand */
-  --magic-deep-blue:        #00134E;   /* clicked/pressed state              */
+  --magic-dark-blue: #001B70;
+  /* "Dark Blue Magic"  — primary brand */
+  --magic-deep-blue: #04123f;
+  /* clicked/pressed state              */
 
   /* Secondary */
-  --magic-light-blue:       #6AC3E7;   /* "Light Blue Magic" — accent / line */
+  --magic-light-blue: #6AC3E7;
+  /* "Light Blue Magic" — accent / line */
 
   /* Blue scale (supporting) */
-  --magic-blue-shade-1:     #6581B8;   /* mid-tone (line dividers, secondary)*/
-  --magic-blue-shade-2:     #C7D2EC;   /* soft tint (chip bg, surfaces)      */
-  --magic-blue-shade-3:     #B7C5E7;   /* alt soft tint                      */
+  --magic-blue-shade-1: #6581B8;
+  /* mid-tone (line dividers, secondary)*/
+  --magic-blue-shade-2: #C7D2EC;
+  /* soft tint (chip bg, surfaces)      */
+  --magic-blue-shade-3: #B7C5E7;
+  /* alt soft tint                      */
 
   /* Neutrals */
-  --magic-white:            #FFFFFF;
-  --magic-grey:             #ADADAD;   /* form borders / disabled            */
-  --magic-grey-soft:        #DDDEDF;   /* tertiary button bg                 */
-  --magic-grey-line:        #E1E1E1;   /* subtle divider                     */
+  --magic-white: #FFFFFF;
+  --magic-grey: #ADADAD;
+  /* form borders / disabled            */
+  --magic-grey-soft: #DDDEDF;
+  /* tertiary button bg                 */
+  --magic-grey-line: #E1E1E1;
+  /* subtle divider                     */
 
   /* Semantic */
-  --magic-error:            #FF0000;   /* form error stroke                  */
-  --magic-success:          #2E8B57;   /* (system extension; not in fig)     */
+  --magic-error: #FF0000;
+  /* form error stroke                  */
+  --magic-success: #2E8B57;
+  /* (system extension; not in fig)     */
 
   /* Gradient — soft brand surface */
-  --magic-soft-gradient:    linear-gradient(180deg, rgba(199,210,236,0.30) 0%, #E1E1E1 100%);
+  --magic-soft-gradient: linear-gradient(180deg, rgba(199, 210, 236, 0.30) 0%, #E1E1E1 100%);
 
   /* ── SEMANTIC ROLES ──────────────────────────────────────────── */
-  --bg:                     var(--magic-white);
-  --bg-elevated:            var(--magic-white);
-  --bg-deep:                var(--magic-dark-blue);   /* navy hero / footer  */
-  --bg-soft:                var(--magic-blue-shade-2);
+  --bg: var(--magic-white);
+  --bg-elevated: var(--magic-white);
+  --bg-deep: var(--magic-dark-blue);
+  /* navy hero / footer  */
+  --bg-soft: var(--magic-blue-shade-2);
 
-  --fg:                     var(--magic-dark-blue);   /* nearly all text     */
-  --fg-on-dark:             var(--magic-white);
-  --fg-muted:               var(--magic-blue-shade-1);
-  --fg-disabled:            var(--magic-grey);
+  --fg: var(--magic-dark-blue);
+  /* nearly all text     */
+  --fg-on-dark: var(--magic-white);
+  --fg-muted: var(--magic-blue-shade-1);
+  --fg-disabled: var(--magic-grey);
 
-  --border:                 var(--magic-grey);
-  --border-accent:          var(--magic-light-blue);  /* active inputs       */
-  --border-error:           var(--magic-error);
-  --divider:                var(--magic-grey-line);
+  --border: var(--magic-grey);
+  --border-accent: var(--magic-light-blue);
+  /* active inputs       */
+  --border-error: var(--magic-error);
+  --divider: var(--magic-grey-line);
 
   /* ── TYPE FAMILIES ───────────────────────────────────────────── */
-  --font-display:           "Mulish", "Harmonia Sans Pro", "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-body:              "Open Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Mulish", "Harmonia Sans Pro", "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Open Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
 
   /* Weights */
   --fw-regular: 400;
-  --fw-bold:    700;
-  --fw-black:   900;
+  --fw-bold: 700;
+  --fw-black: 900;
 
   /* ── TYPE SCALE (from Figma Style Guide) ─────────────────────── */
   /* Headings — Harmonia Sans Pro Black                              */
-  --fs-h1: 64px;  /* Mobile/Heading 1 */
+  --fs-h1: 64px;
+  /* Mobile/Heading 1 */
   --fs-h2: 50px;
   --fs-h3: 40px;
   --fs-h4: 34px;
@@ -86,23 +101,24 @@
   --fs-body-1: 16px;
   --fs-body-2: 14px;
   --fs-body-3: 12px;
-  --fs-body-4: 8px;   /* fine print / disclaimers only */
+  --fs-body-4: 8px;
+  /* fine print / disclaimers only */
 
   /* Line heights */
-  --lh-tight:  1;
-  --lh-snug:   1.15;
-  --lh-body:   1.55;
+  --lh-tight: 1;
+  --lh-snug: 1.15;
+  --lh-body: 1.55;
 
   /* ── SPACING / RADII / SHADOW ────────────────────────────────── */
-  --space-1:   4px;
-  --space-2:   8px;
-  --space-3:   12px;
-  --space-4:   16px;
-  --space-5:   21px;
-  --space-6:   24px;
-  --space-7:   31px;
-  --space-8:   40px;
-  --space-9:   48px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 21px;
+  --space-6: 24px;
+  --space-7: 31px;
+  --space-8: 40px;
+  --space-9: 48px;
 
   /* Radii */
   --radius-xs: 3px;
@@ -112,41 +128,164 @@
 
   /* Borders */
   --border-hairline: 0.5px;
-  --border-thin:     0.7px;
+  --border-thin: 0.7px;
   --border-standard: 1px;
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0,27,112,0.06), 0 1px 1px rgba(0,27,112,0.04);
-  --shadow-md: 0 4px 16px rgba(0,27,112,0.08), 0 1px 2px rgba(0,27,112,0.04);
-  --shadow-lg: 0 12px 40px rgba(0,27,112,0.14);
+  --shadow-sm: 0 1px 2px rgba(0, 27, 112, 0.06), 0 1px 1px rgba(0, 27, 112, 0.04);
+  --shadow-md: 0 4px 16px rgba(0, 27, 112, 0.08), 0 1px 2px rgba(0, 27, 112, 0.04);
+  --shadow-lg: 0 12px 40px rgba(0, 27, 112, 0.14);
 
   /* Motion */
   --ease-standard: cubic-bezier(0.2, 0.6, 0.2, 1);
-  --ease-emph:     cubic-bezier(0.2, 0.8, 0.2, 1);
-  --dur-fast:      120ms;
-  --dur-base:      200ms;
-  --dur-slow:      360ms;
+  --ease-emph: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 360ms;
 }
 
 /* ── SEMANTIC TYPE CLASSES ─────────────────────────────────────── */
-.h1, h1 { font-family: var(--font-display); font-weight: var(--fw-black);   font-size: var(--fs-h1); line-height: var(--lh-snug); color: var(--fg); margin: 0; }
-.h2, h2 { font-family: var(--font-display); font-weight: var(--fw-black);   font-size: var(--fs-h2); line-height: var(--lh-snug); color: var(--fg); margin: 0; }
-.h3, h3 { font-family: var(--font-display); font-weight: var(--fw-black);   font-size: var(--fs-h3); line-height: var(--lh-snug); color: var(--fg); margin: 0; }
-.h4, h4 { font-family: var(--font-display); font-weight: var(--fw-black);   font-size: var(--fs-h4); line-height: var(--lh-snug); color: var(--fg); margin: 0; }
-.h5, h5 { font-family: var(--font-display); font-weight: var(--fw-black);   font-size: var(--fs-h5); line-height: var(--lh-snug); color: var(--fg); margin: 0; }
-.h6, h6 { font-family: var(--font-display); font-weight: var(--fw-black);   font-size: var(--fs-h6); line-height: var(--lh-snug); color: var(--fg); margin: 0; }
+.h1,
+h1 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-black);
+  font-size: var(--fs-h1);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+  margin: 0;
+}
 
-.sub-1 { font-family: var(--font-display); font-weight: var(--fw-regular); font-size: var(--fs-sub-1); line-height: var(--lh-snug); color: var(--fg); }
-.sub-2 { font-family: var(--font-display); font-weight: var(--fw-regular); font-size: var(--fs-sub-2); line-height: var(--lh-snug); color: var(--fg); }
-.sub-3 { font-family: var(--font-display); font-weight: var(--fw-regular); font-size: var(--fs-sub-3); line-height: var(--lh-snug); color: var(--fg); }
-.sub-4 { font-family: var(--font-display); font-weight: var(--fw-regular); font-size: var(--fs-sub-4); line-height: var(--lh-snug); color: var(--fg); }
-.sub-5 { font-family: var(--font-display); font-weight: var(--fw-regular); font-size: var(--fs-sub-5); line-height: var(--lh-snug); color: var(--fg); }
-.sub-6 { font-family: var(--font-display); font-weight: var(--fw-regular); font-size: var(--fs-sub-6); line-height: var(--lh-snug); color: var(--fg); }
+.h2,
+h2 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-black);
+  font-size: var(--fs-h2);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+  margin: 0;
+}
 
-.body-1, p { font-family: var(--font-body); font-weight: var(--fw-regular); font-size: var(--fs-body-1); line-height: var(--lh-body); color: var(--fg); margin: 0; }
-.body-2    { font-family: var(--font-body); font-weight: var(--fw-regular); font-size: var(--fs-body-2); line-height: var(--lh-body); color: var(--fg); }
-.body-3    { font-family: var(--font-body); font-weight: var(--fw-regular); font-size: var(--fs-body-3); line-height: var(--lh-body); color: var(--fg); }
-.fine      { font-family: var(--font-body); font-weight: var(--fw-regular); font-size: var(--fs-body-4); line-height: var(--lh-body); color: var(--fg-muted); }
+.h3,
+h3 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-black);
+  font-size: var(--fs-h3);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+  margin: 0;
+}
+
+.h4,
+h4 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-black);
+  font-size: var(--fs-h4);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+  margin: 0;
+}
+
+.h5,
+h5 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-black);
+  font-size: var(--fs-h5);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+  margin: 0;
+}
+
+.h6,
+h6 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-black);
+  font-size: var(--fs-h6);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+  margin: 0;
+}
+
+.sub-1 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-sub-1);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+}
+
+.sub-2 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-sub-2);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+}
+
+.sub-3 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-sub-3);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+}
+
+.sub-4 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-sub-4);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+}
+
+.sub-5 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-sub-5);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+}
+
+.sub-6 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-sub-6);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+}
+
+.body-1,
+p {
+  font-family: var(--font-body);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-body-1);
+  line-height: var(--lh-body);
+  color: var(--fg);
+  margin: 0;
+}
+
+.body-2 {
+  font-family: var(--font-body);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-body-2);
+  line-height: var(--lh-body);
+  color: var(--fg);
+}
+
+.body-3 {
+  font-family: var(--font-body);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-body-3);
+  line-height: var(--lh-body);
+  color: var(--fg);
+}
+
+.fine {
+  font-family: var(--font-body);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-body-4);
+  line-height: var(--lh-body);
+  color: var(--fg-muted);
+}
 
 .eyebrow {
   font-family: var(--font-display);
