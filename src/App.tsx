@@ -84,15 +84,20 @@ function Moulding({ moldScale, onTipZ, color = '#2c2c2c', ...props }: {
   return <primitive object={clone} {...props} />
 }
 
-function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', ...props }: {
+function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, ...props }: {
   moldScale: number
   moldScale2: number
   color?: string
+  glassMat?: GlassMat
   [key: string]: any
 }) {
   const [vTip, setVTip] = useState(3.94)
   const [hTip, setHTip] = useState(3.92)
   const hSideY = vTip
+
+  // Glass panel fits inside the moulding frame; subtract ~1.2 units per side for the profile
+  const glassW = Math.max(0, hTip * 2 - 1.2)
+  const glassH = Math.max(0, vTip * 2 - 1.2)
 
   return (
     <group {...props}>
@@ -100,6 +105,18 @@ function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', ...props }: {
       <Moulding color={color} moldScale={moldScale} position={[hTip, 0, 0.1]} rotation={[Math.PI / 2, Math.PI, 0.1]} />
       <Moulding color={color} moldScale={moldScale2} onTipZ={setHTip} position={[0, -hSideY, 0.1]} rotation={[Math.PI / 2, Math.PI / 2, 0.1]} />
       <Moulding color={color} moldScale={moldScale2} position={[0, hSideY, 0.1]} rotation={[Math.PI / 2, -Math.PI / 2, 0.1]} />
+      {glassMat && (
+        <group>
+          <mesh position={[0, 0, 0.2]}>
+            <boxGeometry args={[glassW, glassH, 0.04]} />
+            <meshStandardMaterial color={glassMat.color} transparent opacity={glassMat.opacity} roughness={glassMat.roughness} metalness={glassMat.metalness} />
+          </mesh>
+          <mesh position={[0, 0, -0.15]}>
+            <boxGeometry args={[glassW, glassH, 0.04]} />
+            <meshStandardMaterial color={glassMat.color} transparent opacity={glassMat.opacity} roughness={glassMat.roughness} metalness={glassMat.metalness} />
+          </mesh>
+        </group>
+      )}
     </group>
   )
 }
@@ -131,12 +148,14 @@ interface PanelConfig {
   moldScale2: number
 }
 
-function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, height = 30, ...props }: {
+function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, height = 30, glassMat, glassPanelRule = 'top', ...props }: {
   color?: string
   mouldingColor?: string
   panels?: PanelConfig[]
   width?: number
   height?: number
+  glassMat?: GlassMat
+  glassPanelRule?: 'top' | 'all' | 'none'
   [key: string]: any
 }) {
   const DOOR_D = 0.25
@@ -150,69 +169,42 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, heigh
         <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
       </mesh>
 
-      {panels.map((panel, i) => (
-        <PanelMoulding
-          key={i}
-          color={mc}
-          moldScale={panel.moldScale}
-          moldScale2={panel.moldScale2}
-          position={[panel.x ?? 0, panel.y, PANEL_Z]}
-          scale={[0.4, 0.4, 1]}
-        />
-      ))}
+      {panels.map((panel, i) => {
+        const showGlass = glassMat && glassPanelRule !== 'none' && (glassPanelRule === 'all' || i === 0)
+        return (
+          <PanelMoulding
+            key={i}
+            color={mc}
+            moldScale={panel.moldScale}
+            moldScale2={panel.moldScale2}
+            position={[panel.x ?? 0, panel.y, PANEL_Z]}
+            scale={[0.4, 0.4, 1]}
+            glassMat={showGlass ? glassMat : undefined}
+          />
+        )
+      })}
 
       <DoorHandler position={[-(width / 2 - 0.9), 0, PANEL_Z]} rotation={[0, 0, 0]} />
     </group>
   )
 }
 
-function SideLite({ color = '#2c2c2c', width = 4.5, height = 30, ...props }: {
-  color?: string
-  width?: number
-  height?: number
-  [key: string]: any
-}) {
-  const RAIL = 0.5   // stile / rail width
-  const D = 0.25  // sash depth
-  const Z = 1.4   // sits in front of the wall, behind the outer frame (z=0.75)
-  const hw = width / 2
-  const hh = height / 2
+const DEFAULT_GLASS_MAT: GlassMat = { color: '#c8dff0', opacity: 0.4, roughness: 0.05, metalness: 0.1 }
 
+function GlassPane({ width, height, z, mat }: { width: number; height: number; z: number; mat: GlassMat }) {
   return (
-    <group {...props}>
-      {/* Left stile */}
-      <mesh position={[-hw + RAIL / 2, 0, Z]}>
-        <boxGeometry args={[RAIL, height, D]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
-      {/* Right stile */}
-      <mesh position={[hw - RAIL / 2, 0, Z]}>
-        <boxGeometry args={[RAIL, height, D]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
-      {/* Top rail */}
-      <mesh position={[0, hh - RAIL / 2, Z]}>
-        <boxGeometry args={[width, RAIL, D]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
-      {/* Bottom rail */}
-      <mesh position={[0, -hh + RAIL / 2, Z]}>
-        <boxGeometry args={[width, RAIL, D]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
-      {/* Glass */}
-      <mesh position={[0, 0, Z]}>
-        <boxGeometry args={[width - 2 * RAIL, height - 2 * RAIL, 0.04]} />
-        <meshStandardMaterial color="#c8dff0" transparent opacity={0.4} roughness={0.05} metalness={0.1} />
-      </mesh>
-    </group>
+    <mesh position={[0, 0, z]}>
+      <boxGeometry args={[width, height, 0.04]} />
+      <meshStandardMaterial color={mat.color} transparent opacity={mat.opacity} roughness={mat.roughness} metalness={mat.metalness} />
+    </mesh>
   )
 }
 
-function Transom({ color = '#2c2c2c', width = 12, height = 5, ...props }: {
+function SideLite({ color = '#2c2c2c', width = 4.5, height = 30, glassMat, ...props }: {
   color?: string
   width?: number
   height?: number
+  glassMat?: GlassMat
   [key: string]: any
 }) {
   const RAIL = 0.5
@@ -220,43 +212,74 @@ function Transom({ color = '#2c2c2c', width = 12, height = 5, ...props }: {
   const Z = 1.4
   const hw = width / 2
   const hh = height / 2
+  const gm = glassMat ?? DEFAULT_GLASS_MAT
 
   return (
     <group {...props}>
-      {/* Left stile */}
       <mesh position={[-hw + RAIL / 2, 0, Z]}>
         <boxGeometry args={[RAIL, height, D]} />
         <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
       </mesh>
-      {/* Right stile */}
       <mesh position={[hw - RAIL / 2, 0, Z]}>
         <boxGeometry args={[RAIL, height, D]} />
         <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
       </mesh>
-      {/* Top rail */}
       <mesh position={[0, hh - RAIL / 2, Z]}>
         <boxGeometry args={[width, RAIL, D]} />
         <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
       </mesh>
-      {/* Bottom rail */}
       <mesh position={[0, -hh + RAIL / 2, Z]}>
         <boxGeometry args={[width, RAIL, D]} />
         <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
       </mesh>
-      {/* Glass */}
-      <mesh position={[0, 0, Z]}>
-        <boxGeometry args={[width - 2 * RAIL, height - 2 * RAIL, 0.04]} />
-        <meshStandardMaterial color="#c8dff0" transparent opacity={0.4} roughness={0.05} metalness={0.1} />
-      </mesh>
+      <GlassPane width={width - 2 * RAIL} height={height - 2 * RAIL} z={Z} mat={gm} />
     </group>
   )
 }
 
-function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single', ...props }: {
+function Transom({ color = '#2c2c2c', width = 12, height = 5, glassMat, ...props }: {
+  color?: string
+  width?: number
+  height?: number
+  glassMat?: GlassMat
+  [key: string]: any
+}) {
+  const RAIL = 0.5
+  const D = 0.25
+  const Z = 1.4
+  const hw = width / 2
+  const hh = height / 2
+  const gm = glassMat ?? DEFAULT_GLASS_MAT
+
+  return (
+    <group {...props}>
+      <mesh position={[-hw + RAIL / 2, 0, Z]}>
+        <boxGeometry args={[RAIL, height, D]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
+      <mesh position={[hw - RAIL / 2, 0, Z]}>
+        <boxGeometry args={[RAIL, height, D]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
+      <mesh position={[0, hh - RAIL / 2, Z]}>
+        <boxGeometry args={[width, RAIL, D]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
+      <mesh position={[0, -hh + RAIL / 2, Z]}>
+        <boxGeometry args={[width, RAIL, D]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
+      <GlassPane width={width - 2 * RAIL} height={height - 2 * RAIL} z={Z} mat={gm} />
+    </group>
+  )
+}
+
+function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single', glassMat, ...props }: {
   color?: string
   width?: number
   height?: number
   style?: string
+  glassMat?: GlassMat
   [key: string]: any
 }) {
   const T = 0.5   // frame thickness
@@ -312,30 +335,14 @@ function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single
 
       {/* Side lite panels */}
       {hasRight && (
-        <SideLite
-          color={color}
-          width={LITE_W}
-          height={height}
-          position={[hw + T + LITE_W / 2, 0, 0]}
-        />
+        <SideLite color={color} width={LITE_W} height={height} glassMat={glassMat} position={[hw + T + LITE_W / 2, 0, 0]} />
       )}
       {hasLeft && (
-        <SideLite
-          color={color}
-          width={LITE_W}
-          height={height}
-          position={[-(hw + T + LITE_W / 2), 0, 0]}
-        />
+        <SideLite color={color} width={LITE_W} height={height} glassMat={glassMat} position={[-(hw + T + LITE_W / 2), 0, 0]} />
       )}
 
-      {/* Transom panel */}
       {hasTransom && (
-        <Transom
-          color={color}
-          width={aWidth - 2 * T}
-          height={TRANSOM_H}
-          position={[aCenterX, hh + T + TRANSOM_H / 2, 0]}
-        />
+        <Transom color={color} width={aWidth - 2 * T} height={TRANSOM_H} glassMat={glassMat} position={[aCenterX, hh + T + TRANSOM_H / 2, 0]} />
       )}
     </group>
   )
@@ -370,6 +377,7 @@ type CfgState = {
   height: number
   frame: string
   glass: string
+  doorGlass: string
   hardware: string
   screen: string
 }
@@ -447,6 +455,40 @@ const GLASS_PACKAGES = [
   { id: 'lowe', label: 'Triple + Low-E', sub: 'Best year-round comfort', price: 720 },
 ]
 
+type GlassMat = { color: string; opacity: number; roughness: number; metalness: number }
+
+const DOOR_GLASS: { id: string; label: string; category: string; swatch: string }[] = [
+  { id: 'sandblast', label: 'Sandblast', category: 'Textured Glass', swatch: 'rgba(215,215,210,0.85)' },
+  { id: 'edge', label: 'Edge', category: 'Textured Glass', swatch: 'linear-gradient(135deg,rgba(195,218,228,0.5) 50%,rgba(195,218,228,0.92) 50%)' },
+  { id: 'pure', label: 'Pure', category: 'Skillscreen', swatch: 'rgba(238,246,255,0.45)' },
+  { id: 'equation', label: 'Equation', category: 'Skillscreen', swatch: 'rgba(215,238,215,0.5)' },
+  { id: 'nuando', label: 'Nuando', category: 'Skillscreen', swatch: 'rgba(244,236,218,0.55)' },
+  { id: 'mist', label: 'Mist', category: 'Skillscreen', swatch: 'rgba(225,236,248,0.72)' },
+  { id: 'winchester', label: 'Winchester', category: 'Stained Glass', swatch: '#b8956a' },
+  { id: 'nobel', label: 'Nobel', category: 'Stained Glass', swatch: '#7b9cbf' },
+  { id: 'belmont', label: 'Belmont', category: 'Stained Glass', swatch: '#8fb080' },
+  { id: 'celeste', label: 'Celeste', category: 'Stained Glass', swatch: '#90b8d8' },
+  { id: 'bolero', label: 'Bolero', category: 'Stained Glass', swatch: '#b890b0' },
+  { id: 'bistro', label: 'Bistro', category: 'Stained Glass', swatch: '#c0a850' },
+  { id: 'portrait', label: 'Portrait', category: 'Stained Glass', swatch: '#c8a080' },
+]
+
+const DOOR_GLASS_MAT: Record<string, GlassMat> = {
+  sandblast: { color: '#e0e0d8', opacity: 0.78, roughness: 0.85, metalness: 0 },
+  edge: { color: '#c8dce8', opacity: 0.65, roughness: 0.6, metalness: 0 },
+  pure: { color: '#eef5ff', opacity: 0.45, roughness: 0.25, metalness: 0 },
+  equation: { color: '#d8eed8', opacity: 0.5, roughness: 0.25, metalness: 0 },
+  nuando: { color: '#f0e8d0', opacity: 0.5, roughness: 0.25, metalness: 0 },
+  mist: { color: '#d8e8f5', opacity: 0.7, roughness: 0.5, metalness: 0 },
+  winchester: { color: '#b8956a', opacity: 0.65, roughness: 0.1, metalness: 0.15 },
+  nobel: { color: '#7b9cbf', opacity: 0.72, roughness: 0.08, metalness: 0.2 },
+  belmont: { color: '#8fb080', opacity: 0.65, roughness: 0.1, metalness: 0.1 },
+  celeste: { color: '#90b8d8', opacity: 0.72, roughness: 0.05, metalness: 0.2 },
+  bolero: { color: '#b890b0', opacity: 0.65, roughness: 0.1, metalness: 0.15 },
+  bistro: { color: '#c0a850', opacity: 0.62, roughness: 0.1, metalness: 0.1 },
+  portrait: { color: '#c8a080', opacity: 0.62, roughness: 0.15, metalness: 0.1 },
+}
+
 const HARDWARE = [
   { id: 'parallex', label: 'Parallex® push-out', sub: 'Patented · never crank again', price: 0 },
   { id: 'crank', label: 'Traditional crank', sub: 'Compatible with retrofit setups', price: -90 },
@@ -492,6 +534,10 @@ const DOOR_MODELS: DoorModelDef[] = [
     panels: [],
   },
 ]
+
+const DOOR_GLASS_RULE: Record<string, 'top' | 'all' | 'none'> = {
+  orleans: 'top', uno: 'top', london: 'top', victoria: 'top', soho: 'all', vog: 'none',
+}
 
 const LITE_PATTERNS: Record<string, Record<string, number[][]>> = {
   window: {
@@ -696,6 +742,7 @@ export default function App() {
     height: 80,
     frame: 'charcoal',
     glass: 'triple',
+    doorGlass: 'sandblast',
     hardware: 'parallex',
     screen: 'retractable',
   })
@@ -820,10 +867,13 @@ export default function App() {
                     const panels = doorModel === 'orleans'
                       ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
                       : model.panels
+                    const glassMat = DOOR_GLASS_MAT[cfg.doorGlass]
+                    const glassPanelRule = DOOR_GLASS_RULE[doorModel] ?? 'top'
+                    const frameColor = currentUserColorSelected ?? model.color
                     return (
                       <Rotator isRotating={isRotating}>
-                        <FrameDoor color={currentUserColorSelected ?? model.color} width={doorW3d} height={doorH3d} style={cfg.style} />
-                        <Door color={currentUserColorSelected ?? model.color} width={doorW3d} height={doorH3d} panels={panels} />
+                        <FrameDoor color={frameColor} width={doorW3d} height={doorH3d} style={cfg.style} glassMat={glassMat} />
+                        <Door color={frameColor} width={doorW3d} height={doorH3d} panels={panels} glassMat={glassMat} glassPanelRule={glassPanelRule} />
                       </Rotator>
                     )
                   })()}
@@ -1090,31 +1140,67 @@ export default function App() {
                 </div>
               )}
 
-              {/* Step 6 — Glass Package */}
+              {/* Step 6 — Glass */}
               {stepIdx === 5 && (
                 <div className="cfg-step">
-                  <StepHeader
-                    title="Choose your glass package"
-                    sub="More argon, more layers, lower energy bills."
-                  />
-                  <div className="cfg-list">
-                    {GLASS_PACKAGES.map(g => (
-                      <button
-                        key={g.id}
-                        className={`cfg-row${cfg.glass === g.id ? ' is-active' : ''}`}
-                        onClick={() => update({ glass: g.id })}
-                      >
-                        <div className="cfg-row__check" />
-                        <div className="cfg-row__main">
-                          <div className="cfg-row__label">{g.label}</div>
-                          <div className="cfg-row__sub">{g.sub}</div>
+                  {cfg.productType === 'front' ? (
+                    <>
+                      <StepHeader
+                        title="Choose your glass"
+                        sub="Select a decorative glass style for your door panels, side lites, and transom."
+                      />
+                      {(['Textured Glass', 'Skillscreen', 'Stained Glass'] as const).map(cat => (
+                        <div key={cat}>
+                          <SectionTitle>{cat}</SectionTitle>
+                          <div className="cfg-grid cfg-grid--4col" style={{ marginBottom: '0.5rem' }}>
+                            {DOOR_GLASS.filter(g => g.category === cat).map(g => (
+                              <button
+                                key={g.id}
+                                className={`cfg-tile${cfg.doorGlass === g.id ? ' is-active' : ''}`}
+                                onClick={() => update({ doorGlass: g.id })}
+                                style={{ padding: '0.5rem' }}
+                              >
+                                <div style={{
+                                  width: '100%',
+                                  aspectRatio: '1',
+                                  background: g.swatch,
+                                  borderRadius: 4,
+                                  border: '1px solid rgba(0,0,0,0.12)',
+                                  marginBottom: '0.4rem',
+                                }} />
+                                <div className="cfg-tile__label" style={{ fontSize: '0.7rem', textAlign: 'center' }}>{g.label}</div>
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                        <div className="cfg-row__price">
-                          {g.price === 0 ? 'Included' : `+ $${g.price} CAD`}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      <StepHeader
+                        title="Choose your glass package"
+                        sub="More argon, more layers, lower energy bills."
+                      />
+                      <div className="cfg-list">
+                        {GLASS_PACKAGES.map(g => (
+                          <button
+                            key={g.id}
+                            className={`cfg-row${cfg.glass === g.id ? ' is-active' : ''}`}
+                            onClick={() => update({ glass: g.id })}
+                          >
+                            <div className="cfg-row__check" />
+                            <div className="cfg-row__main">
+                              <div className="cfg-row__label">{g.label}</div>
+                              <div className="cfg-row__sub">{g.sub}</div>
+                            </div>
+                            <div className="cfg-row__price">
+                              {g.price === 0 ? 'Included' : `+ $${g.price} CAD`}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 
@@ -1188,7 +1274,9 @@ export default function App() {
                       ['Style', STYLES[cfg.productType]?.find(s => s.id === cfg.style)?.label ?? ''],
                       ['Size', `${cfg.width}" × ${cfg.height}"`],
                       ['Frame', cfg.frame[0].toUpperCase() + cfg.frame.slice(1)],
-                      ['Glass', GLASS_PACKAGES.find(g => g.id === cfg.glass)?.label ?? ''],
+                      ['Glass', cfg.productType === 'front'
+                        ? (DOOR_GLASS.find(g => g.id === cfg.doorGlass)?.label ?? '')
+                        : (GLASS_PACKAGES.find(g => g.id === cfg.glass)?.label ?? '')],
                       ['Hardware', HARDWARE.find(h => h.id === cfg.hardware)?.label ?? ''],
                       ['Screen', SCREENS.find(s => s.id === cfg.screen)?.label ?? ''],
                     ] as [string, string][]).map(([k, v]) => (
