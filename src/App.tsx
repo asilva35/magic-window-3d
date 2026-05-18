@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera, useGLTF } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera, useGLTF, Stats, ContactShadows } from '@react-three/drei'
 import { Suspense, useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
@@ -177,7 +177,7 @@ function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single
   const D = 1.5   // frame depth
   const Z = 0.75  // z offset
   const LITE_W = 4.5   // side lite panel width
-  const TRANSOM_H = 7  // transom panel height
+  const TRANSOM_H = 5  // transom panel height
 
   const hasLeft = ['single-left', 'single-double-side', 'single-transom-left', 'single-transom-double'].includes(style)
   const hasRight = ['single-right', 'single-double-side', 'single-transom-right', 'single-transom-double'].includes(style)
@@ -191,9 +191,9 @@ function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single
   const jambY = hasTransom ? (T + TRANSOM_H) / 2 : 0
 
   // Outer edges of the full assembly
-  const xLeftEdge  = hasLeft  ? -(hw + T + LITE_W + T) : -(hw + T)
-  const xRightEdge = hasRight ? (hw + T + LITE_W + T)  : (hw + T)
-  const aWidth   = xRightEdge - xLeftEdge
+  const xLeftEdge = hasLeft ? -(hw + T + LITE_W + T) : -(hw + T)
+  const xRightEdge = hasRight ? (hw + T + LITE_W + T) : (hw + T)
+  const aWidth = xRightEdge - xLeftEdge
   const aCenterX = (xRightEdge + xLeftEdge) / 2
 
   // Collect all [px, py, pw, ph] tuples for vertical and horizontal members
@@ -207,7 +207,7 @@ function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single
   ]
 
   // Inner mullions when side lites are present
-  if (hasLeft)  pieces.push([-(hw + T / 2), jambY, T, jambH])
+  if (hasLeft) pieces.push([-(hw + T / 2), jambY, T, jambH])
   if (hasRight) pieces.push([hw + T / 2, jambY, T, jambH])
 
   // Transom top header
@@ -635,6 +635,12 @@ export default function App() {
     gsap.fromTo(cameraRef.current.position, { z: 90 }, { z: 30, duration: 1, ease: 'power2.out' })
   }, [])
 
+  useEffect(() => {
+    if (!cameraRef.current) return
+    const targetZ = cfg.style.includes('transom') ? 42 : 30
+    gsap.to(cameraRef.current.position, { z: targetZ, duration: 0.6, ease: 'power2.inOut' })
+  }, [cfg.style])
+
   const toggleFullscreen = () => {
     if (!viewportRef.current) return
     if (!document.fullscreenElement) {
@@ -702,6 +708,8 @@ export default function App() {
                       </Rotator>
                     )
                   })()}
+                  <Stats />
+                  <ContactShadows position={[0, -15, 0]} scale={50} far={40} blur={1.5} opacity={0.75} resolution={512} color="#000000" />
                   <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} enableZoom={false} />
                 </Suspense>
               </Canvas>
