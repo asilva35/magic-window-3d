@@ -537,6 +537,7 @@ export default function App() {
   const [doorModel, setDoorModel] = useState('orleans')
   const [stepIdx, setStepIdx] = useState(0)
   const [isRotating, setIsRotating] = useState(false)
+  const [currentUserColorSelected, setCurrentUserColorSelected] = useState<string | null>(null)
 
   // Snap to valid front-door sizes when switching product type
   useEffect(() => {
@@ -637,7 +638,7 @@ export default function App() {
                       : model.panels
                     return (
                       <Rotator isRotating={isRotating}>
-                        <Door color={FRAME_SWATCHES[cfg.frame] ?? model.color} panels={panels} />
+                        <Door color={currentUserColorSelected ?? model.color} panels={panels} />
                       </Rotator>
                     )
                   })()}
@@ -891,7 +892,7 @@ export default function App() {
                         active={cfg.frame === id}
                         label={id[0].toUpperCase() + id.slice(1)}
                         swatch={hex}
-                        onClick={() => update({ frame: id })}
+                        onClick={() => { update({ frame: id }); setCurrentUserColorSelected(hex) }}
                       />
                     ))}
                   </div>
