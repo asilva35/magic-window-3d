@@ -139,8 +139,8 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
 }) {
   const DOOR_W = 12 // Equivalent to a 32 Inches
   const DOOR_H = 30 // Equivalent to a 80 Inches
-  const DOOR_D = 0.5
-  const PANEL_Z = DOOR_D / 2 + 0.01
+  const DOOR_D = 0.25
+  const PANEL_Z = DOOR_D / 2 - 0.1
   const mc = mouldingColor ?? color
 
   return (
