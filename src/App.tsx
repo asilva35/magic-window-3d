@@ -207,8 +207,8 @@ function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single
   ]
 
   // Inner mullions when side lites are present
-  if (hasLeft) pieces.push([-(hw + T / 2), jambY, T, jambH])
-  if (hasRight) pieces.push([hw + T / 2, jambY, T, jambH])
+  //if (hasLeft) pieces.push([-(hw + T / 2), jambY, T, jambH])
+  //if (hasRight) pieces.push([hw + T / 2, jambY, T, jambH])
 
   // Transom top header
   if (hasTransom) pieces.push([aCenterX, hh + T + TRANSOM_H + T / 2, aWidth, T])
