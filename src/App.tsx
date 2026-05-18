@@ -131,14 +131,14 @@ interface PanelConfig {
   moldScale2: number
 }
 
-function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
+function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, height = 30, ...props }: {
   color?: string
   mouldingColor?: string
   panels?: PanelConfig[]
+  width?: number
+  height?: number
   [key: string]: any
 }) {
-  const DOOR_W = 12 // Equivalent to a 32 Inches
-  const DOOR_H = 30 // Equivalent to a 80 Inches
   const DOOR_D = 0.25
   const PANEL_Z = DOOR_D / 2 - 0.1
   const mc = mouldingColor ?? color
@@ -146,7 +146,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
   return (
     <group {...props}>
       <mesh visible={true}>
-        <boxGeometry args={[DOOR_W, DOOR_H, DOOR_D]} />
+        <boxGeometry args={[width, height, DOOR_D]} />
         <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
       </mesh>
 
@@ -161,7 +161,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
         />
       ))}
 
-      <DoorHandler position={[-5.1, 0, PANEL_Z]} rotation={[0, 0, 0]} />
+      <DoorHandler position={[-(width / 2 - 0.9), 0, PANEL_Z]} rotation={[0, 0, 0]} />
     </group>
   )
 }
@@ -692,7 +692,7 @@ export default function App() {
   const [cfg, setCfg] = useState<CfgState>({
     productType: 'front',
     style: 'single',
-    width: 36,
+    width: 32,
     height: 80,
     frame: 'charcoal',
     glass: 'triple',
@@ -753,9 +753,9 @@ export default function App() {
 
   useEffect(() => {
     if (!cameraRef.current) return
-    const targetZ = cfg.style.includes('transom') ? 42 : 30
+    const targetZ = cfg.style.includes('transom') || cfg.height === 95 ? 42 : 30
     gsap.to(cameraRef.current.position, { z: targetZ, duration: 0.6, ease: 'power2.inOut' })
-  }, [cfg.style])
+  }, [cfg.style, cfg.height])
 
   const toggleFullscreen = () => {
     if (!viewportRef.current) return
@@ -813,19 +813,22 @@ export default function App() {
                   <directionalLight position={[0, 5, 90]} intensity={1.5} />
                   <directionalLight position={[0, 5, -90]} intensity={1.5} />
                   {(() => {
+                    const INCH = 12 / 32  // 0.375 Three.js units per inch
+                    const doorW3d = cfg.width * INCH
+                    const doorH3d = cfg.height * INCH
                     const model = DOOR_MODELS.find(m => m.id === doorModel) ?? DOOR_MODELS[0]
                     const panels = doorModel === 'orleans'
                       ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
                       : model.panels
                     return (
                       <Rotator isRotating={isRotating}>
-                        <FrameDoor color={currentUserColorSelected ?? model.color} width={12} height={30} style={cfg.style} />
-                        <Door color={currentUserColorSelected ?? model.color} panels={panels} />
+                        <FrameDoor color={currentUserColorSelected ?? model.color} width={doorW3d} height={doorH3d} style={cfg.style} />
+                        <Door color={currentUserColorSelected ?? model.color} width={doorW3d} height={doorH3d} panels={panels} />
                       </Rotator>
                     )
                   })()}
                   <Stats />
-                  <ContactShadows position={[0, -15, 0]} scale={50} far={40} blur={1.5} opacity={0.75} resolution={512} color="#000000" />
+                  <ContactShadows position={[0, -(cfg.height * (12 / 32) / 2), 0]} scale={50} far={40} blur={1.5} opacity={0.75} resolution={512} color="#000000" />
                   <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} enableZoom={true} />
                 </Suspense>
               </Canvas>
