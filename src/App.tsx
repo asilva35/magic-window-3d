@@ -166,33 +166,61 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
   )
 }
 
-function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, ...props }: {
+function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single', ...props }: {
   color?: string
   width?: number
   height?: number
+  style?: string
   [key: string]: any
 }) {
-  const FRAME_THICKNESS = 0.5
-  const FRAME_DEPTH = 1.5
-  const Z_POS = 0.75
+  const T = 0.5   // frame thickness
+  const D = 1.5   // frame depth
+  const Z = 0.75  // z offset
+  const LITE_W = 4.5   // side lite panel width
+  const TRANSOM_H = 7  // transom panel height
+
+  const hasLeft = ['single-left', 'single-double-side', 'single-transom-left', 'single-transom-double'].includes(style)
+  const hasRight = ['single-right', 'single-double-side', 'single-transom-right', 'single-transom-double'].includes(style)
+  const hasTransom = style.includes('transom')
+
+  const hw = width / 2   // door half-width
+  const hh = height / 2  // door half-height
+
+  // Jambs taller when transom is present, shifted up to reach transom top
+  const jambH = hasTransom ? height + T + TRANSOM_H : height
+  const jambY = hasTransom ? (T + TRANSOM_H) / 2 : 0
+
+  // Outer edges of the full assembly
+  const xLeftEdge  = hasLeft  ? -(hw + T + LITE_W + T) : -(hw + T)
+  const xRightEdge = hasRight ? (hw + T + LITE_W + T)  : (hw + T)
+  const aWidth   = xRightEdge - xLeftEdge
+  const aCenterX = (xRightEdge + xLeftEdge) / 2
+
+  // Collect all [px, py, pw, ph] tuples for vertical and horizontal members
+  const pieces: [number, number, number, number][] = [
+    // Left outer jamb
+    [xLeftEdge + T / 2, jambY, T, jambH],
+    // Right outer jamb
+    [xRightEdge - T / 2, jambY, T, jambH],
+    // Door-top header (becomes horizontal mullion when transom present)
+    [aCenterX, hh + T / 2, aWidth, T],
+  ]
+
+  // Inner mullions when side lites are present
+  if (hasLeft)  pieces.push([-(hw + T / 2), jambY, T, jambH])
+  if (hasRight) pieces.push([hw + T / 2, jambY, T, jambH])
+
+  // Transom top header
+  if (hasTransom) pieces.push([aCenterX, hh + T + TRANSOM_H + T / 2, aWidth, T])
 
   return (
     <group {...props}>
-      {/* Left jamb */}
-      <mesh position={[-(width / 2 + FRAME_THICKNESS / 2), 0, Z_POS]}>
-        <boxGeometry args={[FRAME_THICKNESS, height, FRAME_DEPTH]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
-      {/* Right jamb */}
-      <mesh position={[(width / 2 + FRAME_THICKNESS / 2), 0, Z_POS]}>
-        <boxGeometry args={[FRAME_THICKNESS, height, FRAME_DEPTH]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
-      {/* Top header */}
-      <mesh position={[0, height / 2 + FRAME_THICKNESS / 2, Z_POS]}>
-        <boxGeometry args={[width + FRAME_THICKNESS * 2, FRAME_THICKNESS, FRAME_DEPTH]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
+      {pieces.map(([px, py, pw, ph], i) => (
+        <mesh key={i} position={[px, py, Z]}>
+          <boxGeometry args={[pw, ph, D]} />
+          <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+        </mesh>
+      ))}
     </group>
   )
 }
@@ -669,7 +697,7 @@ export default function App() {
                       : model.panels
                     return (
                       <Rotator isRotating={isRotating}>
-                        <FrameDoor color={currentUserColorSelected ?? model.color} width={12} height={30} />
+                        <FrameDoor color={currentUserColorSelected ?? model.color} width={12} height={30} style={cfg.style} />
                         <Door color={currentUserColorSelected ?? model.color} panels={panels} />
                       </Rotator>
                     )
