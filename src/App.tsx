@@ -168,7 +168,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
 function Rotator({ isRotating, children }: { isRotating: boolean, children: React.ReactNode }) {
   const groupRef = useRef<THREE.Group>(null)
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (groupRef.current) {
       if (isRotating) {
         groupRef.current.rotation.y += delta * 0.5
