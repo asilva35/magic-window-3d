@@ -84,20 +84,29 @@ function Moulding({ moldScale, onTipZ, color = '#2c2c2c', ...props }: {
   return <primitive object={clone} {...props} />
 }
 
-function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, ...props }: {
+function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, onGlassBounds, ...props }: {
   moldScale: number
   moldScale2: number
   color?: string
   glassMat?: GlassMat
+  onGlassBounds?: (w: number, h: number) => void
   [key: string]: any
 }) {
   const [vTip, setVTip] = useState(3.94)
   const [hTip, setHTip] = useState(3.92)
   const hSideY = vTip
 
-  // Glass panel fits inside the moulding frame; subtract ~1.2 units per side for the profile
   const glassW = Math.max(0, hTip * 2 - 1.2)
   const glassH = Math.max(0, vTip * 2 - 1.2)
+
+  // Use a ref so the effect below doesn't re-run just because the callback identity changed
+  const boundsRef = useRef(onGlassBounds)
+  useEffect(() => { boundsRef.current = onGlassBounds }, [onGlassBounds])
+
+  // Report glass bounds to Door whenever the frame tips settle or glass is toggled
+  useEffect(() => {
+    if (glassMat) boundsRef.current?.(glassW, glassH)
+  }, [hTip, vTip, glassMat, glassW, glassH])
 
   return (
     <group {...props}>
@@ -107,11 +116,7 @@ function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, ...
       <Moulding color={color} moldScale={moldScale2} position={[0, hSideY, 0.1]} rotation={[Math.PI / 2, -Math.PI / 2, 0.1]} />
       {glassMat && (
         <group>
-          <mesh position={[0, 0, 0.2]}>
-            <boxGeometry args={[glassW, glassH, 0.04]} />
-            <meshStandardMaterial color={glassMat.color} transparent opacity={glassMat.opacity} roughness={glassMat.roughness} metalness={glassMat.metalness} />
-          </mesh>
-          <mesh position={[0, 0, -0.15]}>
+          <mesh position={[0, 0, 0]}>
             <boxGeometry args={[glassW, glassH, 0.04]} />
             <meshStandardMaterial color={glassMat.color} transparent opacity={glassMat.opacity} roughness={glassMat.roughness} metalness={glassMat.metalness} />
           </mesh>
@@ -148,6 +153,42 @@ interface PanelConfig {
   moldScale2: number
 }
 
+function buildStileRail(
+  doorW: number,
+  doorH: number,
+  holes: { cx: number; cy: number; w: number; h: number }[]
+): { cx: number; cy: number; w: number; h: number }[] {
+  const hw = doorW / 2, hh = doorH / 2
+  const xs = Array.from(new Set([
+    -hw, hw,
+    ...holes.flatMap(h => [
+      Math.max(-hw, h.cx - h.w / 2),
+      Math.min(hw, h.cx + h.w / 2),
+    ])
+  ])).sort((a, b) => a - b)
+  const ys = Array.from(new Set([
+    -hh, hh,
+    ...holes.flatMap(h => [
+      Math.max(-hh, h.cy - h.h / 2),
+      Math.min(hh, h.cy + h.h / 2),
+    ])
+  ])).sort((a, b) => a - b)
+  const pieces: { cx: number; cy: number; w: number; h: number }[] = []
+  for (let i = 0; i < xs.length - 1; i++) {
+    for (let j = 0; j < ys.length - 1; j++) {
+      const x1 = xs[i], x2 = xs[i + 1], y1 = ys[j], y2 = ys[j + 1]
+      if (x2 - x1 < 1e-6 || y2 - y1 < 1e-6) continue
+      const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2
+      const inHole = holes.some(h =>
+        cx > h.cx - h.w / 2 + 1e-5 && cx < h.cx + h.w / 2 - 1e-5 &&
+        cy > h.cy - h.h / 2 + 1e-5 && cy < h.cy + h.h / 2 - 1e-5
+      )
+      if (!inHole) pieces.push({ cx, cy, w: x2 - x1, h: y2 - y1 })
+    }
+  }
+  return pieces
+}
+
 function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, height = 30, glassMat, glassPanelRule = 'top', ...props }: {
   color?: string
   mouldingColor?: string
@@ -162,12 +203,46 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, heigh
   const PANEL_Z = DOOR_D / 2 - 0.1
   const mc = mouldingColor ?? color
 
+  const [glassBounds, setGlassBounds] = useState<Record<number, { w: number; h: number }>>({})
+
+  const panelsKey = panels.map(p => `${p.y}_${p.x ?? 0}`).join('|')
+  useEffect(() => { setGlassBounds({}) }, [panelsKey])
+
+  const setBoundsForIdx = useCallback((idx: number, w: number, h: number) => {
+    setGlassBounds(prev => {
+      if (prev[idx]?.w === w && prev[idx]?.h === h) return prev
+      return { ...prev, [idx]: { w, h } }
+    })
+  }, [])
+
+  const SCALE = 0.4
+  const holes = useMemo(() => panels.flatMap((panel, i) => {
+    const showGlass = glassMat && glassPanelRule !== 'none' && (glassPanelRule === 'all' || i === 0)
+    const b = glassBounds[i]
+    if (!showGlass || !b) return []
+    return [{ cx: panel.x ?? 0, cy: panel.y, w: b.w * SCALE, h: b.h * SCALE }]
+  }), [panels, glassBounds, glassMat, glassPanelRule])
+
+  const stilePieces = useMemo(
+    () => holes.length > 0 ? buildStileRail(width, height, holes) : null,
+    [width, height, holes]
+  )
+
   return (
     <group {...props}>
-      <mesh visible={true}>
-        <boxGeometry args={[width, height, DOOR_D]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
+      {stilePieces ? (
+        stilePieces.map((p, i) => (
+          <mesh key={i} position={[p.cx, p.cy, 0]}>
+            <boxGeometry args={[p.w, p.h, DOOR_D]} />
+            <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+          </mesh>
+        ))
+      ) : (
+        <mesh>
+          <boxGeometry args={[width, height, DOOR_D]} />
+          <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+        </mesh>
+      )}
 
       {panels.map((panel, i) => {
         const showGlass = glassMat && glassPanelRule !== 'none' && (glassPanelRule === 'all' || i === 0)
@@ -180,6 +255,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, heigh
             position={[panel.x ?? 0, panel.y, PANEL_Z]}
             scale={[0.4, 0.4, 1]}
             glassMat={showGlass ? glassMat : undefined}
+            onGlassBounds={showGlass ? (w, h) => setBoundsForIdx(i, w, h) : undefined}
           />
         )
       })}
