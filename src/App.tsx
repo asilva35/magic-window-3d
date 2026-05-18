@@ -760,6 +760,7 @@ export default function App() {
   const [stepIdx, setStepIdx] = useState(0)
   const [isRotating, setIsRotating] = useState(false)
   const [currentUserColorSelected, setCurrentUserColorSelected] = useState<string | null>(null)
+  const [currentUserGlassSelected, setCurrentUserGlassSelected] = useState<string | null>(null)
 
   // Snap to valid front-door sizes when switching product type
   useEffect(() => {
@@ -867,7 +868,7 @@ export default function App() {
                     const panels = doorModel === 'orleans'
                       ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
                       : model.panels
-                    const glassMat = DOOR_GLASS_MAT[cfg.doorGlass]
+                    const glassMat = currentUserGlassSelected ? DOOR_GLASS_MAT[currentUserGlassSelected] : undefined
                     const glassPanelRule = DOOR_GLASS_RULE[doorModel] ?? 'top'
                     const frameColor = currentUserColorSelected ?? model.color
                     return (
@@ -1157,7 +1158,7 @@ export default function App() {
                               <button
                                 key={g.id}
                                 className={`cfg-tile${cfg.doorGlass === g.id ? ' is-active' : ''}`}
-                                onClick={() => update({ doorGlass: g.id })}
+                                onClick={() => { update({ doorGlass: g.id }); setCurrentUserGlassSelected(g.id) }}
                                 style={{ padding: '0.5rem' }}
                               >
                                 <div style={{
