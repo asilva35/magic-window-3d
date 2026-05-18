@@ -161,7 +161,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
         />
       ))}
 
-      <DoorHandler position={[-5.6, 0, PANEL_Z]} rotation={[0, Math.PI, 0]} scale={0.1} />
+      <DoorHandler position={[-5.6, 0, PANEL_Z]} rotation={[0, 0, 0]} />
     </group>
   )
 }
