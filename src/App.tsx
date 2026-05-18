@@ -169,7 +169,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
 function Rotator({ isRotating, children }: { isRotating: boolean, children: React.ReactNode }) {
   const groupRef = useRef<THREE.Group>(null)
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (groupRef.current) {
       if (isRotating) {
         groupRef.current.rotation.y += delta * 0.5
@@ -253,16 +253,16 @@ const STYLES: Record<string, Array<{ id: string; label: string; sub: string }>> 
 }
 
 const FRAME_SWATCHES: Record<string, string> = {
-  white:      '#F4F5F7',
-  cream:      '#f0ede5',
-  almond:     '#E5DCC9',
-  sage:       '#9dbfb2',
-  cobble:     '#888A8C',
-  charcoal:   '#2c2c2c',
-  black:      '#1B1B1F',
-  navy:       '#001B70',
-  forest:     '#2d5448',
-  espresso:   '#3B2A1E',
+  white: '#F4F5F7',
+  cream: '#f0ede5',
+  almond: '#E5DCC9',
+  sage: '#9dbfb2',
+  cobble: '#888A8C',
+  charcoal: '#2c2c2c',
+  black: '#1B1B1F',
+  navy: '#001B70',
+  forest: '#2d5448',
+  espresso: '#3B2A1E',
   terracotta: '#e86253',
 }
 
