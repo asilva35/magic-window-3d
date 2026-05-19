@@ -136,10 +136,13 @@ function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, onG
       <Moulding color={color} moldScale={moldScale} position={[hTip, 0, 0.1]} rotation={[Math.PI / 2, Math.PI, 0.1]} />
       <Moulding color={color} moldScale={moldScale2} onTipZ={setHTip} position={[0, -hSideY, 0.1]} rotation={[Math.PI / 2, Math.PI / 2, 0.1]} />
       <Moulding color={color} moldScale={moldScale2} position={[0, hSideY, 0.1]} rotation={[Math.PI / 2, -Math.PI / 2, 0.1]} />
-      {glassMat && (
-        <group>
-          <mesh position={[0, 0, 0]} castShadow={false} receiveShadow={false} visible={true}>
-            <boxGeometry args={[glassW, glassH, 0.04]} />
+      {glassMat && (() => {
+        const bw = glassMat.borderWidth ?? 0
+        const innerW = bw > 0 ? Math.max(0.2, glassW - bw * 2) : glassW
+        const innerH = bw > 0 ? Math.max(0.2, glassH - bw * 2) : glassH
+        return (
+          <mesh position={[0, 0, 0]} castShadow={false} receiveShadow={false}>
+            <boxGeometry args={[innerW, innerH, 0.04]} />
             <meshPhysicalMaterial
               transparent
               side={THREE.DoubleSide}
@@ -161,8 +164,8 @@ function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, onG
               clearcoatNormalScale={[glassMat.clearcoatNormalScale ?? 0.2, glassMat.clearcoatNormalScale ?? 0.2]}
             />
           </mesh>
-        </group>
-      )}
+        )
+      })()}
     </group>
   )
 }
@@ -699,6 +702,7 @@ type GlassMat = {
   normalScale?: number
   clearcoatNormalScale?: number
   normalRepeat?: number
+  borderWidth?: number
 }
 
 const DOOR_GLASS: { id: string; label: string; category: string; swatch: string }[] = [
@@ -720,7 +724,7 @@ const DOOR_GLASS: { id: string; label: string; category: string; swatch: string 
 const DOOR_GLASS_MAT: Record<string, GlassMat> = {
   // transmission:0 — CSS background shows through transparent canvas; tune via Leva if a background scene plane is added
   sandblast: { color: '#e0e0d8', opacity: 0.92, roughness: 0.85, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.15, ior: 1.52, thickness: 2.5, reflectivity: 0.05, envMapIntensity: 0.6, normalScale: 0.4, clearcoatNormalScale: 0.25, normalRepeat: 3 },
-  edge: { color: '#c8dce8', opacity: 0.72, roughness: 0.55, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.12, ior: 1.52, thickness: 2.5, reflectivity: 0.08, envMapIntensity: 0.7, normalScale: 0.3, clearcoatNormalScale: 0.2, normalRepeat: 3 },
+  edge: { color: '#e0e0d8', opacity: 0.92, roughness: 0.85, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.15, ior: 1.52, thickness: 2.5, reflectivity: 0.05, envMapIntensity: 0.6, normalScale: 0.4, clearcoatNormalScale: 0.25, normalRepeat: 3, borderWidth: 0.8 },
   pure: { color: '#eef5ff', opacity: 0.38, roughness: 0.08, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.9, normalScale: 0.15, clearcoatNormalScale: 0.1, normalRepeat: 3 },
   equation: { color: '#d8eed8', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
   nuando: { color: '#f0e8d0', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
@@ -1176,7 +1180,9 @@ export default function App() {
                       ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
                       : model.panels
                     const glassMat = currentUserGlassSelected
-                      ? (DEBUG_ON ? (glassControls as GlassMat) : DOOR_GLASS_MAT[currentUserGlassSelected])
+                      ? (DEBUG_ON
+                        ? { ...DOOR_GLASS_MAT[currentUserGlassSelected], ...glassControls }
+                        : DOOR_GLASS_MAT[currentUserGlassSelected])
                       : undefined
                     const glassPanelRule = DOOR_GLASS_RULE[doorModel] ?? 'top'
                     const frameColor = currentUserColorSelected ?? model.color
