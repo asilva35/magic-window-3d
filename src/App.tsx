@@ -485,10 +485,20 @@ function FrontWall({ visible = true, doorWidth, doorHeight, style }: {
   }, [xLeft, xRight, yBottom, yTop])
 
   return (
-    <mesh geometry={geometry} position={[0, 0, 1.5]} visible={visible}>
+    <mesh geometry={geometry} position={[0, 0, 0]} visible={visible}>
       <meshBasicMaterial color='#ffffff' />
     </mesh>
   )
+}
+
+const PAN_MIN = new THREE.Vector3(-5, -2, -5)
+const PAN_MAX = new THREE.Vector3(5, 5, 5)
+
+function PanClamper({ controlsRef }: { controlsRef: React.RefObject<any> }) {
+  useFrame(() => {
+    controlsRef.current?.target.clamp(PAN_MIN, PAN_MAX)
+  })
+  return null
 }
 
 function Rotator({ isRotating, children }: { isRotating: boolean, children: React.ReactNode }) {
@@ -937,6 +947,7 @@ export default function App() {
 
   const viewportRef = useRef<HTMLDivElement>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera>(null)
+  const controlsRef = useRef<any>(null);
 
   const handleLoaded = useCallback(() => {
     if (!cameraRef.current) return
@@ -948,6 +959,7 @@ export default function App() {
     const targetZ = cfg.style.includes('transom') || cfg.height === 95 ? 42 : 30
     gsap.to(cameraRef.current.position, { z: targetZ, duration: 0.6, ease: 'power2.inOut' })
   }, [cfg.style, cfg.height])
+
 
 
   const toggleFullscreen = () => {
@@ -1041,13 +1053,14 @@ export default function App() {
                           <FrameDoor color={frameColor} width={doorW3d} height={doorH3d} style={cfg.style} glassMat={glassMat} />
                           <Door color={frameColor} width={doorW3d} height={doorH3d} panels={panels} glassMat={glassMat} glassPanelRule={glassPanelRule} />
                         </Rotator>
-                        <FrontWall doorWidth={doorW3d} doorHeight={doorH3d} style={cfg.style} visible={stepIdx === 5} />
+                        <FrontWall doorWidth={doorW3d} doorHeight={doorH3d} style={cfg.style} visible={true} />
                       </>
                     )
                   })()}
                   <Stats />
                   <ContactShadows position={[0, -(cfg.height * (12 / 32) / 2), 0]} scale={50} far={40} blur={1.5} opacity={0.75} resolution={512} color="#000000" />
-                  <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} enableZoom={true} />
+                  <OrbitControls ref={controlsRef} makeDefault minPolarAngle={Math.PI * 0.5} maxPolarAngle={Math.PI * 0.5} minAzimuthAngle={Math.PI * -0.075} maxAzimuthAngle={Math.PI * 0.075} enableZoom={true} enablePan={true} minDistance={10} maxDistance={40} />
+                  <PanClamper controlsRef={controlsRef} />
                 </Suspense>
               </Canvas>
             ) : (
