@@ -449,38 +449,8 @@ function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single
   )
 }
 
-function makeBrickTexture() {
-  const canvas = document.createElement('canvas')
-  canvas.width = 512
-  canvas.height = 512
-  const ctx = canvas.getContext('2d')!
-  ctx.fillStyle = '#b0a090'
-  ctx.fillRect(0, 0, 512, 512)
-  const bW = 80, bH = 32, mS = 6
-  const rows = Math.ceil(512 / (bH + mS)) + 2
-  const cols = Math.ceil(512 / (bW + mS)) + 2
-  for (let row = 0; row < rows; row++) {
-    const ox = (row % 2) * ((bW + mS) / 2)
-    for (let col = -1; col < cols; col++) {
-      const x = col * (bW + mS) + ox
-      const y = row * (bH + mS)
-      const v = Math.random() * 40 - 20
-      const r = Math.round(Math.max(0, Math.min(255, 162 + v)))
-      const g = Math.round(Math.max(0, Math.min(255, 82 + v * 0.4)))
-      const b = Math.round(Math.max(0, Math.min(255, 62 + v * 0.3)))
-      ctx.fillStyle = `rgb(${r},${g},${b})`
-      ctx.fillRect(x, y, bW, bH)
-      ctx.fillStyle = 'rgba(255,255,255,0.07)'
-      ctx.fillRect(x, y, bW, 5)
-      ctx.fillStyle = 'rgba(0,0,0,0.14)'
-      ctx.fillRect(x, y + bH - 5, bW, 5)
-    }
-  }
-  const tex = new THREE.CanvasTexture(canvas)
-  tex.wrapS = tex.wrapT = THREE.RepeatWrapping
-  tex.repeat.set(7, 7)
-  return tex
-}
+const BRICK_DIFF = '/assets/textures/dark_brick_wall_1k.blend/textures/dark_brick_wall_diff_1k.jpg'
+const BRICK_DISP = '/assets/textures/dark_brick_wall_1k.blend/textures/dark_brick_wall_disp_1k.png'
 
 function FrontWall({ visible = true, doorWidth, doorHeight, style }: {
   visible?: boolean
@@ -500,7 +470,7 @@ function FrontWall({ visible = true, doorWidth, doorHeight, style }: {
   const xRight = hasRight ? (hw + T + LITE_W + T) : (hw + T)
   const yBottom = -hh
   const yTop = hasTransom ? hh + T + TRANSOM_H + T : hh + T
-  const S = 300
+  const S = 50
 
   const geometry = useMemo(() => {
     const shape = new THREE.Shape()
@@ -517,11 +487,18 @@ function FrontWall({ visible = true, doorWidth, doorHeight, style }: {
     return new THREE.ShapeGeometry(shape)
   }, [xLeft, xRight, yBottom, yTop])
 
-  const texture = useMemo(() => makeBrickTexture(), [])
+  const [brickDiff, brickDisp] = useTexture([BRICK_DIFF, BRICK_DISP])
+  useMemo(() => {
+    ;[brickDiff, brickDisp].forEach(tex => {
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping
+      tex.repeat.set(0.12, 0.12)
+      tex.needsUpdate = true
+    })
+  }, [brickDiff, brickDisp])
 
   return (
-    <mesh geometry={geometry} position={[0, 0, -0.15]} visible={visible}>
-      <meshStandardMaterial map={texture} roughness={0.9} metalness={0} />
+    <mesh geometry={geometry} position={[0, 0, 1.5]} visible={visible}>
+      <meshStandardMaterial map={brickDiff} bumpMap={brickDisp} bumpScale={0.04} roughness={0.95} metalness={0} />
     </mesh>
   )
 }
@@ -572,6 +549,7 @@ function Rotator({ isRotating, children }: { isRotating: boolean, children: Reac
 useGLTF.preload('/assets/models/MoldOrleansDoor.glb')
 useGLTF.preload('/assets/models/HandleBerlinLeverHandle.glb')
 useTexture.preload([WOOD_DIFF, WOOD_AO, WOOD_DISP])
+useTexture.preload([BRICK_DIFF, BRICK_DISP])
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -1112,8 +1090,8 @@ export default function App() {
                     makeDefault
                     minPolarAngle={0}
                     maxPolarAngle={stepIdx === 5 ? Math.PI / 2 : Math.PI / 1.75}
-                    enableZoom={stepIdx !== 5}
-                    enableRotate={stepIdx !== 5}
+                    enableZoom={true}
+                    enableRotate={true}
                     enablePan={true}
                   />
                 </Suspense>
