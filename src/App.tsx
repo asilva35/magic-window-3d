@@ -500,7 +500,7 @@ function FrontWall({ visible = true, doorWidth, doorHeight, style }: {
   const xRight = hasRight ? (hw + T + LITE_W + T) : (hw + T)
   const yBottom = -hh
   const yTop = hasTransom ? hh + T + TRANSOM_H + T : hh + T
-  const S = 100
+  const S = 150
 
   const geometry = useMemo(() => {
     const shape = new THREE.Shape()
@@ -720,18 +720,18 @@ const DOOR_GLASS: { id: string; label: string; category: string; swatch: string 
 const DOOR_GLASS_MAT: Record<string, GlassMat> = {
   // transmission:0 — CSS background shows through transparent canvas; tune via Leva if a background scene plane is added
   sandblast: { color: '#e0e0d8', opacity: 0.92, roughness: 0.85, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.15, ior: 1.52, thickness: 2.5, reflectivity: 0.05, envMapIntensity: 0.6, normalScale: 0.4, clearcoatNormalScale: 0.25, normalRepeat: 3 },
-  edge:      { color: '#c8dce8', opacity: 0.72, roughness: 0.55, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.12, ior: 1.52, thickness: 2.5, reflectivity: 0.08, envMapIntensity: 0.7, normalScale: 0.3, clearcoatNormalScale: 0.2,  normalRepeat: 3 },
-  pure:      { color: '#eef5ff', opacity: 0.38, roughness: 0.08, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.9, normalScale: 0.15, clearcoatNormalScale: 0.1, normalRepeat: 3 },
-  equation:  { color: '#d8eed8', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1,  envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
-  nuando:    { color: '#f0e8d0', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1,  envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
-  mist:      { color: '#d8e8f5', opacity: 0.65, roughness: 0.4,  metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.1,  ior: 1.52, thickness: 2.5, reflectivity: 0.07, envMapIntensity: 0.7, normalScale: 0.3, clearcoatNormalScale: 0.2,  normalRepeat: 3 },
-  winchester:{ color: '#b8956a', opacity: 0.62, roughness: 0.08, metalness: 0.15, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.8, normalScale: 0.25, clearcoatNormalScale: 0.18, normalRepeat: 3 },
-  nobel:     { color: '#7b9cbf', opacity: 0.68, roughness: 0.06, metalness: 0.2, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.04, ior: 1.52, thickness: 2.5, reflectivity: 0.15, envMapIntensity: 0.9, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
-  belmont:   { color: '#8fb080', opacity: 0.62, roughness: 0.08, metalness: 0.1, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.1,  envMapIntensity: 0.8, normalScale: 0.22, clearcoatNormalScale: 0.16, normalRepeat: 3 },
-  celeste:   { color: '#90b8d8', opacity: 0.68, roughness: 0.04, metalness: 0.2, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.04, ior: 1.52, thickness: 2.5, reflectivity: 0.15, envMapIntensity: 0.9, normalScale: 0.18, clearcoatNormalScale: 0.12, normalRepeat: 3 },
-  bolero:    { color: '#b890b0', opacity: 0.62, roughness: 0.08, metalness: 0.15, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.8, normalScale: 0.22, clearcoatNormalScale: 0.16, normalRepeat: 3 },
-  bistro:    { color: '#c0a850', opacity: 0.58, roughness: 0.08, metalness: 0.1, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.8, normalScale: 0.22, clearcoatNormalScale: 0.16, normalRepeat: 3 },
-  portrait:  { color: '#c8a080', opacity: 0.58, roughness: 0.12, metalness: 0.1, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1,  envMapIntensity: 0.8, normalScale: 0.25, clearcoatNormalScale: 0.18, normalRepeat: 3 },
+  edge: { color: '#c8dce8', opacity: 0.72, roughness: 0.55, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.12, ior: 1.52, thickness: 2.5, reflectivity: 0.08, envMapIntensity: 0.7, normalScale: 0.3, clearcoatNormalScale: 0.2, normalRepeat: 3 },
+  pure: { color: '#eef5ff', opacity: 0.38, roughness: 0.08, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.9, normalScale: 0.15, clearcoatNormalScale: 0.1, normalRepeat: 3 },
+  equation: { color: '#d8eed8', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
+  nuando: { color: '#f0e8d0', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
+  mist: { color: '#d8e8f5', opacity: 0.65, roughness: 0.4, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.1, ior: 1.52, thickness: 2.5, reflectivity: 0.07, envMapIntensity: 0.7, normalScale: 0.3, clearcoatNormalScale: 0.2, normalRepeat: 3 },
+  winchester: { color: '#b8956a', opacity: 0.62, roughness: 0.08, metalness: 0.15, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.8, normalScale: 0.25, clearcoatNormalScale: 0.18, normalRepeat: 3 },
+  nobel: { color: '#7b9cbf', opacity: 0.68, roughness: 0.06, metalness: 0.2, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.04, ior: 1.52, thickness: 2.5, reflectivity: 0.15, envMapIntensity: 0.9, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
+  belmont: { color: '#8fb080', opacity: 0.62, roughness: 0.08, metalness: 0.1, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.22, clearcoatNormalScale: 0.16, normalRepeat: 3 },
+  celeste: { color: '#90b8d8', opacity: 0.68, roughness: 0.04, metalness: 0.2, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.04, ior: 1.52, thickness: 2.5, reflectivity: 0.15, envMapIntensity: 0.9, normalScale: 0.18, clearcoatNormalScale: 0.12, normalRepeat: 3 },
+  bolero: { color: '#b890b0', opacity: 0.62, roughness: 0.08, metalness: 0.15, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.8, normalScale: 0.22, clearcoatNormalScale: 0.16, normalRepeat: 3 },
+  bistro: { color: '#c0a850', opacity: 0.58, roughness: 0.08, metalness: 0.1, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.8, normalScale: 0.22, clearcoatNormalScale: 0.16, normalRepeat: 3 },
+  portrait: { color: '#c8a080', opacity: 0.58, roughness: 0.12, metalness: 0.1, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.25, clearcoatNormalScale: 0.18, normalRepeat: 3 },
 }
 
 const HARDWARE = [
@@ -1475,14 +1475,19 @@ export default function App() {
                                 onClick={() => { update({ doorGlass: g.id }); setCurrentUserGlassSelected(g.id) }}
                                 style={{ padding: '0.5rem' }}
                               >
-                                <div style={{
-                                  width: '100%',
-                                  aspectRatio: '1',
-                                  background: g.swatch,
-                                  borderRadius: 4,
-                                  border: '1px solid rgba(0,0,0,0.12)',
-                                  marginBottom: '0.4rem',
-                                }} />
+                                <img
+                                  src={`/assets/images/glass-samples/${g.id}.png`}
+                                  alt={g.label}
+                                  style={{
+                                    width: '100%',
+                                    aspectRatio: '211 / 138',
+                                    objectFit: 'cover',
+                                    borderRadius: 4,
+                                    border: '1px solid rgba(0,0,0,0.12)',
+                                    marginBottom: '0.4rem',
+                                    display: 'block',
+                                  }}
+                                />
                                 <div className="cfg-tile__label" style={{ fontSize: '0.7rem', textAlign: 'center' }}>{g.label}</div>
                               </button>
                             ))}
