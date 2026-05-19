@@ -7,7 +7,7 @@ import gsap from 'gsap'
 import { LoadingScreen } from './LoadingScreen'
 import { useControls, Leva } from 'leva'
 
-const DEBUG_ON = true
+const DEBUG_ON = false
 
 type InitData = { c1z: number; c2z: number; moldMin: number; moldMax: number }
 
