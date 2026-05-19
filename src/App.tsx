@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera, useGLTF, Stats, ContactShadows, useTexture } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera, useGLTF, Stats, ContactShadows, useTexture, Environment } from '@react-three/drei'
 import { Suspense, useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
@@ -117,6 +117,13 @@ function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, onG
     if (glassMat) boundsRef.current?.(glassW, glassH)
   }, [hTip, vTip, glassMat, glassW, glassH])
 
+  const normalMap = useTexture('/assets/textures/normal.jpg')
+  useMemo(() => {
+    normalMap.wrapS = normalMap.wrapT = THREE.RepeatWrapping
+    normalMap.repeat.set(3, 3)
+    normalMap.needsUpdate = true
+  }, [normalMap])
+
   return (
     <group {...props}>
       <Moulding color={color} moldScale={moldScale} onTipZ={setVTip} position={[-hTip, 0, 0.1]} rotation={[Math.PI / 2, 0, 0]} />
@@ -125,9 +132,24 @@ function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, onG
       <Moulding color={color} moldScale={moldScale2} position={[0, hSideY, 0.1]} rotation={[Math.PI / 2, -Math.PI / 2, 0.1]} />
       {glassMat && (
         <group>
-          <mesh position={[0, 0, 0]}>
+          <mesh position={[0, 0, 0]} castShadow={false} receiveShadow={false}>
             <boxGeometry args={[glassW, glassH, 0.04]} />
-            <meshStandardMaterial color={glassMat.color} transparent opacity={glassMat.opacity} roughness={glassMat.roughness} metalness={glassMat.metalness} />
+            <meshPhysicalMaterial
+              color={glassMat.color}
+              metalness={glassMat.metalness}
+              roughness={glassMat.roughness}
+              transmission={glassMat.transmission ?? 1}
+              ior={glassMat.ior ?? 1.5}
+              reflectivity={glassMat.reflectivity ?? 0.5}
+              thickness={glassMat.thickness ?? 2.5}
+              envMapIntensity={glassMat.envMapIntensity ?? 1.5}
+              clearcoat={glassMat.clearcoat ?? 1}
+              clearcoatRoughness={glassMat.clearcoatRoughness ?? 0.1}
+              normalScale={[glassMat.normalScale ?? 0.3, glassMat.normalScale ?? 0.3]}
+              normalMap={normalMap}
+              clearcoatNormalMap={normalMap}
+              clearcoatNormalScale={[glassMat.clearcoatNormalScale ?? 0.2, glassMat.clearcoatNormalScale ?? 0.2]}
+            />
           </mesh>
         </group>
       )}
@@ -242,6 +264,7 @@ function WoodMesh({ args, color, roughness = 0.5, metalness = 0.5, ...props }: {
         bumpScale={0.02}
         roughness={roughness}
         metalness={metalness}
+        envMapIntensity={0.6}
       />
     </mesh>
   )
@@ -494,10 +517,10 @@ function FrontWall({ visible = true, doorWidth, doorHeight, style }: {
 function CeilLamp({ position = [0, 0, -5] as [number, number, number] } = {}) {
   const CEIL_Y = 15
   const CABLE_LEN = 6.5
-  const CABLE_BOT = CEIL_Y - CABLE_LEN   // 6.5
+  const CABLE_BOT = CEIL_Y - CABLE_LEN
   const SHADE_H = 0.5
-  const SHADE_Y = CABLE_BOT - SHADE_H / 2   // 6.25
-  const LIGHT_Y = CABLE_BOT - SHADE_H       // 6.0
+  const SHADE_Y = CABLE_BOT - SHADE_H / 2
+  const LIGHT_Y = CABLE_BOT - SHADE_H
 
   return (
     <group position={position}>
@@ -525,7 +548,7 @@ function CeilLamp({ position = [0, 0, -5] as [number, number, number] } = {}) {
         color="#ffe8a0"
         intensity={400}
         distance={90}
-        decay={2}
+        decay={1}
         castShadow={false}
       />
     </group>
@@ -562,6 +585,7 @@ function Rotator({ isRotating, children }: { isRotating: boolean, children: Reac
 useGLTF.preload('/assets/models/MoldOrleansDoor.glb')
 useGLTF.preload('/assets/models/HandleBerlinLeverHandle.glb')
 useTexture.preload([WOOD_DIFF, WOOD_AO, WOOD_DISP])
+useTexture.preload('/assets/textures/normal.jpg')
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -650,7 +674,21 @@ const GLASS_PACKAGES = [
   { id: 'lowe', label: 'Triple + Low-E', sub: 'Best year-round comfort', price: 720 },
 ]
 
-type GlassMat = { color: string; opacity: number; roughness: number; metalness: number }
+type GlassMat = {
+  color: string
+  opacity: number
+  roughness: number
+  metalness: number
+  transmission?: number
+  ior?: number
+  reflectivity?: number
+  thickness?: number
+  envMapIntensity?: number
+  clearcoat?: number
+  clearcoatRoughness?: number
+  normalScale?: number
+  clearcoatNormalScale?: number
+}
 
 const DOOR_GLASS: { id: string; label: string; category: string; swatch: string }[] = [
   { id: 'sandblast', label: 'Sandblast', category: 'Textured Glass', swatch: 'rgba(215,215,210,0.85)' },
@@ -1073,6 +1111,7 @@ export default function App() {
             {cfg.productType === 'front' ? (
               <Canvas shadows gl={{ alpha: true }}>
                 <Suspense fallback={null}>
+                  <Environment files="/assets/hdr/empty_warehouse_01_2k.hdr" />
                   <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 0, 30]} fov={60} />
                   <directionalLight position={[0, 5, 90]} intensity={1.5} />
                   {/* <directionalLight position={[0, 5, -90]} intensity={1.5} /> */}
@@ -1098,7 +1137,7 @@ export default function App() {
                       </>
                     )
                   })()}
-                  <CeilLamp position={[0, 0, -5]} />
+                  {/* <CeilLamp position={[0, 0, -5]} /> */}
                   <Stats />
                   <ContactShadows position={[0, -(cfg.height * (12 / 32) / 2), 0]} scale={50} far={40} blur={1.5} opacity={0.75} resolution={512} color="#000000" />
                   <OrbitControls ref={controlsRef} makeDefault minPolarAngle={Math.PI * 0.5} maxPolarAngle={Math.PI * 0.5} minAzimuthAngle={Math.PI * -0.075} maxAzimuthAngle={Math.PI * 0.075} enableZoom={true} enablePan={true} minDistance={10} maxDistance={40} />
