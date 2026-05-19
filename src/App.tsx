@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera, useGLTF } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera, useGLTF, ContactShadows } from '@react-three/drei'
 import { Suspense, useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
@@ -131,14 +131,14 @@ interface PanelConfig {
   moldScale2: number
 }
 
-function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
+function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, height = 30, ...props }: {
   color?: string
   mouldingColor?: string
   panels?: PanelConfig[]
+  width?: number
+  height?: number
   [key: string]: any
 }) {
-  const DOOR_W = 12 // Equivalent to a 32 Inches
-  const DOOR_H = 30 // Equivalent to a 80 Inches
   const DOOR_D = 0.25
   const PANEL_Z = DOOR_D / 2 - 0.1
   const mc = mouldingColor ?? color
@@ -146,7 +146,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
   return (
     <group {...props}>
       <mesh visible={true}>
-        <boxGeometry args={[DOOR_W, DOOR_H, DOOR_D]} />
+        <boxGeometry args={[width, height, DOOR_D]} />
         <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
       </mesh>
 
@@ -161,7 +161,182 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], ...props }: {
         />
       ))}
 
-      <DoorHandler position={[-5.6, 0, PANEL_Z]} rotation={[0, Math.PI, 0]} scale={0.1} />
+      <DoorHandler position={[-(width / 2 - 0.9), 0, PANEL_Z]} rotation={[0, 0, 0]} />
+    </group>
+  )
+}
+
+function SideLite({ color = '#2c2c2c', width = 4.5, height = 30, ...props }: {
+  color?: string
+  width?: number
+  height?: number
+  [key: string]: any
+}) {
+  const RAIL = 0.5   // stile / rail width
+  const D = 0.25  // sash depth
+  const Z = 1.4   // sits in front of the wall, behind the outer frame (z=0.75)
+  const hw = width / 2
+  const hh = height / 2
+
+  return (
+    <group {...props}>
+      {/* Left stile */}
+      <mesh position={[-hw + RAIL / 2, 0, Z]}>
+        <boxGeometry args={[RAIL, height, D]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
+      {/* Right stile */}
+      <mesh position={[hw - RAIL / 2, 0, Z]}>
+        <boxGeometry args={[RAIL, height, D]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
+      {/* Top rail */}
+      <mesh position={[0, hh - RAIL / 2, Z]}>
+        <boxGeometry args={[width, RAIL, D]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
+      {/* Bottom rail */}
+      <mesh position={[0, -hh + RAIL / 2, Z]}>
+        <boxGeometry args={[width, RAIL, D]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
+      {/* Glass */}
+      <mesh position={[0, 0, Z]}>
+        <boxGeometry args={[width - 2 * RAIL, height - 2 * RAIL, 0.04]} />
+        <meshStandardMaterial color="#c8dff0" transparent opacity={0.4} roughness={0.05} metalness={0.1} />
+      </mesh>
+    </group>
+  )
+}
+
+function Transom({ color = '#2c2c2c', width = 12, height = 5, ...props }: {
+  color?: string
+  width?: number
+  height?: number
+  [key: string]: any
+}) {
+  const RAIL = 0.5
+  const D = 0.25
+  const Z = 1.4
+  const hw = width / 2
+  const hh = height / 2
+
+  return (
+    <group {...props}>
+      {/* Left stile */}
+      <mesh position={[-hw + RAIL / 2, 0, Z]}>
+        <boxGeometry args={[RAIL, height, D]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
+      {/* Right stile */}
+      <mesh position={[hw - RAIL / 2, 0, Z]}>
+        <boxGeometry args={[RAIL, height, D]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
+      {/* Top rail */}
+      <mesh position={[0, hh - RAIL / 2, Z]}>
+        <boxGeometry args={[width, RAIL, D]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
+      {/* Bottom rail */}
+      <mesh position={[0, -hh + RAIL / 2, Z]}>
+        <boxGeometry args={[width, RAIL, D]} />
+        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+      </mesh>
+      {/* Glass */}
+      <mesh position={[0, 0, Z]}>
+        <boxGeometry args={[width - 2 * RAIL, height - 2 * RAIL, 0.04]} />
+        <meshStandardMaterial color="#c8dff0" transparent opacity={0.4} roughness={0.05} metalness={0.1} />
+      </mesh>
+    </group>
+  )
+}
+
+function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single', ...props }: {
+  color?: string
+  width?: number
+  height?: number
+  style?: string
+  [key: string]: any
+}) {
+  const T = 0.5   // frame thickness
+  const D = 1.5   // frame depth
+  const Z = 0.75  // z offset
+  const LITE_W = 4.5   // side lite panel width
+  const TRANSOM_H = 5  // transom panel height
+
+  const hasLeft = ['single-left', 'single-double-side', 'single-transom-left', 'single-transom-double'].includes(style)
+  const hasRight = ['single-right', 'single-double-side', 'single-transom-right', 'single-transom-double'].includes(style)
+  const hasTransom = style.includes('transom')
+
+  const hw = width / 2   // door half-width
+  const hh = height / 2  // door half-height
+
+  // Jambs taller when transom is present, shifted up to reach transom top
+  const jambH = hasTransom ? height + T + TRANSOM_H : height
+  const jambY = hasTransom ? (T + TRANSOM_H) / 2 : 0
+
+  // Outer edges of the full assembly
+  const xLeftEdge = hasLeft ? -(hw + T + LITE_W + T) : -(hw + T)
+  const xRightEdge = hasRight ? (hw + T + LITE_W + T) : (hw + T)
+  const aWidth = xRightEdge - xLeftEdge
+  const aCenterX = (xRightEdge + xLeftEdge) / 2
+
+  // Collect all [px, py, pw, ph] tuples for vertical and horizontal members
+  const pieces: [number, number, number, number][] = [
+    // Left outer jamb
+    [xLeftEdge + T / 2, jambY, T, jambH],
+    // Right outer jamb
+    [xRightEdge - T / 2, jambY, T, jambH],
+    // Door-top header (becomes horizontal mullion when transom present)
+    [aCenterX, hh + T / 2, aWidth, T],
+  ]
+
+  // Inner mullions when side lites are present
+  const innerJambH = hasTransom ? jambH - TRANSOM_H : jambH
+  const innerJambY = hasTransom ? 0 : jambY
+  if (hasLeft) pieces.push([-(hw + T / 2), innerJambY, T, innerJambH])
+  if (hasRight) pieces.push([hw + T / 2, innerJambY, T, innerJambH])
+
+  // Transom top header
+  if (hasTransom) pieces.push([aCenterX, hh + T + TRANSOM_H + T / 2, aWidth, T])
+
+  return (
+    <group {...props}>
+      {pieces.map(([px, py, pw, ph], i) => (
+        <mesh key={i} position={[px, py, Z]}>
+          <boxGeometry args={[pw, ph, D]} />
+          <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+        </mesh>
+      ))}
+
+      {/* Side lite panels */}
+      {hasRight && (
+        <SideLite
+          color={color}
+          width={LITE_W}
+          height={height}
+          position={[hw + T + LITE_W / 2, 0, 0]}
+        />
+      )}
+      {hasLeft && (
+        <SideLite
+          color={color}
+          width={LITE_W}
+          height={height}
+          position={[-(hw + T + LITE_W / 2), 0, 0]}
+        />
+      )}
+
+      {/* Transom panel */}
+      {hasTransom && (
+        <Transom
+          color={color}
+          width={aWidth - 2 * T}
+          height={TRANSOM_H}
+          position={[aCenterX, hh + T + TRANSOM_H / 2, 0]}
+        />
+      )}
     </group>
   )
 }
@@ -517,7 +692,7 @@ export default function App() {
   const [cfg, setCfg] = useState<CfgState>({
     productType: 'front',
     style: 'single',
-    width: 36,
+    width: 32,
     height: 80,
     frame: 'charcoal',
     glass: 'triple',
@@ -576,6 +751,12 @@ export default function App() {
     gsap.fromTo(cameraRef.current.position, { z: 90 }, { z: 30, duration: 1, ease: 'power2.out' })
   }, [])
 
+  useEffect(() => {
+    if (!cameraRef.current) return
+    const targetZ = cfg.style.includes('transom') || cfg.height === 95 ? 42 : 30
+    gsap.to(cameraRef.current.position, { z: targetZ, duration: 0.6, ease: 'power2.inOut' })
+  }, [cfg.style, cfg.height])
+
   const toggleFullscreen = () => {
     if (!viewportRef.current) return
     if (!document.fullscreenElement) {
@@ -632,17 +813,22 @@ export default function App() {
                   <directionalLight position={[0, 5, 90]} intensity={1.5} />
                   <directionalLight position={[0, 5, -90]} intensity={1.5} />
                   {(() => {
+                    const INCH = 12 / 32  // 0.375 Three.js units per inch
+                    const doorW3d = cfg.width * INCH
+                    const doorH3d = cfg.height * INCH
                     const model = DOOR_MODELS.find(m => m.id === doorModel) ?? DOOR_MODELS[0]
                     const panels = doorModel === 'orleans'
                       ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
                       : model.panels
                     return (
                       <Rotator isRotating={isRotating}>
-                        <Door color={currentUserColorSelected ?? model.color} panels={panels} />
+                        <FrameDoor color={currentUserColorSelected ?? model.color} width={doorW3d} height={doorH3d} style={cfg.style} />
+                        <Door color={currentUserColorSelected ?? model.color} width={doorW3d} height={doorH3d} panels={panels} />
                       </Rotator>
                     )
                   })()}
-                  <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} enableZoom={false} />
+                  <ContactShadows position={[0, -(cfg.height * (12 / 32) / 2), 0]} scale={50} far={40} blur={1.5} opacity={0.75} resolution={512} color="#000000" />
+                  <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} enableZoom={true} />
                 </Suspense>
               </Canvas>
             ) : (
