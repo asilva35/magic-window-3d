@@ -560,47 +560,6 @@ function FrontWall({ visible = true, doorWidth, doorHeight, style }: {
   )
 }
 
-function CeilLamp({ position = [0, 0, -5] as [number, number, number] } = {}) {
-  const CEIL_Y = 15
-  const CABLE_LEN = 6.5
-  const CABLE_BOT = CEIL_Y - CABLE_LEN
-  const SHADE_H = 0.5
-  const SHADE_Y = CABLE_BOT - SHADE_H / 2
-  const LIGHT_Y = CABLE_BOT - SHADE_H
-
-  return (
-    <group position={position}>
-      {/* Cable */}
-      <mesh position={[0, CEIL_Y - CABLE_LEN / 2, 0]} castShadow={false} receiveShadow={false}>
-        <cylinderGeometry args={[0.03, 0.03, CABLE_LEN, 8]} />
-        <meshStandardMaterial color="#1a1a1a" roughness={0.8} metalness={0.3} />
-      </mesh>
-
-      {/* Shade — inverted cone, narrow top, wide bottom */}
-      <mesh position={[0, SHADE_Y, 0]} castShadow={false} receiveShadow={false}>
-        <cylinderGeometry args={[0.25, 0.75, SHADE_H, 24]} />
-        <meshStandardMaterial color="#d4cfc8" roughness={0.4} metalness={0.2} side={THREE.DoubleSide} />
-      </mesh>
-
-      {/* Bulb */}
-      <mesh position={[0, CABLE_BOT - 0.5, 0]} castShadow={false} receiveShadow={false}>
-        <sphereGeometry args={[0.22, 12, 8]} />
-        <meshStandardMaterial color="#fff9e0" emissive="#ffe07a" emissiveIntensity={3} />
-      </mesh>
-
-      {/* Light */}
-      <pointLight
-        position={[0, LIGHT_Y, 0]}
-        color="#ffe8a0"
-        intensity={400}
-        distance={90}
-        decay={1}
-        castShadow={false}
-      />
-    </group>
-  )
-}
-
 const PAN_MIN = new THREE.Vector3(-5, -2, -5)
 const PAN_MAX = new THREE.Vector3(5, 5, 5)
 
