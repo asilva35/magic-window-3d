@@ -1001,12 +1001,22 @@ export default function App() {
           <div
             className="cfg__viewport"
             ref={viewportRef}
-            style={stepIdx === 5 ? {
-              backgroundImage: "url('/assets/images/interior-home.jpg')",
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            } : undefined}
           >
+            <div
+              className="cfg__background"
+              style={{
+                zIndex: 0,
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                backgroundImage: "url('/assets/images/interior-home.jpg')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                transition: 'opacity 0.3s',
+                opacity: stepIdx === 5 ? 1 : 0
+              }}
+            ></div>
             {cfg.productType === 'front' ? (
               <Canvas shadows gl={{ alpha: true }}>
                 <Suspense fallback={null}>
