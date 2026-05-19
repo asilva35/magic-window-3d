@@ -45,18 +45,27 @@ function Moulding({ moldScale, onTipZ, color = '#2c2c2c', ...props }: {
     setInitData({ c1z, c2z, moldMin, moldMax })
   }, [clone])
 
+  const [woodDiff, woodAo, woodDisp] = useWoodTextures()
+
   useEffect(() => {
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh
+        const uv = mesh.geometry.getAttribute('uv')
+        if (uv && !mesh.geometry.getAttribute('uv2')) mesh.geometry.setAttribute('uv2', uv)
         mesh.material = new THREE.MeshStandardMaterial({
           color: color,
+          map: woodDiff,
+          aoMap: woodAo,
+          aoMapIntensity: 0.8,
+          bumpMap: woodDisp,
+          bumpScale: 0.02,
           metalness: 0.1,
-          roughness: 0.3,
+          roughness: 0.8,
         })
       }
     })
-  }, [clone, color])
+  }, [clone, color, woodDiff, woodAo, woodDisp])
 
   useEffect(() => {
     const baseMold = baseMoldRef.current
@@ -189,6 +198,55 @@ function buildStileRail(
   return pieces
 }
 
+/* ── Wood texture system ─────────────────────────────────────────── */
+
+const WOOD_DIFF = '/assets/textures/oak_veneer_01_1k.blend/textures/oak_veneer_01_diff_1k.jpg'
+const WOOD_AO = '/assets/textures/oak_veneer_01_1k.blend/textures/oak_veneer_01_ao_1k.jpg'
+const WOOD_DISP = '/assets/textures/oak_veneer_01_1k.blend/textures/oak_veneer_01_disp_1k.png'
+
+function useWoodTextures() {
+  const [diff, ao, disp] = useTexture([WOOD_DIFF, WOOD_AO, WOOD_DISP])
+  useMemo(() => {
+    ;[diff, ao, disp].forEach(tex => {
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping
+      tex.repeat.set(3, 6)
+      tex.needsUpdate = true
+    })
+  }, [diff, ao, disp])
+  return [diff, ao, disp] as const
+}
+
+function WoodMesh({ args, color, roughness = 0.8, metalness = 0, ...props }: {
+  args: [number, number, number]
+  color: string
+  roughness?: number
+  metalness?: number
+  [key: string]: any
+}) {
+  const [diff, ao, disp] = useWoodTextures()
+  return (
+    <mesh {...props}>
+      <boxGeometry
+        args={args}
+        onUpdate={(geom: THREE.BufferGeometry) => {
+          const uv = geom.getAttribute('uv')
+          if (uv && !geom.getAttribute('uv2')) geom.setAttribute('uv2', uv)
+        }}
+      />
+      <meshStandardMaterial
+        color={color}
+        map={diff}
+        aoMap={ao}
+        aoMapIntensity={0.8}
+        bumpMap={disp}
+        bumpScale={0.02}
+        roughness={roughness}
+        metalness={metalness}
+      />
+    </mesh>
+  )
+}
+
 function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, height = 30, glassMat, glassPanelRule = 'top', ...props }: {
   color?: string
   mouldingColor?: string
@@ -232,16 +290,10 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, heigh
     <group {...props}>
       {stilePieces ? (
         stilePieces.map((p, i) => (
-          <mesh key={i} position={[p.cx, p.cy, 0]}>
-            <boxGeometry args={[p.w, p.h, DOOR_D]} />
-            <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-          </mesh>
+          <WoodMesh key={i} args={[p.w, p.h, DOOR_D]} color={color} position={[p.cx, p.cy, 0]} />
         ))
       ) : (
-        <mesh>
-          <boxGeometry args={[width, height, DOOR_D]} />
-          <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-        </mesh>
+        <WoodMesh args={[width, height, DOOR_D]} color={color} />
       )}
 
       {panels.map((panel, i) => {
@@ -292,22 +344,10 @@ function SideLite({ color = '#2c2c2c', width = 4.5, height = 30, glassMat, ...pr
 
   return (
     <group {...props}>
-      <mesh position={[-hw + RAIL / 2, 0, Z]}>
-        <boxGeometry args={[RAIL, height, D]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
-      <mesh position={[hw - RAIL / 2, 0, Z]}>
-        <boxGeometry args={[RAIL, height, D]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
-      <mesh position={[0, hh - RAIL / 2, Z]}>
-        <boxGeometry args={[width, RAIL, D]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
-      <mesh position={[0, -hh + RAIL / 2, Z]}>
-        <boxGeometry args={[width, RAIL, D]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
+      <WoodMesh args={[RAIL, height, D]} color={color} position={[-hw + RAIL / 2, 0, Z]} />
+      <WoodMesh args={[RAIL, height, D]} color={color} position={[hw - RAIL / 2, 0, Z]} />
+      <WoodMesh args={[width, RAIL, D]} color={color} position={[0, hh - RAIL / 2, Z]} />
+      <WoodMesh args={[width, RAIL, D]} color={color} position={[0, -hh + RAIL / 2, Z]} />
       <GlassPane width={width - 2 * RAIL} height={height - 2 * RAIL} z={Z} mat={gm} />
     </group>
   )
@@ -329,22 +369,10 @@ function Transom({ color = '#2c2c2c', width = 12, height = 5, glassMat, ...props
 
   return (
     <group {...props}>
-      <mesh position={[-hw + RAIL / 2, 0, Z]}>
-        <boxGeometry args={[RAIL, height, D]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
-      <mesh position={[hw - RAIL / 2, 0, Z]}>
-        <boxGeometry args={[RAIL, height, D]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
-      <mesh position={[0, hh - RAIL / 2, Z]}>
-        <boxGeometry args={[width, RAIL, D]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
-      <mesh position={[0, -hh + RAIL / 2, Z]}>
-        <boxGeometry args={[width, RAIL, D]} />
-        <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-      </mesh>
+      <WoodMesh args={[RAIL, height, D]} color={color} position={[-hw + RAIL / 2, 0, Z]} />
+      <WoodMesh args={[RAIL, height, D]} color={color} position={[hw - RAIL / 2, 0, Z]} />
+      <WoodMesh args={[width, RAIL, D]} color={color} position={[0, hh - RAIL / 2, Z]} />
+      <WoodMesh args={[width, RAIL, D]} color={color} position={[0, -hh + RAIL / 2, Z]} />
       <GlassPane width={width - 2 * RAIL} height={height - 2 * RAIL} z={Z} mat={gm} />
     </group>
   )
@@ -403,10 +431,7 @@ function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single
   return (
     <group {...props}>
       {pieces.map(([px, py, pw, ph], i) => (
-        <mesh key={i} position={[px, py, Z]}>
-          <boxGeometry args={[pw, ph, D]} />
-          <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
-        </mesh>
+        <WoodMesh key={i} args={[pw, ph, D]} color={color} position={[px, py, Z]} />
       ))}
 
       {/* Side lite panels */}
@@ -546,6 +571,7 @@ function Rotator({ isRotating, children }: { isRotating: boolean, children: Reac
 
 useGLTF.preload('/assets/models/MoldOrleansDoor.glb')
 useGLTF.preload('/assets/models/HandleBerlinLeverHandle.glb')
+useTexture.preload([WOOD_DIFF, WOOD_AO, WOOD_DISP])
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -1057,6 +1083,7 @@ export default function App() {
                   <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 0, 30]} fov={60} />
                   <directionalLight position={[0, 5, 90]} intensity={1.5} />
                   <directionalLight position={[0, 5, -90]} intensity={1.5} />
+                  <hemisphereLight args={['#e5ebf6', '#4e4f4e', 5]} />
                   {(() => {
                     const INCH = 12 / 32  // 0.375 Three.js units per inch
                     const doorW3d = cfg.width * INCH
@@ -1087,7 +1114,7 @@ export default function App() {
                     maxPolarAngle={stepIdx === 5 ? Math.PI / 2 : Math.PI / 1.75}
                     enableZoom={stepIdx !== 5}
                     enableRotate={stepIdx !== 5}
-                    enablePan={stepIdx === 5}
+                    enablePan={true}
                   />
                 </Suspense>
               </Canvas>
