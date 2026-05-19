@@ -449,7 +449,47 @@ function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single
   )
 }
 
+function FrontWall({ visible = true, doorWidth, doorHeight, style }: {
+  visible?: boolean
+  doorWidth: number
+  doorHeight: number
+  style: string
+}) {
+  const T = 0.5
+  const LITE_W = 4.5
+  const TRANSOM_H = 5
+  const hw = doorWidth / 2
+  const hh = doorHeight / 2
+  const hasLeft = ['single-left', 'single-double-side', 'single-transom-left', 'single-transom-double'].includes(style)
+  const hasRight = ['single-right', 'single-double-side', 'single-transom-right', 'single-transom-double'].includes(style)
+  const hasTransom = style.includes('transom')
+  const xLeft = hasLeft ? -(hw + T + LITE_W + T) : -(hw + T)
+  const xRight = hasRight ? (hw + T + LITE_W + T) : (hw + T)
+  const yBottom = -hh
+  const yTop = hasTransom ? hh + T + TRANSOM_H + T : hh + T
+  const S = 100
 
+  const geometry = useMemo(() => {
+    const shape = new THREE.Shape()
+    shape.moveTo(-S / 2, -S / 2)
+    shape.lineTo(S / 2, -S / 2)
+    shape.lineTo(S / 2, S / 2)
+    shape.lineTo(-S / 2, S / 2)
+    const hole = new THREE.Path()
+    hole.moveTo(xLeft, yBottom)
+    hole.lineTo(xRight, yBottom)
+    hole.lineTo(xRight, yTop)
+    hole.lineTo(xLeft, yTop)
+    shape.holes.push(hole)
+    return new THREE.ShapeGeometry(shape)
+  }, [xLeft, xRight, yBottom, yTop])
+
+  return (
+    <mesh geometry={geometry} position={[0, 0, 1.5]} visible={visible}>
+      <meshBasicMaterial color='#ffffff' />
+    </mesh>
+  )
+}
 
 function Rotator({ isRotating, children }: { isRotating: boolean, children: React.ReactNode }) {
   const groupRef = useRef<THREE.Group>(null)
@@ -986,10 +1026,13 @@ export default function App() {
                     const glassPanelRule = DOOR_GLASS_RULE[doorModel] ?? 'top'
                     const frameColor = currentUserColorSelected ?? model.color
                     return (
-                      <Rotator isRotating={isRotating}>
-                        <FrameDoor color={frameColor} width={doorW3d} height={doorH3d} style={cfg.style} glassMat={glassMat} />
-                        <Door color={frameColor} width={doorW3d} height={doorH3d} panels={panels} glassMat={glassMat} glassPanelRule={glassPanelRule} />
-                      </Rotator>
+                      <>
+                        <Rotator isRotating={isRotating}>
+                          <FrameDoor color={frameColor} width={doorW3d} height={doorH3d} style={cfg.style} glassMat={glassMat} />
+                          <Door color={frameColor} width={doorW3d} height={doorH3d} panels={panels} glassMat={glassMat} glassPanelRule={glassPanelRule} />
+                        </Rotator>
+                        <FrontWall doorWidth={doorW3d} doorHeight={doorH3d} style={cfg.style} visible={stepIdx === 5} />
+                      </>
                     )
                   })()}
                   <Stats />
