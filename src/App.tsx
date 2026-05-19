@@ -1026,7 +1026,7 @@ export default function App() {
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 transition: 'opacity 0.3s',
-                opacity: stepIdx === 5 ? 1 : 0
+                opacity: 1
               }}
             ></div>
             {cfg.productType === 'front' ? (
@@ -1034,8 +1034,8 @@ export default function App() {
                 <Suspense fallback={null}>
                   <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 0, 30]} fov={60} />
                   <directionalLight position={[0, 5, 90]} intensity={1.5} />
-                  <directionalLight position={[0, 5, -90]} intensity={1.5} />
-                  <hemisphereLight args={['#e5ebf6', '#4e4f4e', 5]} />
+                  {/* <directionalLight position={[0, 5, -90]} intensity={1.5} />
+                  <hemisphereLight args={['#e5ebf6', '#4e4f4e', 5]} /> */}
                   {(() => {
                     const INCH = 12 / 32  // 0.375 Three.js units per inch
                     const doorW3d = cfg.width * INCH
