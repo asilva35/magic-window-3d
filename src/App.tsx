@@ -5,6 +5,9 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import gsap from 'gsap'
 import { LoadingScreen } from './LoadingScreen'
+import { useControls, Leva } from 'leva'
+
+const DEBUG_ON = true
 
 type InitData = { c1z: number; c2z: number; moldMin: number; moldMax: number }
 
@@ -118,11 +121,14 @@ function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, onG
   }, [hTip, vTip, glassMat, glassW, glassH])
 
   const normalMap = useTexture('/assets/textures/normal.jpg')
+  const normalRepeat = glassMat?.normalRepeat ?? 3
   useMemo(() => {
     normalMap.wrapS = normalMap.wrapT = THREE.RepeatWrapping
-    normalMap.repeat.set(3, 3)
     normalMap.needsUpdate = true
   }, [normalMap])
+  useEffect(() => {
+    normalMap.repeat.set(normalRepeat, normalRepeat)
+  }, [normalMap, normalRepeat])
 
   return (
     <group {...props}>
@@ -132,17 +138,21 @@ function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, onG
       <Moulding color={color} moldScale={moldScale2} position={[0, hSideY, 0.1]} rotation={[Math.PI / 2, -Math.PI / 2, 0.1]} />
       {glassMat && (
         <group>
-          <mesh position={[0, 0, 0]} castShadow={false} receiveShadow={false}>
+          <mesh position={[0, 0, 0]} castShadow={false} receiveShadow={false} visible={true}>
             <boxGeometry args={[glassW, glassH, 0.04]} />
             <meshPhysicalMaterial
+              transparent
+              side={THREE.DoubleSide}
+              depthWrite={false}
               color={glassMat.color}
+              opacity={glassMat.opacity}
               metalness={glassMat.metalness}
               roughness={glassMat.roughness}
-              transmission={glassMat.transmission ?? 1}
-              ior={glassMat.ior ?? 1.5}
-              reflectivity={glassMat.reflectivity ?? 0.5}
+              transmission={glassMat.transmission ?? 0}
+              ior={glassMat.ior ?? 1.52}
+              reflectivity={glassMat.reflectivity ?? 0.05}
               thickness={glassMat.thickness ?? 2.5}
-              envMapIntensity={glassMat.envMapIntensity ?? 1.5}
+              envMapIntensity={glassMat.envMapIntensity ?? 0.8}
               clearcoat={glassMat.clearcoat ?? 1}
               clearcoatRoughness={glassMat.clearcoatRoughness ?? 0.1}
               normalScale={[glassMat.normalScale ?? 0.3, glassMat.normalScale ?? 0.3]}
@@ -688,6 +698,7 @@ type GlassMat = {
   clearcoatRoughness?: number
   normalScale?: number
   clearcoatNormalScale?: number
+  normalRepeat?: number
 }
 
 const DOOR_GLASS: { id: string; label: string; category: string; swatch: string }[] = [
@@ -707,19 +718,20 @@ const DOOR_GLASS: { id: string; label: string; category: string; swatch: string 
 ]
 
 const DOOR_GLASS_MAT: Record<string, GlassMat> = {
-  sandblast: { color: '#e0e0d8', opacity: 0.98, roughness: 0.85, metalness: 0 },
-  edge: { color: '#c8dce8', opacity: 0.65, roughness: 0.6, metalness: 0 },
-  pure: { color: '#eef5ff', opacity: 0.45, roughness: 0.25, metalness: 0 },
-  equation: { color: '#d8eed8', opacity: 0.5, roughness: 0.25, metalness: 0 },
-  nuando: { color: '#f0e8d0', opacity: 0.5, roughness: 0.25, metalness: 0 },
-  mist: { color: '#d8e8f5', opacity: 0.7, roughness: 0.5, metalness: 0 },
-  winchester: { color: '#b8956a', opacity: 0.65, roughness: 0.1, metalness: 0.15 },
-  nobel: { color: '#7b9cbf', opacity: 0.72, roughness: 0.08, metalness: 0.2 },
-  belmont: { color: '#8fb080', opacity: 0.65, roughness: 0.1, metalness: 0.1 },
-  celeste: { color: '#90b8d8', opacity: 0.72, roughness: 0.05, metalness: 0.2 },
-  bolero: { color: '#b890b0', opacity: 0.65, roughness: 0.1, metalness: 0.15 },
-  bistro: { color: '#c0a850', opacity: 0.62, roughness: 0.1, metalness: 0.1 },
-  portrait: { color: '#c8a080', opacity: 0.62, roughness: 0.15, metalness: 0.1 },
+  // transmission:0 — CSS background shows through transparent canvas; tune via Leva if a background scene plane is added
+  sandblast: { color: '#e0e0d8', opacity: 0.92, roughness: 0.85, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.15, ior: 1.52, thickness: 2.5, reflectivity: 0.05, envMapIntensity: 0.6, normalScale: 0.4, clearcoatNormalScale: 0.25, normalRepeat: 3 },
+  edge:      { color: '#c8dce8', opacity: 0.72, roughness: 0.55, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.12, ior: 1.52, thickness: 2.5, reflectivity: 0.08, envMapIntensity: 0.7, normalScale: 0.3, clearcoatNormalScale: 0.2,  normalRepeat: 3 },
+  pure:      { color: '#eef5ff', opacity: 0.38, roughness: 0.08, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.9, normalScale: 0.15, clearcoatNormalScale: 0.1, normalRepeat: 3 },
+  equation:  { color: '#d8eed8', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1,  envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
+  nuando:    { color: '#f0e8d0', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1,  envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
+  mist:      { color: '#d8e8f5', opacity: 0.65, roughness: 0.4,  metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.1,  ior: 1.52, thickness: 2.5, reflectivity: 0.07, envMapIntensity: 0.7, normalScale: 0.3, clearcoatNormalScale: 0.2,  normalRepeat: 3 },
+  winchester:{ color: '#b8956a', opacity: 0.62, roughness: 0.08, metalness: 0.15, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.8, normalScale: 0.25, clearcoatNormalScale: 0.18, normalRepeat: 3 },
+  nobel:     { color: '#7b9cbf', opacity: 0.68, roughness: 0.06, metalness: 0.2, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.04, ior: 1.52, thickness: 2.5, reflectivity: 0.15, envMapIntensity: 0.9, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
+  belmont:   { color: '#8fb080', opacity: 0.62, roughness: 0.08, metalness: 0.1, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.1,  envMapIntensity: 0.8, normalScale: 0.22, clearcoatNormalScale: 0.16, normalRepeat: 3 },
+  celeste:   { color: '#90b8d8', opacity: 0.68, roughness: 0.04, metalness: 0.2, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.04, ior: 1.52, thickness: 2.5, reflectivity: 0.15, envMapIntensity: 0.9, normalScale: 0.18, clearcoatNormalScale: 0.12, normalRepeat: 3 },
+  bolero:    { color: '#b890b0', opacity: 0.62, roughness: 0.08, metalness: 0.15, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.8, normalScale: 0.22, clearcoatNormalScale: 0.16, normalRepeat: 3 },
+  bistro:    { color: '#c0a850', opacity: 0.58, roughness: 0.08, metalness: 0.1, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.8, normalScale: 0.22, clearcoatNormalScale: 0.16, normalRepeat: 3 },
+  portrait:  { color: '#c8a080', opacity: 0.58, roughness: 0.12, metalness: 0.1, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1,  envMapIntensity: 0.8, normalScale: 0.25, clearcoatNormalScale: 0.18, normalRepeat: 3 },
 }
 
 const HARDWARE = [
@@ -995,6 +1007,45 @@ export default function App() {
   const [currentUserColorSelected, setCurrentUserColorSelected] = useState<string | null>(null)
   const [currentUserGlassSelected, setCurrentUserGlassSelected] = useState<string | null>(null)
 
+  const _defaultMat = DOOR_GLASS_MAT.sandblast
+  const [glassControls, setGlassControls] = useControls('Glass Material', () => ({
+    color: { value: _defaultMat.color },
+    opacity: { value: _defaultMat.opacity, min: 0, max: 1, step: 0.01 },
+    roughness: { value: _defaultMat.roughness, min: 0, max: 1, step: 0.01 },
+    metalness: { value: _defaultMat.metalness, min: 0, max: 1, step: 0.01 },
+    transmission: { value: _defaultMat.transmission ?? 1, min: 0, max: 1, step: 0.01 },
+    ior: { value: _defaultMat.ior ?? 1.52, min: 1, max: 2.5, step: 0.01 },
+    reflectivity: { value: _defaultMat.reflectivity ?? 0.05, min: 0, max: 1, step: 0.01 },
+    thickness: { value: _defaultMat.thickness ?? 0.06, min: 0, max: 10, step: 0.01 },
+    envMapIntensity: { value: _defaultMat.envMapIntensity ?? 1, min: 0, max: 5, step: 0.05 },
+    clearcoat: { value: _defaultMat.clearcoat ?? 1, min: 0, max: 1, step: 0.01 },
+    clearcoatRoughness: { value: _defaultMat.clearcoatRoughness ?? 0.8, min: 0, max: 1, step: 0.01 },
+    normalScale: { value: _defaultMat.normalScale ?? 0, min: 0, max: 2, step: 0.01 },
+    clearcoatNormalScale: { value: _defaultMat.clearcoatNormalScale ?? 0, min: 0, max: 2, step: 0.01 },
+    normalRepeat: { value: _defaultMat.normalRepeat ?? 3, min: 1, max: 8, step: 1 },
+  }))
+
+  useEffect(() => {
+    if (!DEBUG_ON || !currentUserGlassSelected) return
+    const mat = DOOR_GLASS_MAT[currentUserGlassSelected]
+    setGlassControls({
+      color: mat.color,
+      opacity: mat.opacity,
+      roughness: mat.roughness,
+      metalness: mat.metalness,
+      transmission: mat.transmission ?? 1,
+      ior: mat.ior ?? 1.52,
+      reflectivity: mat.reflectivity ?? 0.05,
+      thickness: mat.thickness ?? 0.06,
+      envMapIntensity: mat.envMapIntensity ?? 1,
+      clearcoat: mat.clearcoat ?? 1,
+      clearcoatRoughness: mat.clearcoatRoughness ?? 0.8,
+      normalScale: mat.normalScale ?? 0,
+      clearcoatNormalScale: mat.clearcoatNormalScale ?? 0,
+      normalRepeat: mat.normalRepeat ?? 3,
+    })
+  }, [currentUserGlassSelected])
+
   // Snap to valid front-door sizes when switching product type
   useEffect(() => {
     if (cfg.productType !== 'front') return
@@ -1113,9 +1164,9 @@ export default function App() {
                 <Suspense fallback={null}>
                   <Environment files="/assets/hdr/empty_warehouse_01_2k.hdr" />
                   <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 0, 30]} fov={60} />
-                  <directionalLight position={[0, 5, 90]} intensity={1.5} />
+                  {/* <directionalLight position={[0, 5, 90]} intensity={1.5} /> */}
                   {/* <directionalLight position={[0, 5, -90]} intensity={1.5} /> */}
-                  <hemisphereLight args={['#e5ebf6', '#4e4f4e', 5]} />
+                  {/* <hemisphereLight args={['#e5ebf6', '#4e4f4e', 5]} /> */}
                   {(() => {
                     const INCH = 12 / 32  // 0.375 Three.js units per inch
                     const doorW3d = cfg.width * INCH
@@ -1124,7 +1175,9 @@ export default function App() {
                     const panels = doorModel === 'orleans'
                       ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
                       : model.panels
-                    const glassMat = currentUserGlassSelected ? DOOR_GLASS_MAT[currentUserGlassSelected] : undefined
+                    const glassMat = currentUserGlassSelected
+                      ? (DEBUG_ON ? (glassControls as GlassMat) : DOOR_GLASS_MAT[currentUserGlassSelected])
+                      : undefined
                     const glassPanelRule = DOOR_GLASS_RULE[doorModel] ?? 'top'
                     const frameColor = currentUserColorSelected ?? model.color
                     return (
@@ -1138,7 +1191,7 @@ export default function App() {
                     )
                   })()}
                   {/* <CeilLamp position={[0, 0, -5]} /> */}
-                  <Stats />
+                  {DEBUG_ON && <Stats />}
                   <ContactShadows position={[0, -(cfg.height * (12 / 32) / 2), 0]} scale={50} far={40} blur={1.5} opacity={0.75} resolution={512} color="#000000" />
                   <OrbitControls ref={controlsRef} makeDefault minPolarAngle={Math.PI * 0.5} maxPolarAngle={Math.PI * 0.5} minAzimuthAngle={Math.PI * -0.075} maxAzimuthAngle={Math.PI * 0.075} enableZoom={true} enablePan={true} minDistance={10} maxDistance={40} />
                   <PanClamper controlsRef={controlsRef} />
@@ -1601,6 +1654,8 @@ export default function App() {
         </div>
 
       </div>
+
+      <Leva hidden={!DEBUG_ON} />
     </div>
   )
 }
