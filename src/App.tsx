@@ -356,10 +356,43 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, heigh
 const DEFAULT_GLASS_MAT: GlassMat = { color: '#c8dff0', opacity: 0.4, roughness: 0.05, metalness: 0.1 }
 
 function GlassPane({ width, height, z, mat }: { width: number; height: number; z: number; mat: GlassMat }) {
+  const normalMap = useTexture('/assets/textures/normal.jpg')
+  const normalRepeat = mat.normalRepeat ?? 3
+  useMemo(() => {
+    normalMap.wrapS = normalMap.wrapT = THREE.RepeatWrapping
+    normalMap.needsUpdate = true
+  }, [normalMap])
+  useEffect(() => {
+    normalMap.repeat.set(normalRepeat, normalRepeat)
+  }, [normalMap, normalRepeat])
+
+  const bw = mat.borderWidth ?? 0
+  const innerW = bw > 0 ? Math.max(0.2, width - bw * 0.5) : width
+  const innerH = bw > 0 ? Math.max(0.2, height - bw * 0.5) : height
+
   return (
     <mesh position={[0, 0, z]}>
-      <boxGeometry args={[width, height, 0.04]} />
-      <meshStandardMaterial color={mat.color} transparent opacity={mat.opacity} roughness={mat.roughness} metalness={mat.metalness} />
+      <boxGeometry args={[innerW, innerH, 0.04]} />
+      <meshPhysicalMaterial
+        transparent
+        side={THREE.DoubleSide}
+        depthWrite={false}
+        color={mat.color}
+        opacity={mat.opacity}
+        metalness={mat.metalness}
+        roughness={mat.roughness}
+        transmission={mat.transmission ?? 0}
+        ior={mat.ior ?? 1.52}
+        reflectivity={mat.reflectivity ?? 0.05}
+        thickness={mat.thickness ?? 2.5}
+        envMapIntensity={mat.envMapIntensity ?? 0.8}
+        clearcoat={mat.clearcoat ?? 1}
+        clearcoatRoughness={mat.clearcoatRoughness ?? 0.1}
+        normalScale={[mat.normalScale ?? 0.3, mat.normalScale ?? 0.3]}
+        normalMap={normalMap}
+        clearcoatNormalMap={normalMap}
+        clearcoatNormalScale={[mat.clearcoatNormalScale ?? 0.2, mat.clearcoatNormalScale ?? 0.2]}
+      />
     </mesh>
   )
 }
