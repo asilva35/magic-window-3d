@@ -216,7 +216,7 @@ function useWoodTextures() {
   return [diff, ao, disp] as const
 }
 
-function WoodMesh({ args, color, roughness = 0.8, metalness = 0, ...props }: {
+function WoodMesh({ args, color, roughness = 0.5, metalness = 0.5, ...props }: {
   args: [number, number, number]
   color: string
   roughness?: number
@@ -1034,8 +1034,8 @@ export default function App() {
                 <Suspense fallback={null}>
                   <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 0, 30]} fov={60} />
                   <directionalLight position={[0, 5, 90]} intensity={1.5} />
-                  {/* <directionalLight position={[0, 5, -90]} intensity={1.5} />
-                  <hemisphereLight args={['#e5ebf6', '#4e4f4e', 5]} /> */}
+                  {/* <directionalLight position={[0, 5, -90]} intensity={1.5} /> */}
+                  <hemisphereLight args={['#e5ebf6', '#4e4f4e', 5]} />
                   {(() => {
                     const INCH = 12 / 32  // 0.375 Three.js units per inch
                     const doorW3d = cfg.width * INCH
