@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera, useGLTF, Stats, ContactShadows } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera, useGLTF, ContactShadows } from '@react-three/drei'
 import { Suspense, useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
@@ -954,7 +954,6 @@ export default function App() {
                       </Rotator>
                     )
                   })()}
-                  <Stats />
                   <ContactShadows position={[0, -(cfg.height * (12 / 32) / 2), 0]} scale={50} far={40} blur={1.5} opacity={0.75} resolution={512} color="#000000" />
                   <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} enableZoom={true} />
                 </Suspense>
