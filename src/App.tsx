@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera, useGLTF, Stats, ContactShadows } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera, useGLTF, Stats, ContactShadows, useTexture } from '@react-three/drei'
 import { Suspense, useEffect, useState, useRef, useMemo, useCallback } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import gsap from 'gsap'
 import { LoadingScreen } from './LoadingScreen'
@@ -424,6 +424,109 @@ function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single
   )
 }
 
+function makeBrickTexture() {
+  const canvas = document.createElement('canvas')
+  canvas.width = 512
+  canvas.height = 512
+  const ctx = canvas.getContext('2d')!
+  ctx.fillStyle = '#b0a090'
+  ctx.fillRect(0, 0, 512, 512)
+  const bW = 80, bH = 32, mS = 6
+  const rows = Math.ceil(512 / (bH + mS)) + 2
+  const cols = Math.ceil(512 / (bW + mS)) + 2
+  for (let row = 0; row < rows; row++) {
+    const ox = (row % 2) * ((bW + mS) / 2)
+    for (let col = -1; col < cols; col++) {
+      const x = col * (bW + mS) + ox
+      const y = row * (bH + mS)
+      const v = Math.random() * 40 - 20
+      const r = Math.round(Math.max(0, Math.min(255, 162 + v)))
+      const g = Math.round(Math.max(0, Math.min(255, 82 + v * 0.4)))
+      const b = Math.round(Math.max(0, Math.min(255, 62 + v * 0.3)))
+      ctx.fillStyle = `rgb(${r},${g},${b})`
+      ctx.fillRect(x, y, bW, bH)
+      ctx.fillStyle = 'rgba(255,255,255,0.07)'
+      ctx.fillRect(x, y, bW, 5)
+      ctx.fillStyle = 'rgba(0,0,0,0.14)'
+      ctx.fillRect(x, y + bH - 5, bW, 5)
+    }
+  }
+  const tex = new THREE.CanvasTexture(canvas)
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping
+  tex.repeat.set(7, 7)
+  return tex
+}
+
+function FrontWall({ visible = true, doorWidth, doorHeight, style }: {
+  visible?: boolean
+  doorWidth: number
+  doorHeight: number
+  style: string
+}) {
+  const T = 0.5
+  const LITE_W = 4.5
+  const TRANSOM_H = 5
+  const hw = doorWidth / 2
+  const hh = doorHeight / 2
+  const hasLeft = ['single-left', 'single-double-side', 'single-transom-left', 'single-transom-double'].includes(style)
+  const hasRight = ['single-right', 'single-double-side', 'single-transom-right', 'single-transom-double'].includes(style)
+  const hasTransom = style.includes('transom')
+  const xLeft = hasLeft ? -(hw + T + LITE_W + T) : -(hw + T)
+  const xRight = hasRight ? (hw + T + LITE_W + T) : (hw + T)
+  const yBottom = -hh
+  const yTop = hasTransom ? hh + T + TRANSOM_H + T : hh + T
+  const S = 300
+
+  const geometry = useMemo(() => {
+    const shape = new THREE.Shape()
+    shape.moveTo(-S / 2, -S / 2)
+    shape.lineTo(S / 2, -S / 2)
+    shape.lineTo(S / 2, S / 2)
+    shape.lineTo(-S / 2, S / 2)
+    const hole = new THREE.Path()
+    hole.moveTo(xLeft, yBottom)
+    hole.lineTo(xRight, yBottom)
+    hole.lineTo(xRight, yTop)
+    hole.lineTo(xLeft, yTop)
+    shape.holes.push(hole)
+    return new THREE.ShapeGeometry(shape)
+  }, [xLeft, xRight, yBottom, yTop])
+
+  const texture = useMemo(() => makeBrickTexture(), [])
+
+  return (
+    <mesh geometry={geometry} position={[0, 0, -0.15]} visible={visible}>
+      <meshStandardMaterial map={texture} roughness={0.9} metalness={0} />
+    </mesh>
+  )
+}
+
+function InteriorHousePlane({ visible = true }: { visible?: boolean }) {
+  const meshRef = useRef<THREE.Mesh>(null)
+  const texture = useTexture('/assets/images/interior-home.jpg')
+  const { camera, size } = useThree()
+
+  useFrame(() => {
+    if (!meshRef.current || !(camera instanceof THREE.PerspectiveCamera)) return
+    const distance = 25
+    const direction = new THREE.Vector3()
+    camera.getWorldDirection(direction)
+    meshRef.current.position.copy(camera.position).addScaledVector(direction, distance)
+    meshRef.current.quaternion.copy(camera.quaternion)
+    const fovRad = (camera.fov * Math.PI) / 180
+    const h = 2 * Math.tan(fovRad / 2) * distance
+    const w = h * (size.width / size.height)
+    meshRef.current.scale.set(w, h, 1)
+  })
+
+  return (
+    <mesh ref={meshRef} renderOrder={-1} visible={visible}>
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial map={texture} depthTest={false} depthWrite={false} />
+    </mesh>
+  )
+}
+
 function Rotator({ isRotating, children }: { isRotating: boolean, children: React.ReactNode }) {
   const groupRef = useRef<THREE.Group>(null)
 
@@ -550,7 +653,7 @@ const DOOR_GLASS: { id: string; label: string; category: string; swatch: string 
 ]
 
 const DOOR_GLASS_MAT: Record<string, GlassMat> = {
-  sandblast: { color: '#e0e0d8', opacity: 0.78, roughness: 0.85, metalness: 0 },
+  sandblast: { color: '#e0e0d8', opacity: 0.98, roughness: 0.85, metalness: 0 },
   edge: { color: '#c8dce8', opacity: 0.65, roughness: 0.6, metalness: 0 },
   pure: { color: '#eef5ff', opacity: 0.45, roughness: 0.25, metalness: 0 },
   equation: { color: '#d8eed8', opacity: 0.5, roughness: 0.25, metalness: 0 },
@@ -837,6 +940,7 @@ export default function App() {
   const [isRotating, setIsRotating] = useState(false)
   const [currentUserColorSelected, setCurrentUserColorSelected] = useState<string | null>(null)
   const [currentUserGlassSelected, setCurrentUserGlassSelected] = useState<string | null>(null)
+  const [showInteriorPlane, setShowInteriorPlane] = useState(false)
 
   // Snap to valid front-door sizes when switching product type
   useEffect(() => {
@@ -880,6 +984,23 @@ export default function App() {
     const targetZ = cfg.style.includes('transom') || cfg.height === 95 ? 42 : 30
     gsap.to(cameraRef.current.position, { z: targetZ, duration: 0.6, ease: 'power2.inOut' })
   }, [cfg.style, cfg.height])
+
+  useEffect(() => {
+    if (!cameraRef.current) return
+    if (stepIdx === 5) {
+      setShowInteriorPlane(false)
+      gsap.to(cameraRef.current.position, {
+        z: 20,
+        duration: 1.2,
+        ease: 'power2.inOut',
+        onComplete: () => setShowInteriorPlane(true),
+      })
+    } else {
+      setShowInteriorPlane(false)
+      const targetZ = cfg.style.includes('transom') || cfg.height === 95 ? 42 : 30
+      gsap.to(cameraRef.current.position, { z: targetZ, duration: 0.8, ease: 'power2.inOut' })
+    }
+  }, [stepIdx])
 
   const toggleFullscreen = () => {
     if (!viewportRef.current) return
@@ -948,15 +1069,26 @@ export default function App() {
                     const glassPanelRule = DOOR_GLASS_RULE[doorModel] ?? 'top'
                     const frameColor = currentUserColorSelected ?? model.color
                     return (
-                      <Rotator isRotating={isRotating}>
-                        <FrameDoor color={frameColor} width={doorW3d} height={doorH3d} style={cfg.style} glassMat={glassMat} />
-                        <Door color={frameColor} width={doorW3d} height={doorH3d} panels={panels} glassMat={glassMat} glassPanelRule={glassPanelRule} />
-                      </Rotator>
+                      <>
+                        <Rotator isRotating={isRotating}>
+                          <FrameDoor color={frameColor} width={doorW3d} height={doorH3d} style={cfg.style} glassMat={glassMat} />
+                          <Door color={frameColor} width={doorW3d} height={doorH3d} panels={panels} glassMat={glassMat} glassPanelRule={glassPanelRule} />
+                        </Rotator>
+                        <FrontWall doorWidth={doorW3d} doorHeight={doorH3d} style={cfg.style} visible={stepIdx === 5} />
+                      </>
                     )
                   })()}
+                  <InteriorHousePlane visible={showInteriorPlane || stepIdx === 5} />
                   <Stats />
                   <ContactShadows position={[0, -(cfg.height * (12 / 32) / 2), 0]} scale={50} far={40} blur={1.5} opacity={0.75} resolution={512} color="#000000" />
-                  <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} enableZoom={true} />
+                  <OrbitControls
+                    makeDefault
+                    minPolarAngle={0}
+                    maxPolarAngle={stepIdx === 5 ? Math.PI / 2 : Math.PI / 1.75}
+                    enableZoom={stepIdx !== 5}
+                    enableRotate={stepIdx !== 5}
+                    enablePan={stepIdx === 5}
+                  />
                 </Suspense>
               </Canvas>
             ) : (
