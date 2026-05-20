@@ -96,6 +96,76 @@ function Moulding({ moldScale, onTipZ, color = '#2c2c2c', ...props }: {
   return <primitive object={clone} {...props} />
 }
 
+function GlbGlass({ width, height, path, mat, normalMap }: {
+  width: number
+  height: number
+  path: string
+  mat: GlassMat
+  normalMap: THREE.Texture
+}) {
+  const { scene } = useGLTF(path)
+  const clone = useMemo(() => scene.clone(true), [scene])
+
+  useEffect(() => {
+    clone.traverse((child: any) => {
+      if (child.name === 'glass-pure-orlean') {
+        child.scale.set(width / 2, height / 2, 0.01)
+      }
+      if (!child.isMesh) return
+      child.castShadow = false
+      child.receiveShadow = false
+
+      if (child.name === 'glass-pure-orlean-clear') {
+        child.material = new THREE.MeshPhysicalMaterial({
+          transparent: true,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+          color: mat.color,
+          opacity: mat.opacity,
+          metalness: mat.metalness,
+          roughness: mat.roughness,
+          transmission: mat.transmission ?? 0,
+          ior: mat.ior ?? 1.52,
+          reflectivity: mat.reflectivity ?? 0.05,
+          thickness: mat.thickness ?? 2.5,
+          envMapIntensity: mat.envMapIntensity ?? 0.8,
+          clearcoat: mat.clearcoat ?? 1,
+          clearcoatRoughness: mat.clearcoatRoughness ?? 0.1,
+          normalScale: new THREE.Vector2(mat.normalScale ?? 0.3, mat.normalScale ?? 0.3),
+          normalMap,
+          clearcoatNormalMap: normalMap,
+          clearcoatNormalScale: new THREE.Vector2(mat.clearcoatNormalScale ?? 0.2, mat.clearcoatNormalScale ?? 0.2),
+        })
+      } else if (child.name === 'glass-pure-orlean-ink') {
+        child.material = new THREE.MeshBasicMaterial({ color: '#000000' })
+      } else if (child.name === 'glass-pure-orlean') {
+        child.material = new THREE.MeshPhysicalMaterial({
+          transparent: true,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+          color: '#e0e0d8',
+          opacity: 0.92,
+          roughness: 0.85,
+          metalness: 0,
+          transmission: 0,
+          ior: 1.52,
+          reflectivity: 0.05,
+          thickness: 2.5,
+          envMapIntensity: 0.6,
+          clearcoat: 1,
+          clearcoatRoughness: 0.15,
+          normalScale: new THREE.Vector2(0.4, 0.4),
+          normalMap,
+          clearcoatNormalMap: normalMap,
+          clearcoatNormalScale: new THREE.Vector2(0.25, 0.25),
+        })
+      }
+    })
+  }, [clone, width, height, mat, normalMap])
+
+  return <primitive object={clone} position={[0, 0, 0]} />
+}
+
 function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, onGlassBounds, ...props }: {
   moldScale: number
   moldScale2: number
@@ -140,6 +210,9 @@ function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, onG
         const bw = glassMat.borderWidth ?? 0
         const innerW = bw > 0 ? Math.max(0.2, glassW - bw * 2) : glassW
         const innerH = bw > 0 ? Math.max(0.2, glassH - bw * 2) : glassH
+        if (glassMat.glbPath) {
+          return <GlbGlass width={innerW} height={innerH} path={glassMat.glbPath} mat={glassMat} normalMap={normalMap} />
+        }
         return (
           <mesh position={[0, 0, 0]} castShadow={false} receiveShadow={false}>
             <boxGeometry args={[innerW, innerH, 0.04]} />
@@ -609,6 +682,7 @@ useGLTF.preload('/assets/models/HandleBerlinLeverHandle.glb')
 useTexture.preload([WOOD_DIFF, WOOD_AO, WOOD_DISP])
 useTexture.preload('/assets/textures/normal.jpg')
 useGLTF.preload('/assets/models/vog-door.glb')
+useGLTF.preload('/assets/models/glass-pure.glb')
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -713,6 +787,7 @@ type GlassMat = {
   clearcoatNormalScale?: number
   normalRepeat?: number
   borderWidth?: number
+  glbPath?: string
 }
 
 const DOOR_GLASS: { id: string; label: string; category: string; swatch: string }[] = [
@@ -735,7 +810,7 @@ const DOOR_GLASS_MAT: Record<string, GlassMat> = {
   // transmission:0 — CSS background shows through transparent canvas; tune via Leva if a background scene plane is added
   sandblast: { color: '#e0e0d8', opacity: 0.92, roughness: 0.85, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.15, ior: 1.52, thickness: 2.5, reflectivity: 0.05, envMapIntensity: 0.6, normalScale: 0.4, clearcoatNormalScale: 0.25, normalRepeat: 3 },
   edge: { color: '#e0e0d8', opacity: 0.92, roughness: 0.85, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.15, ior: 1.52, thickness: 2.5, reflectivity: 0.05, envMapIntensity: 0.6, normalScale: 0.4, clearcoatNormalScale: 0.25, normalRepeat: 3, borderWidth: 0.8 },
-  pure: { color: '#eef5ff', opacity: 0.38, roughness: 0.08, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.9, normalScale: 0.15, clearcoatNormalScale: 0.1, normalRepeat: 3 },
+  pure: { color: '#eef5ff', opacity: 0.38, roughness: 0.08, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.9, normalScale: 0.15, clearcoatNormalScale: 0.1, normalRepeat: 3, glbPath: '/assets/models/glass-pure.glb' },
   equation: { color: '#d8eed8', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
   nuando: { color: '#f0e8d0', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
   mist: { color: '#d8e8f5', opacity: 0.65, roughness: 0.4, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.1, ior: 1.52, thickness: 2.5, reflectivity: 0.07, envMapIntensity: 0.7, normalScale: 0.3, clearcoatNormalScale: 0.2, normalRepeat: 3 },
