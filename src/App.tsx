@@ -195,7 +195,7 @@ function GlbDoorSlab({ path, color, width, height }: { path: string; color: stri
   useEffect(() => {
     clone.traverse(child => {
       if ((child as THREE.Mesh).isMesh) {
-        ;(child as THREE.Mesh).material = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.1 })
+        ; (child as THREE.Mesh).material = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.1 })
       }
     })
   }, [clone, color])
@@ -890,11 +890,19 @@ export default function App() {
 
   const viewportRef = useRef<HTMLDivElement>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera>(null)
+  const [isInterior, setIsInterior] = useState(false)
 
   const handleLoaded = useCallback(() => {
     if (!cameraRef.current) return
     gsap.fromTo(cameraRef.current.position, { z: 90 }, { z: 30, duration: 1, ease: 'power2.out' })
   }, [])
+
+  const toggleInterior = useCallback(() => {
+    if (!cameraRef.current) return
+    const targetZ = isInterior ? 30 : -30
+    gsap.to(cameraRef.current.position, { z: targetZ, duration: 0.5, ease: 'power2.inOut' })
+    setIsInterior(v => !v)
+  }, [isInterior])
 
   useEffect(() => {
     if (!cameraRef.current) return
@@ -983,10 +991,12 @@ export default function App() {
             ) : (
               <SVGViewport state={cfg} />
             )}
-            {/* <div className="cfg__viewport-meta">
-              <button className="cfg__viewport-chip">Show Interior</button>
-              <button className="cfg__viewport-chip">Show Top View</button>
-            </div> */}
+            <div className="cfg__viewport-meta">
+              <button className="cfg__viewport-chip" onClick={toggleInterior}>
+                {isInterior ? 'Show Exterior' : 'Show Interior'}
+              </button>
+              {/* <button className="cfg__viewport-chip">Show Top View</button> */}
+            </div>
             <div className="cfg__tools">
               <button
                 title="Rotate"
