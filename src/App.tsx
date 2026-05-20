@@ -582,6 +582,7 @@ type DoorModelDef = {
   sub: string
   color: string
   panels: PanelConfig[]
+  glassOnly?: boolean
 }
 
 const DOOR_MODELS: DoorModelDef[] = [
@@ -590,7 +591,7 @@ const DOOR_MODELS: DoorModelDef[] = [
     panels: [{ y: 4.0, moldScale: 112, moldScale2: 50 }, { y: -7.5, moldScale: 19, moldScale2: 50 }],
   },
   {
-    id: 'uno', label: 'Uno', sub: '1 large panel', color: '#e86253',
+    id: 'uno', label: 'Uno', sub: '1 large panel', color: '#e86253', glassOnly: true,
     panels: [{ y: 1, moldScale: 150.0, moldScale2: 50.0 }],
   },
   {
@@ -941,10 +942,11 @@ export default function App() {
                     const doorW3d = cfg.width * INCH
                     const doorH3d = cfg.height * INCH
                     const model = DOOR_MODELS.find(m => m.id === doorModel) ?? DOOR_MODELS[0]
-                    const panels = doorModel === 'orleans'
+                    const glassMat = currentUserGlassSelected ? DOOR_GLASS_MAT[currentUserGlassSelected] : undefined
+                    const basePanels = doorModel === 'orleans'
                       ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
                       : model.panels
-                    const glassMat = currentUserGlassSelected ? DOOR_GLASS_MAT[currentUserGlassSelected] : undefined
+                    const panels = model.glassOnly && !glassMat ? [] : basePanels
                     const glassPanelRule = DOOR_GLASS_RULE[doorModel] ?? 'top'
                     const frameColor = currentUserColorSelected ?? model.color
                     return (
