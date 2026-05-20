@@ -283,7 +283,21 @@ function WoodMesh({ args, color, roughness = 0.5, metalness = 0.5, ...props }: {
   )
 }
 
-function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, height = 30, glassMat, glassPanelRule = 'top', ...props }: {
+function GlbDoorSlab({ path, color, width, height }: { path: string; color: string; width: number; height: number }) {
+  const { scene } = useGLTF(path)
+  const clone = useMemo(() => scene.clone(), [scene])
+  useEffect(() => {
+    clone.traverse(child => {
+      if ((child as THREE.Mesh).isMesh) {
+        ; (child as THREE.Mesh).material = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.1 })
+      }
+    })
+  }, [clone, color])
+  // GLTF geometry spans [-1,1], node scale [12,30,0.25] → rendered 24×60×0.5; scale to match door size
+  return <primitive object={clone} scale={[width / 24, height / 60, 0.5]} />
+}
+
+function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, height = 30, glassMat, glassPanelRule = 'top', glbSlab, ...props }: {
   color?: string
   mouldingColor?: string
   panels?: PanelConfig[]
@@ -291,6 +305,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, heigh
   height?: number
   glassMat?: GlassMat
   glassPanelRule?: 'top' | 'all' | 'none'
+  glbSlab?: string
   [key: string]: any
 }) {
   const DOOR_D = 0.25
@@ -324,7 +339,9 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, heigh
 
   return (
     <group {...props}>
-      {stilePieces ? (
+      {glbSlab ? (
+        <GlbDoorSlab path={glbSlab} color={color} width={width} height={height} />
+      ) : stilePieces ? (
         stilePieces.map((p, i) => (
           <WoodMesh key={i} args={[p.w, p.h, DOOR_D]} color={color} position={[p.cx, p.cy, 0]} />
         ))
@@ -348,7 +365,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, heigh
         )
       })}
 
-      <DoorHandler position={[-(width / 2 - 0.9), 0, PANEL_Z]} rotation={[0, 0, 0]} />
+      <DoorHandler position={[(width / 2 - 0.9), 0, PANEL_Z]} rotation={[0, 0, 0]} />
     </group>
   )
 }
@@ -589,6 +606,7 @@ function Rotator({ isRotating, children }: { isRotating: boolean, children: Reac
 
 useGLTF.preload('/assets/models/MoldOrleansDoor.glb')
 useGLTF.preload('/assets/models/HandleBerlinLeverHandle.glb')
+useGLTF.preload('/assets/models/vog-door.glb')
 useTexture.preload([WOOD_DIFF, WOOD_AO, WOOD_DISP])
 useTexture.preload('/assets/textures/normal.jpg')
 
@@ -747,6 +765,8 @@ type DoorModelDef = {
   sub: string
   color: string
   panels: PanelConfig[]
+  glassOnly?: boolean
+  glbSlab?: string
 }
 
 const DOOR_MODELS: DoorModelDef[] = [
@@ -755,7 +775,7 @@ const DOOR_MODELS: DoorModelDef[] = [
     panels: [{ y: 4.0, moldScale: 112, moldScale2: 50 }, { y: -7.5, moldScale: 19, moldScale2: 50 }],
   },
   {
-    id: 'uno', label: 'Uno', sub: '1 large panel', color: '#e86253',
+    id: 'uno', label: 'Uno', sub: '1 large panel', color: '#e86253', glassOnly: true,
     panels: [{ y: 1, moldScale: 150.0, moldScale2: 50.0 }],
   },
   {
@@ -772,6 +792,7 @@ const DOOR_MODELS: DoorModelDef[] = [
   },
   {
     id: 'vog', label: 'Vog', sub: 'Solid · no panels', color: '#3d3d3d',
+    glbSlab: '/assets/models/vog-door.glb',
     panels: [],
   },
 ]
@@ -1074,11 +1095,19 @@ export default function App() {
   const viewportRef = useRef<HTMLDivElement>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera>(null)
   const controlsRef = useRef<any>(null);
+  const [isInterior, setIsInterior] = useState(false)
 
   const handleLoaded = useCallback(() => {
     if (!cameraRef.current) return
     gsap.fromTo(cameraRef.current.position, { z: 90 }, { z: 30, duration: 1, ease: 'power2.out' })
   }, [])
+
+  const toggleInterior = useCallback(() => {
+    if (!cameraRef.current) return
+    const targetZ = isInterior ? 30 : -30
+    gsap.to(cameraRef.current.position, { z: targetZ, duration: 0.5, ease: 'power2.inOut' })
+    setIsInterior(v => !v)
+  }, [isInterior])
 
   useEffect(() => {
     if (!cameraRef.current) return
@@ -1168,7 +1197,8 @@ export default function App() {
                     const doorW3d = cfg.width * INCH
                     const doorH3d = cfg.height * INCH
                     const model = DOOR_MODELS.find(m => m.id === doorModel) ?? DOOR_MODELS[0]
-                    const panels = doorModel === 'orleans'
+                    const glassMat = currentUserGlassSelected ? DOOR_GLASS_MAT[currentUserGlassSelected] : undefined
+                    const basePanels = doorModel === 'orleans'
                       ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
                       : model.panels
                     const glassMat = currentUserGlassSelected
@@ -1182,7 +1212,7 @@ export default function App() {
                       <>
                         <Rotator isRotating={isRotating}>
                           <FrameDoor color={frameColor} width={doorW3d} height={doorH3d} style={cfg.style} glassMat={glassMat} />
-                          <Door color={frameColor} width={doorW3d} height={doorH3d} panels={panels} glassMat={glassMat} glassPanelRule={glassPanelRule} />
+                          <Door color={frameColor} width={doorW3d} height={doorH3d} panels={panels} glassMat={glassMat} glassPanelRule={glassPanelRule} glbSlab={model.glbSlab} />
                         </Rotator>
                         <FrontWall doorWidth={doorW3d} doorHeight={doorH3d} style={cfg.style} visible={true} />
                       </>
@@ -1198,10 +1228,12 @@ export default function App() {
             ) : (
               <SVGViewport state={cfg} />
             )}
-            {/* <div className="cfg__viewport-meta">
-              <button className="cfg__viewport-chip">Show Interior</button>
-              <button className="cfg__viewport-chip">Show Top View</button>
-            </div> */}
+            <div className="cfg__viewport-meta">
+              <button className="cfg__viewport-chip" onClick={toggleInterior}>
+                {isInterior ? 'Show Exterior' : 'Show Interior'}
+              </button>
+              {/* <button className="cfg__viewport-chip">Show Top View</button> */}
+            </div>
             <div className="cfg__tools">
               <button
                 title="Rotate"
