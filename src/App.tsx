@@ -1197,8 +1197,7 @@ export default function App() {
                     const doorW3d = cfg.width * INCH
                     const doorH3d = cfg.height * INCH
                     const model = DOOR_MODELS.find(m => m.id === doorModel) ?? DOOR_MODELS[0]
-                    const glassMat = currentUserGlassSelected ? DOOR_GLASS_MAT[currentUserGlassSelected] : undefined
-                    const basePanels = doorModel === 'orleans'
+                    const panels = doorModel === 'orleans'
                       ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
                       : model.panels
                     const glassMat = currentUserGlassSelected
