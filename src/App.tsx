@@ -189,7 +189,21 @@ function buildStileRail(
   return pieces
 }
 
-function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, height = 30, glassMat, glassPanelRule = 'top', ...props }: {
+function GlbDoorSlab({ path, color, width, height }: { path: string; color: string; width: number; height: number }) {
+  const { scene } = useGLTF(path)
+  const clone = useMemo(() => scene.clone(), [scene])
+  useEffect(() => {
+    clone.traverse(child => {
+      if ((child as THREE.Mesh).isMesh) {
+        ;(child as THREE.Mesh).material = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.1 })
+      }
+    })
+  }, [clone, color])
+  // GLTF geometry spans [-1,1], node scale [12,30,0.25] → rendered 24×60×0.5; scale to match door size
+  return <primitive object={clone} scale={[width / 24, height / 60, 0.5]} />
+}
+
+function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, height = 30, glassMat, glassPanelRule = 'top', glbSlab, ...props }: {
   color?: string
   mouldingColor?: string
   panels?: PanelConfig[]
@@ -197,6 +211,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, heigh
   height?: number
   glassMat?: GlassMat
   glassPanelRule?: 'top' | 'all' | 'none'
+  glbSlab?: string
   [key: string]: any
 }) {
   const DOOR_D = 0.25
@@ -230,7 +245,9 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, heigh
 
   return (
     <group {...props}>
-      {stilePieces ? (
+      {glbSlab ? (
+        <GlbDoorSlab path={glbSlab} color={color} width={width} height={height} />
+      ) : stilePieces ? (
         stilePieces.map((p, i) => (
           <mesh key={i} position={[p.cx, p.cy, 0]}>
             <boxGeometry args={[p.w, p.h, DOOR_D]} />
@@ -443,6 +460,7 @@ function Rotator({ isRotating, children }: { isRotating: boolean, children: Reac
 
 useGLTF.preload('/assets/models/MoldOrleansDoor.glb')
 useGLTF.preload('/assets/models/HandleBerlinLeverHandle.glb')
+useGLTF.preload('/assets/models/vog-door.glb')
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -583,6 +601,7 @@ type DoorModelDef = {
   color: string
   panels: PanelConfig[]
   glassOnly?: boolean
+  glbSlab?: string
 }
 
 const DOOR_MODELS: DoorModelDef[] = [
@@ -608,6 +627,7 @@ const DOOR_MODELS: DoorModelDef[] = [
   },
   {
     id: 'vog', label: 'Vog', sub: 'Solid · no panels', color: '#3d3d3d',
+    glbSlab: '/assets/models/vog-door.glb',
     panels: [],
   },
 ]
@@ -952,7 +972,7 @@ export default function App() {
                     return (
                       <Rotator isRotating={isRotating}>
                         <FrameDoor color={frameColor} width={doorW3d} height={doorH3d} style={cfg.style} glassMat={glassMat} />
-                        <Door color={frameColor} width={doorW3d} height={doorH3d} panels={panels} glassMat={glassMat} glassPanelRule={glassPanelRule} />
+                        <Door color={frameColor} width={doorW3d} height={doorH3d} panels={panels} glassMat={glassMat} glassPanelRule={glassPanelRule} glbSlab={model.glbSlab} />
                       </Rotator>
                     )
                   })()}
