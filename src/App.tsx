@@ -260,7 +260,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, heigh
         )
       })}
 
-      <DoorHandler position={[-(width / 2 - 0.9), 0, PANEL_Z]} rotation={[0, 0, 0]} />
+      <DoorHandler position={[(width / 2 - 0.9), 0, PANEL_Z]} rotation={[0, 0, 0]} />
     </group>
   )
 }
