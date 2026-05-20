@@ -1093,6 +1093,7 @@ export default function App() {
   // }
 
   const viewportRef = useRef<HTMLDivElement>(null)
+  const backgroundRef = useRef<HTMLDivElement>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera>(null)
   const controlsRef = useRef<any>(null);
   const [isInterior, setIsInterior] = useState(false)
@@ -1103,10 +1104,40 @@ export default function App() {
   }, [])
 
   const toggleInterior = useCallback(() => {
-    if (!cameraRef.current) return
-    const targetZ = isInterior ? 30 : -30
-    gsap.to(cameraRef.current.position, { z: targetZ, duration: 0.5, ease: 'power2.inOut' })
-    setIsInterior(v => !v)
+    if (!cameraRef.current || !controlsRef.current) return
+    const nextIsInterior = !isInterior
+    const targetZ = nextIsInterior ? -30 : 30
+
+    if (nextIsInterior) {
+      // Hide background before camera moves to interior
+      if (backgroundRef.current) backgroundRef.current.style.display = 'none'
+    } else {
+      // Show background as soon as exterior animation begins
+      if (backgroundRef.current) backgroundRef.current.style.display = 'block'
+    }
+
+    gsap.killTweensOf(cameraRef.current.position)
+    // Disable controls so OrbitControls' useFrame doesn't override GSAP
+    controlsRef.current.enabled = false
+    gsap.to(cameraRef.current.position, {
+      z: targetZ,
+      duration: 0.5,
+      ease: 'power2.inOut',
+      onComplete: () => {
+        // Shift azimuth constraints to match new view direction (interior: θ≈π, exterior: θ≈0)
+        if (nextIsInterior) {
+          controlsRef.current.minAzimuthAngle = Math.PI * (1 - 0.075)
+          controlsRef.current.maxAzimuthAngle = Math.PI * (1 + 0.075)
+        } else {
+          controlsRef.current.minAzimuthAngle = -Math.PI * 0.075
+          controlsRef.current.maxAzimuthAngle = Math.PI * 0.075
+        }
+        // Sync OrbitControls internal spherical state to the new camera position
+        controlsRef.current.update()
+        controlsRef.current.enabled = true
+      }
+    })
+    setIsInterior(nextIsInterior)
   }, [isInterior])
 
   useEffect(() => {
@@ -1170,6 +1201,7 @@ export default function App() {
             ref={viewportRef}
           >
             <div
+              ref={backgroundRef}
               className="cfg__background"
               style={{
                 zIndex: 0,
@@ -1197,14 +1229,15 @@ export default function App() {
                     const doorW3d = cfg.width * INCH
                     const doorH3d = cfg.height * INCH
                     const model = DOOR_MODELS.find(m => m.id === doorModel) ?? DOOR_MODELS[0]
-                    const panels = doorModel === 'orleans'
-                      ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
-                      : model.panels
                     const glassMat = currentUserGlassSelected
                       ? (DEBUG_ON
                         ? { ...DOOR_GLASS_MAT[currentUserGlassSelected], ...glassControls }
                         : DOOR_GLASS_MAT[currentUserGlassSelected])
                       : undefined
+                    const basePanels = doorModel === 'orleans'
+                      ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
+                      : model.panels
+                    const panels = model.glassOnly && !glassMat ? [] : basePanels
                     const glassPanelRule = DOOR_GLASS_RULE[doorModel] ?? 'top'
                     const frameColor = currentUserColorSelected ?? model.color
                     return (
