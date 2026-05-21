@@ -96,26 +96,34 @@ function Moulding({ moldScale, onTipZ, color = '#2c2c2c', ...props }: {
   return <primitive object={clone} {...props} />
 }
 
-function GlbGlass({ width, height, path, mat, normalMap }: {
+function GlbGlass({ width, height, path, mat, normalMap, variant }: {
   width: number
   height: number
   path: string
   mat: GlassMat
   normalMap: THREE.Texture
+  variant: string
 }) {
   const { scene } = useGLTF(path)
   const clone = useMemo(() => scene.clone(true), [scene])
 
   useEffect(() => {
     clone.traverse((child: any) => {
-      if (child.name === 'glass-pure-orlean') {
-        child.scale.set(width / 2, height / 2, 0.01)
+      const name: string = child.name ?? ''
+      // Root variant nodes — show the matching one, hide the rest, set scale
+      if (/^glass-[a-z]+-[a-z]+$/.test(name) && !name.endsWith('-clear') && !name.endsWith('-ink')) {
+        const isMatch = name === variant
+        child.visible = isMatch
+        if (isMatch) child.scale.set(width / 2, (mat.glbFixedHeight ?? height) / 2, 0.01)
+        // fall through so the matching root mesh still gets its material below
+        if (!isMatch || !child.isMesh) return
       }
+
       if (!child.isMesh) return
       child.castShadow = false
       child.receiveShadow = false
 
-      if (child.name === 'glass-pure-orlean-clear') {
+      if (child.name === `${variant}-clear`) {
         child.material = new THREE.MeshPhysicalMaterial({
           transparent: true,
           side: THREE.DoubleSide,
@@ -136,9 +144,9 @@ function GlbGlass({ width, height, path, mat, normalMap }: {
           clearcoatNormalMap: normalMap,
           clearcoatNormalScale: new THREE.Vector2(mat.clearcoatNormalScale ?? 0.2, mat.clearcoatNormalScale ?? 0.2),
         })
-      } else if (child.name === 'glass-pure-orlean-ink') {
+      } else if (child.name === `${variant}-ink`) {
         child.material = new THREE.MeshBasicMaterial({ color: '#000000' })
-      } else if (child.name === 'glass-pure-orlean') {
+      } else if (child.name === variant) {
         child.material = new THREE.MeshPhysicalMaterial({
           transparent: true,
           side: THREE.DoubleSide,
@@ -161,7 +169,7 @@ function GlbGlass({ width, height, path, mat, normalMap }: {
         })
       }
     })
-  }, [clone, width, height, mat, normalMap])
+  }, [clone, width, height, mat, normalMap, variant])
 
   return <primitive object={clone} position={[0, 0, 0]} />
 }
@@ -210,8 +218,8 @@ function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, onG
         const bw = glassMat.borderWidth ?? 0
         const innerW = bw > 0 ? Math.max(0.2, glassW - bw * 2) : glassW
         const innerH = bw > 0 ? Math.max(0.2, glassH - bw * 2) : glassH
-        if (glassMat.glbPath) {
-          return <GlbGlass width={innerW} height={innerH} path={glassMat.glbPath} mat={glassMat} normalMap={normalMap} />
+        if (glassMat.glbPath && glassMat.glbVariant) {
+          return <GlbGlass width={innerW} height={innerH} path={glassMat.glbPath} mat={glassMat} normalMap={normalMap} variant={glassMat.glbVariant} />
         }
         return (
           <mesh position={[0, 0, 0]} castShadow={false} receiveShadow={false}>
@@ -696,6 +704,7 @@ useTexture.preload([WOOD_DIFF, WOOD_AO, WOOD_DISP])
 useTexture.preload('/assets/textures/normal.jpg')
 useGLTF.preload('/assets/models/vog-door.glb')
 useGLTF.preload('/assets/models/glass-pure.glb')
+useGLTF.preload('/assets/models/glass-equation.glb')
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -801,6 +810,9 @@ type GlassMat = {
   normalRepeat?: number
   borderWidth?: number
   glbPath?: string
+  glbVariants?: Record<string, string>
+  glbVariant?: string
+  glbFixedHeight?: number
 }
 
 const DOOR_GLASS: { id: string; label: string; category: string; swatch: string }[] = [
@@ -823,8 +835,8 @@ const DOOR_GLASS_MAT: Record<string, GlassMat> = {
   // transmission:0 — CSS background shows through transparent canvas; tune via Leva if a background scene plane is added
   sandblast: { color: '#e0e0d8', opacity: 0.92, roughness: 0.85, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.15, ior: 1.52, thickness: 2.5, reflectivity: 0.05, envMapIntensity: 0.6, normalScale: 0.4, clearcoatNormalScale: 0.25, normalRepeat: 3 },
   edge: { color: '#e0e0d8', opacity: 0.92, roughness: 0.85, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.15, ior: 1.52, thickness: 2.5, reflectivity: 0.05, envMapIntensity: 0.6, normalScale: 0.4, clearcoatNormalScale: 0.25, normalRepeat: 3, borderWidth: 0.8 },
-  pure: { color: '#eef5ff', opacity: 0.38, roughness: 0.08, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.9, normalScale: 0.15, clearcoatNormalScale: 0.1, normalRepeat: 3, glbPath: '/assets/models/glass-pure.glb' },
-  equation: { color: '#d8eed8', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
+  pure: { color: '#eef5ff', opacity: 0.38, roughness: 0.08, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.9, normalScale: 0.15, clearcoatNormalScale: 0.1, normalRepeat: 3, glbPath: '/assets/models/glass-pure.glb', glbVariants: { orleans: 'glass-pure-orlean', uno: 'glass-pure-uno' } },
+  equation: { color: '#d8eed8', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3, glbPath: '/assets/models/glass-equation.glb', glbVariants: { orleans: 'glass-equation-orleans', uno: 'glass-equation-uno', london: 'glass-equation-london' }, glbFixedHeight: 51.38 },
   nuando: { color: '#f0e8d0', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
   mist: { color: '#d8e8f5', opacity: 0.65, roughness: 0.4, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.1, ior: 1.52, thickness: 2.5, reflectivity: 0.07, envMapIntensity: 0.7, normalScale: 0.3, clearcoatNormalScale: 0.2, normalRepeat: 3 },
   winchester: { color: '#b8956a', opacity: 0.62, roughness: 0.08, metalness: 0.15, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.8, normalScale: 0.25, clearcoatNormalScale: 0.18, normalRepeat: 3 },
@@ -1082,6 +1094,36 @@ function SVGViewport({ state }: { state: CfgState }) {
   )
 }
 
+/* ── GlassUnavailableToast ───────────────────────────────────────── */
+
+function GlassUnavailableToast({ message, onClose }: { message: string; onClose: () => void }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const onCloseRef = useRef(onClose)
+  useEffect(() => { onCloseRef.current = onClose }, [onClose])
+
+  const dismiss = useCallback(() => {
+    if (!ref.current) return
+    gsap.to(ref.current, {
+      x: 80, opacity: 0, duration: 0.28, ease: 'power2.in',
+      onComplete: () => onCloseRef.current(),
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!ref.current) return
+    gsap.fromTo(ref.current, { x: 80, opacity: 0 }, { x: 0, opacity: 1, duration: 0.35, ease: 'power2.out' })
+    const t = setTimeout(dismiss, 5000)
+    return () => clearTimeout(t)
+  }, [dismiss])
+
+  return (
+    <div ref={ref} className="glass-unavail-toast" style={{ opacity: 0 }}>
+      <p className="glass-unavail-toast__msg">{message}</p>
+      <button className="glass-unavail-toast__close" onClick={dismiss} aria-label="Close">×</button>
+    </div>
+  )
+}
+
 /* ── App ─────────────────────────────────────────────────────────── */
 
 export default function App() {
@@ -1111,6 +1153,7 @@ export default function App() {
   const [isRotating, setIsRotating] = useState(false)
   const [currentUserColorSelected, setCurrentUserColorSelected] = useState<string | null>(null)
   const [currentUserGlassSelected, setCurrentUserGlassSelected] = useState<string | null>(null)
+  const [glassToast, setGlassToast] = useState<string | null>(null)
 
   const _defaultMat = DOOR_GLASS_MAT.sandblast
   const [glassControls, setGlassControls] = useControls('Glass Material', () => ({
@@ -1318,10 +1361,16 @@ export default function App() {
                     const doorH3d = cfg.height * INCH
                     const model = DOOR_MODELS.find(m => m.id === doorModel) ?? DOOR_MODELS[0]
                     const glassMat = currentUserGlassSelected
-                      ? (DEBUG_ON
-                        ? { ...DOOR_GLASS_MAT[currentUserGlassSelected], ...glassControls }
-                        : DOOR_GLASS_MAT[currentUserGlassSelected])
+                      ? (() => {
+                          const base = DEBUG_ON
+                            ? { ...DOOR_GLASS_MAT[currentUserGlassSelected], ...glassControls }
+                            : DOOR_GLASS_MAT[currentUserGlassSelected]
+                          return base.glbVariants
+                            ? { ...base, glbVariant: base.glbVariants[doorModel] }
+                            : base
+                        })()
                       : undefined
+                    const frameGlassMat = glassMat?.glbPath ? DOOR_GLASS_MAT.sandblast : glassMat
                     const basePanels = doorModel === 'orleans'
                       ? [{ y: 4.0, moldScale: ms1, moldScale2: ms2 }, { y: -7.5, moldScale: ms3, moldScale2: ms4 }]
                       : model.panels
@@ -1331,7 +1380,7 @@ export default function App() {
                     return (
                       <>
                         <Rotator isRotating={isRotating}>
-                          <FrameDoor color={frameColor} width={doorW3d} height={doorH3d} style={cfg.style} glassMat={glassMat} />
+                          <FrameDoor color={frameColor} width={doorW3d} height={doorH3d} style={cfg.style} glassMat={frameGlassMat} />
                           <Door color={frameColor} width={doorW3d} height={doorH3d} panels={panels} glassMat={glassMat} glassPanelRule={glassPanelRule} glbSlab={model.glbSlab} />
                         </Rotator>
                         <FrontWall doorWidth={doorW3d} doorHeight={doorH3d} style={cfg.style} visible={true} />
@@ -1347,6 +1396,9 @@ export default function App() {
               </Canvas>
             ) : (
               <SVGViewport state={cfg} />
+            )}
+            {glassToast && (
+              <GlassUnavailableToast message={glassToast} onClose={() => setGlassToast(null)} />
             )}
             <div className="cfg__viewport-meta">
               <button className="cfg__viewport-chip" onClick={toggleInterior}>
@@ -1622,7 +1674,15 @@ export default function App() {
                               <button
                                 key={g.id}
                                 className={`cfg-tile${cfg.doorGlass === g.id ? ' is-active' : ''}`}
-                                onClick={() => { update({ doorGlass: g.id }); setCurrentUserGlassSelected(g.id) }}
+                                onClick={() => {
+                                  const mat = DOOR_GLASS_MAT[g.id]
+                                  if (mat?.glbVariants && !mat.glbVariants[doorModel]) {
+                                    setGlassToast(`${g.label} glass is not available for this door model.`)
+                                    return
+                                  }
+                                  update({ doorGlass: g.id })
+                                  setCurrentUserGlassSelected(g.id)
+                                }}
                                 style={{ padding: '0.5rem' }}
                               >
                                 <img
