@@ -235,7 +235,7 @@ function buildStileRail(
 
 /* ── Wood texture system ─────────────────────────────────────────── */
 
-const WOOD_DIFF = '/assets/textures/oak_veneer_01_1k.blend/textures/oak_veneer_01_diff_1k.jpg'
+const WOOD_DIFF = '/assets/textures/oak_veneer_01_1k.blend/textures/oak_veneer_01_diff_1k_desatured.jpg'
 const WOOD_AO = '/assets/textures/oak_veneer_01_1k.blend/textures/oak_veneer_01_ao_1k.jpg'
 const WOOD_DISP = '/assets/textures/oak_veneer_01_1k.blend/textures/oak_veneer_01_disp_1k.png'
 
@@ -286,13 +286,26 @@ function WoodMesh({ args, color, roughness = 0.5, metalness = 0.5, ...props }: {
 function GlbDoorSlab({ path, color, width, height }: { path: string; color: string; width: number; height: number }) {
   const { scene } = useGLTF(path)
   const clone = useMemo(() => scene.clone(), [scene])
+  const [woodDiff, woodAo, woodDisp] = useWoodTextures()
   useEffect(() => {
     clone.traverse(child => {
       if ((child as THREE.Mesh).isMesh) {
-        ; (child as THREE.Mesh).material = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.1 })
+        const mesh = child as THREE.Mesh
+        const uv = mesh.geometry.getAttribute('uv')
+        if (uv && !mesh.geometry.getAttribute('uv2')) mesh.geometry.setAttribute('uv2', uv)
+        mesh.material = new THREE.MeshStandardMaterial({
+          color,
+          map: woodDiff,
+          aoMap: woodAo,
+          aoMapIntensity: 0.8,
+          bumpMap: woodDisp,
+          bumpScale: 0.02,
+          roughness: 0.8,
+          metalness: 0.1,
+        })
       }
     })
-  }, [clone, color])
+  }, [clone, color, woodDiff, woodAo, woodDisp])
   // GLTF geometry spans [-1,1], node scale [12,30,0.25] → rendered 24×60×0.5; scale to match door size
   return <primitive object={clone} scale={[width / 24, height / 60, 0.5]} />
 }
