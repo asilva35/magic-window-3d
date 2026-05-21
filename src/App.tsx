@@ -96,13 +96,14 @@ function Moulding({ moldScale, onTipZ, color = '#2c2c2c', ...props }: {
   return <primitive object={clone} {...props} />
 }
 
-function GlbGlass({ width, height, path, mat, normalMap, variant }: {
+function GlbGlass({ width, height, path, mat, normalMap, variant, rotationZ = 0 }: {
   width: number
   height: number
   path: string
   mat: GlassMat
   normalMap: THREE.Texture
   variant: string
+  rotationZ?: number
 }) {
   const { scene } = useGLTF(path)
   const clone = useMemo(() => scene.clone(true), [scene])
@@ -171,7 +172,7 @@ function GlbGlass({ width, height, path, mat, normalMap, variant }: {
     })
   }, [clone, width, height, mat, normalMap, variant])
 
-  return <primitive object={clone} position={[0, 0, 0]} />
+  return <primitive object={clone} position={[0, 0, 0]} rotation={[0, 0, rotationZ]} />
 }
 
 function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, onGlassBounds, ...props }: {
@@ -219,7 +220,7 @@ function PanelMoulding({ moldScale, moldScale2, color = '#2c2c2c', glassMat, onG
         const innerW = bw > 0 ? Math.max(0.2, glassW - bw * 2) : glassW
         const innerH = bw > 0 ? Math.max(0.2, glassH - bw * 2) : glassH
         if (glassMat.glbPath && glassMat.glbVariant) {
-          return <GlbGlass width={innerW} height={innerH} path={glassMat.glbPath} mat={glassMat} normalMap={normalMap} variant={glassMat.glbVariant} />
+          return <GlbGlass width={innerW} height={innerH} path={glassMat.glbPath} mat={glassMat} normalMap={normalMap} variant={glassMat.glbVariant} rotationZ={glassMat.glbRotationZ ?? 0} />
         }
         return (
           <mesh position={[0, 0, 0]} castShadow={false} receiveShadow={false}>
@@ -813,6 +814,7 @@ type GlassMat = {
   glbVariants?: Record<string, string>
   glbVariant?: string
   glbFixedHeight?: number
+  glbRotationZ?: number
 }
 
 const DOOR_GLASS: { id: string; label: string; category: string; swatch: string }[] = [
@@ -1154,6 +1156,8 @@ export default function App() {
   const [currentUserColorSelected, setCurrentUserColorSelected] = useState<string | null>(null)
   const [currentUserGlassSelected, setCurrentUserGlassSelected] = useState<string | null>(null)
   const [glassToast, setGlassToast] = useState<string | null>(null)
+  const [equationFlipped, setEquationFlipped] = useState(false)
+  const [showEquationSub, setShowEquationSub] = useState(false)
 
   const _defaultMat = DOOR_GLASS_MAT.sandblast
   const [glassControls, setGlassControls] = useControls('Glass Material', () => ({
@@ -1365,9 +1369,9 @@ export default function App() {
                           const base = DEBUG_ON
                             ? { ...DOOR_GLASS_MAT[currentUserGlassSelected], ...glassControls }
                             : DOOR_GLASS_MAT[currentUserGlassSelected]
-                          return base.glbVariants
-                            ? { ...base, glbVariant: base.glbVariants[doorModel] }
-                            : base
+                          let result = base.glbVariants ? { ...base, glbVariant: base.glbVariants[doorModel] } : base
+                          if (currentUserGlassSelected === 'equation') result = { ...result, glbRotationZ: equationFlipped ? Math.PI : 0 }
+                          return result
                         })()
                       : undefined
                     const frameGlassMat = glassMat?.glbPath ? DOOR_GLASS_MAT.sandblast : glassMat
@@ -1670,37 +1674,56 @@ export default function App() {
                         <div key={cat}>
                           <SectionTitle>{cat}</SectionTitle>
                           <div className="cfg-grid cfg-grid--4col" style={{ marginBottom: '0.5rem' }}>
-                            {DOOR_GLASS.filter(g => g.category === cat).map(g => (
-                              <button
-                                key={g.id}
-                                className={`cfg-tile${cfg.doorGlass === g.id ? ' is-active' : ''}`}
-                                onClick={() => {
-                                  const mat = DOOR_GLASS_MAT[g.id]
-                                  if (mat?.glbVariants && !mat.glbVariants[doorModel]) {
-                                    setGlassToast(`${g.label} glass is not available for this door model.`)
-                                    return
-                                  }
-                                  update({ doorGlass: g.id })
-                                  setCurrentUserGlassSelected(g.id)
-                                }}
-                                style={{ padding: '0.5rem' }}
-                              >
-                                <img
-                                  src={`/assets/images/glass-samples/${g.id}.png`}
-                                  alt={g.label}
-                                  style={{
-                                    width: '100%',
-                                    aspectRatio: '211 / 138',
-                                    objectFit: 'cover',
-                                    borderRadius: 4,
-                                    border: '1px solid rgba(0,0,0,0.12)',
-                                    marginBottom: '0.4rem',
-                                    display: 'block',
+                            {DOOR_GLASS.filter(g => g.category === cat).flatMap(g => {
+                              const tile = (
+                                <button
+                                  key={g.id}
+                                  className={`cfg-tile${cfg.doorGlass === g.id ? ' is-active' : ''}`}
+                                  onClick={() => {
+                                    const mat = DOOR_GLASS_MAT[g.id]
+                                    if (mat?.glbVariants && !mat.glbVariants[doorModel]) {
+                                      setGlassToast(`${g.label} glass is not available for this door model.`)
+                                      return
+                                    }
+                                    update({ doorGlass: g.id })
+                                    setCurrentUserGlassSelected(g.id)
+                                    if (g.id === 'equation') setShowEquationSub(true)
+                                    else setShowEquationSub(false)
                                   }}
-                                />
-                                <div className="cfg-tile__label" style={{ fontSize: '0.7rem', textAlign: 'center' }}>{g.label}</div>
-                              </button>
-                            ))}
+                                  style={{ padding: '0.5rem' }}
+                                >
+                                  <img
+                                    src={`/assets/images/glass-samples/${g.id}.png`}
+                                    alt={g.label}
+                                    style={{
+                                      width: '100%',
+                                      aspectRatio: '211 / 138',
+                                      objectFit: 'cover',
+                                      borderRadius: 4,
+                                      border: '1px solid rgba(0,0,0,0.12)',
+                                      marginBottom: '0.4rem',
+                                      display: 'block',
+                                    }}
+                                  />
+                                  <div className="cfg-tile__label" style={{ fontSize: '0.7rem', textAlign: 'center' }}>{g.label}</div>
+                                </button>
+                              )
+                              if (g.id === 'equation' && cfg.doorGlass === 'equation' && showEquationSub) {
+                                return [tile, (
+                                  <div key="equation-sub" className="cfg-equation-sub" style={{ gridColumn: '1 / -1' }}>
+                                    <button
+                                      className={`cfg-equation-sub__btn${!equationFlipped ? ' is-active' : ''}`}
+                                      onClick={() => { setEquationFlipped(false); setShowEquationSub(false) }}
+                                    >Right</button>
+                                    <button
+                                      className={`cfg-equation-sub__btn${equationFlipped ? ' is-active' : ''}`}
+                                      onClick={() => { setEquationFlipped(true); setShowEquationSub(false) }}
+                                    >Left</button>
+                                  </div>
+                                )]
+                              }
+                              return [tile]
+                            })}
                           </div>
                         </div>
                       ))}

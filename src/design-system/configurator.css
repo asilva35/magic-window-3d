@@ -941,3 +941,38 @@
 .glass-unavail-toast__close:hover {
   color: var(--magic-dark-blue, #001b70);
 }
+
+/* ── Equation glass orientation submenu ─────────────────────────── */
+
+.cfg-equation-sub {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.cfg-equation-sub__btn {
+  flex: 1;
+  padding: 0.45rem 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1.5px solid var(--border, #e2e8f0);
+  border-radius: var(--radius-sm, 4px);
+  background: transparent;
+  color: var(--magic-dark-blue, #001b70);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.cfg-equation-sub__btn:hover {
+  border-color: var(--magic-dark-blue, #001b70);
+  background: rgba(0, 27, 112, 0.05);
+}
+
+.cfg-equation-sub__btn.is-active {
+  border-color: var(--magic-dark-blue, #001b70);
+  background: var(--magic-dark-blue, #001b70);
+  color: #fff;
+}
