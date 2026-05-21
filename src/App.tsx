@@ -1253,7 +1253,7 @@ export default function App() {
                   {/* <CeilLamp position={[0, 0, -5]} /> */}
                   {DEBUG_ON && <Stats />}
                   <ContactShadows position={[0, -(cfg.height * (12 / 32) / 2), 0]} scale={50} far={40} blur={1.5} opacity={0.75} resolution={512} color="#000000" />
-                  <OrbitControls ref={controlsRef} makeDefault minPolarAngle={Math.PI * 0.5} maxPolarAngle={Math.PI * 0.5} minAzimuthAngle={Math.PI * -0.075} maxAzimuthAngle={Math.PI * 0.075} enableZoom={true} enablePan={true} minDistance={10} maxDistance={40} />
+                  <OrbitControls ref={controlsRef} makeDefault minPolarAngle={Math.PI * 0.5} maxPolarAngle={Math.PI * 0.5} minAzimuthAngle={Math.PI * -0.075} maxAzimuthAngle={Math.PI * 0.075} enableZoom={true} enablePan={true} minDistance={5} maxDistance={40} />
                   <PanClamper controlsRef={controlsRef} />
                 </Suspense>
               </Canvas>
