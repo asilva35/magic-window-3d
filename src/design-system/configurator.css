@@ -896,3 +896,83 @@
 .cfg__footer .mw-btn--primary {
   padding: 12px 32px;
 }
+
+/* ── Glass unavailable toast ─────────────────────────────────────── */
+
+.glass-unavail-toast {
+  position: absolute;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  width: 260px;
+  padding: 0.875rem 1rem;
+  background: #fff;
+  border: 1px solid var(--border, #e2e8f0);
+  border-left: 3px solid var(--magic-dark-blue, #001b70);
+  border-radius: var(--radius-md, 6px);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0,27,112,.08));
+  pointer-events: all;
+}
+
+.glass-unavail-toast__msg {
+  flex: 1;
+  margin: 0;
+  font-family: var(--font-body, 'Open Sans', sans-serif);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--magic-dark-blue, #001b70);
+}
+
+.glass-unavail-toast__close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  line-height: 1;
+  font-size: 1.125rem;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.glass-unavail-toast__close:hover {
+  color: var(--magic-dark-blue, #001b70);
+}
+
+/* ── Equation glass orientation submenu ─────────────────────────── */
+
+.cfg-equation-sub {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.cfg-equation-sub__btn {
+  flex: 1;
+  padding: 0.45rem 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1.5px solid var(--border, #e2e8f0);
+  border-radius: var(--radius-sm, 4px);
+  background: transparent;
+  color: var(--magic-dark-blue, #001b70);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.cfg-equation-sub__btn:hover {
+  border-color: var(--magic-dark-blue, #001b70);
+  background: rgba(0, 27, 112, 0.05);
+}
+
+.cfg-equation-sub__btn.is-active {
+  border-color: var(--magic-dark-blue, #001b70);
+  background: var(--magic-dark-blue, #001b70);
+  color: #fff;
+}
