@@ -99,6 +99,24 @@ function Moulding({ moldScale, onTipZ, color = '#2c2c2c', ...props }: {
   return <primitive object={clone} {...props} />
 }
 
+// Texture suffix convention: the last word in every glass mesh name declares its material.
+// Valid suffixes: sandblastgray | sandblastwhite | clear | ink
+// 'sandblast' is accepted as a legacy alias for sandblastwhite (pre-rename GLBs).
+const GLASS_TEX_SUFFIXES = ['sandblastgray', 'sandblastwhite', 'clear', 'ink', 'sandblast'] as const
+type GlassTex = (typeof GLASS_TEX_SUFFIXES)[number]
+
+function glassTexSuffix(name: string): GlassTex | null {
+  for (const t of GLASS_TEX_SUFFIXES) {
+    if (name.endsWith(`-${t}`)) return t
+  }
+  return null
+}
+
+function glassBaseName(name: string): string {
+  const t = glassTexSuffix(name)
+  return t ? name.slice(0, -(t.length + 1)) : name
+}
+
 function GlbGlass({ width, height, path, mat, normalMap, variant, rotationZ = 0 }: {
   width: number
   height: number
@@ -114,12 +132,15 @@ function GlbGlass({ width, height, path, mat, normalMap, variant, rotationZ = 0 
   useEffect(() => {
     clone.traverse((child: any) => {
       const name: string = child.name ?? ''
-      // Root variant nodes — show the matching one, hide the rest, set scale
-      if (/^glass-[a-z]+-[a-z]+$/.test(name) && !name.endsWith('-clear') && !name.endsWith('-ink')) {
-        const isMatch = name === variant
+      const tex = glassTexSuffix(name)
+      const base = glassBaseName(name)
+
+      // Root variant nodes are direct children of the cloned scene (depth 1).
+      // They may be old-style (name === variant, no suffix) or new-style (base === variant, has suffix).
+      if (name.startsWith('glass-') && child.parent === clone) {
+        const isMatch = name === variant || (tex !== null && base === variant)
         child.visible = isMatch
         if (isMatch) child.scale.set(width / 2, (mat.glbFixedHeight ?? height) / 2, 0.01)
-        // fall through so the matching root mesh still gets its material below
         if (!isMatch || !child.isMesh) return
       }
 
@@ -127,7 +148,10 @@ function GlbGlass({ width, height, path, mat, normalMap, variant, rotationZ = 0 
       child.castShadow = false
       child.receiveShadow = false
 
-      if (child.name === `${variant}-clear`) {
+      // Skip nodes that don't belong to the active variant
+      if (base !== variant) return
+
+      if (tex === 'clear') {
         child.material = new THREE.MeshPhysicalMaterial({
           transparent: true,
           side: THREE.DoubleSide,
@@ -148,14 +172,37 @@ function GlbGlass({ width, height, path, mat, normalMap, variant, rotationZ = 0 
           clearcoatNormalMap: normalMap,
           clearcoatNormalScale: new THREE.Vector2(mat.clearcoatNormalScale ?? 0.2, mat.clearcoatNormalScale ?? 0.2),
         })
-      } else if (child.name === `${variant}-ink`) {
+      } else if (tex === 'ink') {
         child.material = new THREE.MeshBasicMaterial({ color: '#000000' })
-      } else if (child.name === variant) {
+      } else if (tex === 'sandblastwhite' || tex === 'sandblast') {
+        // 'sandblast' is the legacy suffix used before the rename convention was adopted
         child.material = new THREE.MeshPhysicalMaterial({
           transparent: true,
           side: THREE.DoubleSide,
           depthWrite: false,
-          color: '#e0e0d8',
+          color: '#f5f5f0',
+          opacity: 0.88,
+          roughness: 0.72,
+          metalness: 0,
+          transmission: 0,
+          ior: 1.52,
+          reflectivity: 0.05,
+          thickness: 2.5,
+          envMapIntensity: 0.6,
+          clearcoat: 1,
+          clearcoatRoughness: 0.12,
+          normalScale: new THREE.Vector2(0.35, 0.35),
+          normalMap,
+          clearcoatNormalMap: normalMap,
+          clearcoatNormalScale: new THREE.Vector2(0.22, 0.22),
+        })
+      } else if (tex === 'sandblastgray' || (tex === null && name === variant)) {
+        // 'sandblastgray' is the explicit suffix; fallback handles old-style parents with no suffix
+        child.material = new THREE.MeshPhysicalMaterial({
+          transparent: true,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+          color: '#a0a098',
           opacity: 0.92,
           roughness: 0.85,
           metalness: 0,
@@ -631,6 +678,7 @@ useTexture.preload('/assets/textures/normal.jpg')
 useGLTF.preload('/assets/models/vog-door.glb')
 useGLTF.preload('/assets/models/glass-pure.glb')
 useGLTF.preload('/assets/models/glass-equation.glb')
+useGLTF.preload('/assets/models/glass-nuando.glb')
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -764,7 +812,7 @@ const DOOR_GLASS_MAT: Record<string, GlassMat> = {
   edge: { color: '#e0e0d8', opacity: 0.92, roughness: 0.85, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.15, ior: 1.52, thickness: 2.5, reflectivity: 0.05, envMapIntensity: 0.6, normalScale: 0.4, clearcoatNormalScale: 0.25, normalRepeat: 3, borderWidth: 0.8 },
   pure: { color: '#eef5ff', opacity: 0.38, roughness: 0.08, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.9, normalScale: 0.15, clearcoatNormalScale: 0.1, normalRepeat: 3, glbPath: '/assets/models/glass-pure.glb', glbVariants: { orleans: 'glass-pure-orlean', uno: 'glass-pure-uno' } },
   equation: { color: '#d8eed8', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3, glbPath: '/assets/models/glass-equation.glb', glbVariants: { orleans: 'glass-equation-orleans', uno: 'glass-equation-uno', london: 'glass-equation-london' }, glbFixedHeight: 51.38 },
-  nuando: { color: '#f0e8d0', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
+  nuando: { color: '#f0e8d0', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3, glbPath: '/assets/models/glass-nuando.glb', glbVariants: { uno: 'glass-nuando-uno', london: 'glass-nuando-london', orleans: 'glass-nuando-orleans' }, glbFixedHeight: 51.38 },
   mist: { color: '#d8e8f5', opacity: 0.65, roughness: 0.4, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.1, ior: 1.52, thickness: 2.5, reflectivity: 0.07, envMapIntensity: 0.7, normalScale: 0.3, clearcoatNormalScale: 0.2, normalRepeat: 3 },
   winchester: { color: '#b8956a', opacity: 0.62, roughness: 0.08, metalness: 0.15, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.8, normalScale: 0.25, clearcoatNormalScale: 0.18, normalRepeat: 3 },
   nobel: { color: '#7b9cbf', opacity: 0.68, roughness: 0.06, metalness: 0.2, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.04, ior: 1.52, thickness: 2.5, reflectivity: 0.15, envMapIntensity: 0.9, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
@@ -1083,6 +1131,8 @@ export default function App() {
   const [glassToast, setGlassToast] = useState<string | null>(null)
   const [equationFlipped, setEquationFlipped] = useState(false)
   const [showEquationSub, setShowEquationSub] = useState(false)
+  const [nuandoFlipped, setNuandoFlipped] = useState(false)
+  const [showNuandoSub, setShowNuandoSub] = useState(false)
 
   const _defaultMat = DOOR_GLASS_MAT.sandblast
   const [glassControls, setGlassControls] = useControls('Glass Material', () => ({
@@ -1291,13 +1341,14 @@ export default function App() {
                     const model = DOOR_MODELS.find(m => m.id === doorModel) ?? DOOR_MODELS[0]
                     const glassMat = currentUserGlassSelected
                       ? (() => {
-                          const base = DEBUG_ON
-                            ? { ...DOOR_GLASS_MAT[currentUserGlassSelected], ...glassControls }
-                            : DOOR_GLASS_MAT[currentUserGlassSelected]
-                          let result = base.glbVariants ? { ...base, glbVariant: base.glbVariants[doorModel] } : base
-                          if (currentUserGlassSelected === 'equation') result = { ...result, glbRotationZ: equationFlipped ? Math.PI : 0 }
-                          return result
-                        })()
+                        const base = DEBUG_ON
+                          ? { ...DOOR_GLASS_MAT[currentUserGlassSelected], ...glassControls }
+                          : DOOR_GLASS_MAT[currentUserGlassSelected]
+                        let result = base.glbVariants ? { ...base, glbVariant: base.glbVariants[doorModel] } : base
+                        if (currentUserGlassSelected === 'equation') result = { ...result, glbRotationZ: equationFlipped ? Math.PI : 0 }
+                        if (currentUserGlassSelected === 'nuando') result = { ...result, glbRotationZ: nuandoFlipped ? Math.PI : 0 }
+                        return result
+                      })()
                       : undefined
                     const frameGlassMat = glassMat?.glbPath ? DOOR_GLASS_MAT.sandblast : glassMat
                     const basePanels = doorModel === 'orleans'
@@ -1612,8 +1663,9 @@ export default function App() {
                                     }
                                     update({ doorGlass: g.id })
                                     setCurrentUserGlassSelected(g.id)
-                                    if (g.id === 'equation') setShowEquationSub(true)
-                                    else setShowEquationSub(false)
+                                    if (g.id === 'equation') { setShowEquationSub(true); setShowNuandoSub(false) }
+                                    else if (g.id === 'nuando') { setShowNuandoSub(true); setShowEquationSub(false) }
+                                    else { setShowEquationSub(false); setShowNuandoSub(false) }
                                   }}
                                   style={{ padding: '0.5rem' }}
                                 >
@@ -1643,6 +1695,20 @@ export default function App() {
                                     <button
                                       className={`cfg-equation-sub__btn${equationFlipped ? ' is-active' : ''}`}
                                       onClick={() => { setEquationFlipped(true); setShowEquationSub(false) }}
+                                    >Left</button>
+                                  </div>
+                                )]
+                              }
+                              if (g.id === 'nuando' && cfg.doorGlass === 'nuando' && showNuandoSub) {
+                                return [tile, (
+                                  <div key="nuando-sub" className="cfg-equation-sub" style={{ gridColumn: '1 / -1' }}>
+                                    <button
+                                      className={`cfg-equation-sub__btn${!nuandoFlipped ? ' is-active' : ''}`}
+                                      onClick={() => { setNuandoFlipped(false); setShowNuandoSub(false) }}
+                                    >Right</button>
+                                    <button
+                                      className={`cfg-equation-sub__btn${nuandoFlipped ? ' is-active' : ''}`}
+                                      onClick={() => { setNuandoFlipped(true); setShowNuandoSub(false) }}
                                     >Left</button>
                                   </div>
                                 )]
