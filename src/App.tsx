@@ -102,7 +102,7 @@ function Moulding({ moldScale, onTipZ, color = '#2c2c2c', ...props }: {
 // Texture suffix convention: the last word in every glass mesh name declares its material.
 // Valid suffixes: sandblastgray | sandblastwhite | clear | ink
 // 'sandblast' is accepted as a legacy alias for sandblastwhite (pre-rename GLBs).
-const GLASS_TEX_SUFFIXES = ['sandblastgray', 'sandblastwhite', 'clear', 'ink', 'sandblast'] as const
+const GLASS_TEX_SUFFIXES = ['sandblastgray', 'sandblastwhite', 'beveledtoclear', 'beveled', 'clear', 'ink', 'sandblast'] as const
 type GlassTex = (typeof GLASS_TEX_SUFFIXES)[number]
 
 function glassTexSuffix(name: string): GlassTex | null {
@@ -195,6 +195,68 @@ function GlbGlass({ width, height, path, mat, normalMap, variant, rotationZ = 0 
           normalMap,
           clearcoatNormalMap: normalMap,
           clearcoatNormalScale: new THREE.Vector2(0.22, 0.22),
+        })
+      } else if (tex === 'beveledtoclear') {
+        // Gradient material: UV.y=0 is the beveled end (frosted), UV.y=1 is the clear end.
+        // onBeforeCompile blends both roughness and normal-map contribution across the mesh height.
+        const btcMat = new THREE.MeshPhysicalMaterial({
+          transparent: true,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+          color: mat.color,
+          opacity: mat.opacity,
+          metalness: mat.metalness,
+          roughness: mat.roughness,
+          transmission: mat.transmission ?? 0,
+          ior: mat.ior ?? 1.52,
+          reflectivity: mat.reflectivity ?? 0.06,
+          thickness: mat.thickness ?? 2.5,
+          envMapIntensity: mat.envMapIntensity ?? 0.65,
+          clearcoat: mat.clearcoat ?? 1,
+          clearcoatRoughness: mat.clearcoatRoughness ?? 0.12,
+          normalScale: new THREE.Vector2(mat.normalScale ?? 0.3, mat.normalScale ?? 0.3),
+          normalMap,
+          clearcoatNormalMap: normalMap,
+          clearcoatNormalScale: new THREE.Vector2(mat.clearcoatNormalScale ?? 0.2, mat.clearcoatNormalScale ?? 0.2),
+        })
+        btcMat.onBeforeCompile = (shader) => {
+          // Roughness gradient: beveled roughness (0.70) at UV.y=0 → mat roughness at UV.y=1
+          shader.fragmentShader = shader.fragmentShader.replace(
+            '#include <roughnessmap_fragment>',
+            `#include <roughnessmap_fragment>
+            roughnessFactor = mix(roughnessFactor, 0.70, clamp(1.0 - vNormalMapUv.y, 0.0, 1.0));`
+          )
+          // Normal fade: save the flat normal before the normal-map chunk modifies it,
+          // then blend from fully bumped (bottom) back toward flat (top)
+          shader.fragmentShader = shader.fragmentShader.replace(
+            '#include <normal_fragment_maps>',
+            `vec3 flatNormal = normal;
+            #include <normal_fragment_maps>
+            normal = normalize(mix(normal, flatNormal, clamp(vNormalMapUv.y, 0.0, 1.0)));`
+          )
+        }
+        btcMat.customProgramCacheKey = () => 'beveledtoclear'
+        child.material = btcMat
+      } else if (tex === 'beveled') {
+        child.material = new THREE.MeshPhysicalMaterial({
+          transparent: true,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+          color: '#ffffff',
+          opacity: 0.78,
+          roughness: 0.70,
+          metalness: 0,
+          transmission: 0,
+          ior: 1.52,
+          reflectivity: 0.06,
+          thickness: 2.5,
+          envMapIntensity: 0.65,
+          clearcoat: 1,
+          clearcoatRoughness: 0.13,
+          normalScale: new THREE.Vector2(0.38, 0.38),
+          normalMap,
+          clearcoatNormalMap: normalMap,
+          clearcoatNormalScale: new THREE.Vector2(0.94, 0.94),
         })
       } else if (tex === 'sandblastgray' || (tex === null && name === variant)) {
         // 'sandblastgray' is the explicit suffix; fallback handles old-style parents with no suffix
@@ -679,6 +741,7 @@ useGLTF.preload('/assets/models/vog-door.glb')
 useGLTF.preload('/assets/models/glass-pure.glb')
 useGLTF.preload('/assets/models/glass-equation.glb')
 useGLTF.preload('/assets/models/glass-nuando.glb')
+useGLTF.preload('/assets/models/glass-mist.glb')
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -813,7 +876,7 @@ const DOOR_GLASS_MAT: Record<string, GlassMat> = {
   pure: { color: '#eef5ff', opacity: 0.38, roughness: 0.08, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.9, normalScale: 0.15, clearcoatNormalScale: 0.1, normalRepeat: 3, glbPath: '/assets/models/glass-pure.glb', glbVariants: { orleans: 'glass-pure-orlean', uno: 'glass-pure-uno' } },
   equation: { color: '#d8eed8', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3, glbPath: '/assets/models/glass-equation.glb', glbVariants: { orleans: 'glass-equation-orleans', uno: 'glass-equation-uno', london: 'glass-equation-london' }, glbFixedHeight: 51.38 },
   nuando: { color: '#f0e8d0', opacity: 0.45, roughness: 0.12, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.06, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3, glbPath: '/assets/models/glass-nuando.glb', glbVariants: { uno: 'glass-nuando-uno', london: 'glass-nuando-london', orleans: 'glass-nuando-orleans' }, glbFixedHeight: 51.38 },
-  mist: { color: '#d8e8f5', opacity: 0.65, roughness: 0.4, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.1, ior: 1.52, thickness: 2.5, reflectivity: 0.07, envMapIntensity: 0.7, normalScale: 0.3, clearcoatNormalScale: 0.2, normalRepeat: 3 },
+  mist: { color: '#ffffff', opacity: 0.65, roughness: 0.4, metalness: 0, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.1, ior: 1.52, thickness: 2.5, reflectivity: 0.07, envMapIntensity: 0.7, normalScale: 0.3, clearcoatNormalScale: 0.2, normalRepeat: 3, glbPath: '/assets/models/glass-mist.glb', glbVariants: { uno: 'glass-mist-uno', london: 'glass-mist-london', orleans: 'glass-mist-orleans' } },
   winchester: { color: '#b8956a', opacity: 0.62, roughness: 0.08, metalness: 0.15, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.12, envMapIntensity: 0.8, normalScale: 0.25, clearcoatNormalScale: 0.18, normalRepeat: 3 },
   nobel: { color: '#7b9cbf', opacity: 0.68, roughness: 0.06, metalness: 0.2, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.04, ior: 1.52, thickness: 2.5, reflectivity: 0.15, envMapIntensity: 0.9, normalScale: 0.2, clearcoatNormalScale: 0.15, normalRepeat: 3 },
   belmont: { color: '#8fb080', opacity: 0.62, roughness: 0.08, metalness: 0.1, transmission: 0, clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.52, thickness: 2.5, reflectivity: 0.1, envMapIntensity: 0.8, normalScale: 0.22, clearcoatNormalScale: 0.16, normalRepeat: 3 },
