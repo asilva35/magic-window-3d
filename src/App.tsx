@@ -6,6 +6,9 @@ import * as THREE from 'three'
 import gsap from 'gsap'
 import { LoadingScreen } from './LoadingScreen'
 import { useControls, Leva } from 'leva'
+import { SteelMesh } from './components/SteelMesh'
+import { GlbDoorSlab } from './components/GlbDoorSlab'
+import { useWoodTextures } from './components/useWoodTextures'
 
 const DEBUG_ON = false
 
@@ -315,83 +318,6 @@ function buildStileRail(
   return pieces
 }
 
-/* ── Wood texture system ─────────────────────────────────────────── */
-
-const WOOD_DIFF = '/assets/textures/oak_veneer_01_1k.blend/textures/oak_veneer_01_diff_1k_desatured.jpg'
-const WOOD_AO = '/assets/textures/oak_veneer_01_1k.blend/textures/oak_veneer_01_ao_1k.jpg'
-const WOOD_DISP = '/assets/textures/oak_veneer_01_1k.blend/textures/oak_veneer_01_disp_1k.png'
-
-function useWoodTextures() {
-  const [diff, ao, disp] = useTexture([WOOD_DIFF, WOOD_AO, WOOD_DISP])
-  useMemo(() => {
-    ;[diff, ao, disp].forEach(tex => {
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping
-      tex.repeat.set(3, 6)
-      tex.needsUpdate = true
-    })
-  }, [diff, ao, disp])
-  return [diff, ao, disp] as const
-}
-
-function WoodMesh({ args, color, roughness = 0.5, metalness = 0.5, ...props }: {
-  args: [number, number, number]
-  color: string
-  roughness?: number
-  metalness?: number
-  [key: string]: any
-}) {
-  const [diff, ao, disp] = useWoodTextures()
-  return (
-    <mesh {...props}>
-      <boxGeometry
-        args={args}
-        onUpdate={(geom: THREE.BufferGeometry) => {
-          const uv = geom.getAttribute('uv')
-          if (uv && !geom.getAttribute('uv2')) geom.setAttribute('uv2', uv)
-        }}
-      />
-      <meshStandardMaterial
-        color={color}
-        map={diff}
-        aoMap={ao}
-        aoMapIntensity={0.8}
-        bumpMap={disp}
-        bumpScale={0.02}
-        roughness={roughness}
-        metalness={metalness}
-        envMapIntensity={0.6}
-      />
-    </mesh>
-  )
-}
-
-function GlbDoorSlab({ path, color, width, height }: { path: string; color: string; width: number; height: number }) {
-  const { scene } = useGLTF(path)
-  const clone = useMemo(() => scene.clone(), [scene])
-  const [woodDiff, woodAo, woodDisp] = useWoodTextures()
-  useEffect(() => {
-    clone.traverse(child => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh
-        const uv = mesh.geometry.getAttribute('uv')
-        if (uv && !mesh.geometry.getAttribute('uv2')) mesh.geometry.setAttribute('uv2', uv)
-        mesh.material = new THREE.MeshStandardMaterial({
-          color,
-          map: woodDiff,
-          aoMap: woodAo,
-          aoMapIntensity: 0.8,
-          bumpMap: woodDisp,
-          bumpScale: 0.02,
-          roughness: 0.8,
-          metalness: 0.1,
-        })
-      }
-    })
-  }, [clone, color, woodDiff, woodAo, woodDisp])
-  // GLTF geometry spans [-1,1], node scale [12,30,0.25] → rendered 24×60×0.5; scale to match door size
-  return <primitive object={clone} scale={[width / 24, height / 60, 0.5]} />
-}
-
 function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, height = 30, glassMat, glassPanelRule = 'top', glbSlab, ...props }: {
   color?: string
   mouldingColor?: string
@@ -438,10 +364,10 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, heigh
         <GlbDoorSlab path={glbSlab} color={color} width={width} height={height} />
       ) : stilePieces ? (
         stilePieces.map((p, i) => (
-          <WoodMesh key={i} args={[p.w, p.h, DOOR_D]} color={color} position={[p.cx, p.cy, 0]} />
+          <SteelMesh key={i} args={[p.w, p.h, DOOR_D]} color={color} position={[p.cx, p.cy, 0]} />
         ))
       ) : (
-        <WoodMesh args={[width, height, DOOR_D]} color={color} />
+        <SteelMesh args={[width, height, DOOR_D]} color={color} />
       )}
 
       {panels.map((panel, i) => {
@@ -525,10 +451,10 @@ function SideLite({ color = '#2c2c2c', width = 4.5, height = 30, glassMat, ...pr
 
   return (
     <group {...props}>
-      <WoodMesh args={[RAIL, height, D]} color={color} position={[-hw + RAIL / 2, 0, Z]} />
-      <WoodMesh args={[RAIL, height, D]} color={color} position={[hw - RAIL / 2, 0, Z]} />
-      <WoodMesh args={[width, RAIL, D]} color={color} position={[0, hh - RAIL / 2, Z]} />
-      <WoodMesh args={[width, RAIL, D]} color={color} position={[0, -hh + RAIL / 2, Z]} />
+      <SteelMesh args={[RAIL, height, D]} color={color} position={[-hw + RAIL / 2, 0, Z]} />
+      <SteelMesh args={[RAIL, height, D]} color={color} position={[hw - RAIL / 2, 0, Z]} />
+      <SteelMesh args={[width, RAIL, D]} color={color} position={[0, hh - RAIL / 2, Z]} />
+      <SteelMesh args={[width, RAIL, D]} color={color} position={[0, -hh + RAIL / 2, Z]} />
       <GlassPane width={width - 2 * RAIL} height={height - 2 * RAIL} z={Z} mat={gm} />
     </group>
   )
@@ -550,10 +476,10 @@ function Transom({ color = '#2c2c2c', width = 12, height = 5, glassMat, ...props
 
   return (
     <group {...props}>
-      <WoodMesh args={[RAIL, height, D]} color={color} position={[-hw + RAIL / 2, 0, Z]} />
-      <WoodMesh args={[RAIL, height, D]} color={color} position={[hw - RAIL / 2, 0, Z]} />
-      <WoodMesh args={[width, RAIL, D]} color={color} position={[0, hh - RAIL / 2, Z]} />
-      <WoodMesh args={[width, RAIL, D]} color={color} position={[0, -hh + RAIL / 2, Z]} />
+      <SteelMesh args={[RAIL, height, D]} color={color} position={[-hw + RAIL / 2, 0, Z]} />
+      <SteelMesh args={[RAIL, height, D]} color={color} position={[hw - RAIL / 2, 0, Z]} />
+      <SteelMesh args={[width, RAIL, D]} color={color} position={[0, hh - RAIL / 2, Z]} />
+      <SteelMesh args={[width, RAIL, D]} color={color} position={[0, -hh + RAIL / 2, Z]} />
       <GlassPane width={width - 2 * RAIL} height={height - 2 * RAIL} z={Z} mat={gm} />
     </group>
   )
@@ -612,7 +538,7 @@ function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single
   return (
     <group {...props}>
       {pieces.map(([px, py, pw, ph], i) => (
-        <WoodMesh key={i} args={[pw, ph, D]} color={color} position={[px, py, Z]} />
+        <SteelMesh key={i} args={[pw, ph, D]} color={color} position={[px, py, Z]} />
       ))}
 
       {/* Side lite panels */}
@@ -701,7 +627,6 @@ function Rotator({ isRotating, children }: { isRotating: boolean, children: Reac
 
 useGLTF.preload('/assets/models/MoldOrleansDoor.glb')
 useGLTF.preload('/assets/models/HandleBerlinLeverHandle.glb')
-useTexture.preload([WOOD_DIFF, WOOD_AO, WOOD_DISP])
 useTexture.preload('/assets/textures/normal.jpg')
 useGLTF.preload('/assets/models/vog-door.glb')
 useGLTF.preload('/assets/models/glass-pure.glb')
