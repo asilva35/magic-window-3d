@@ -66,8 +66,8 @@ function Moulding({ moldScale, onTipZ, color = '#2c2c2c', ...props }: {
           aoMapIntensity: 0.8,
           bumpMap: woodDisp,
           bumpScale: 0.02,
-          metalness: 0.1,
-          roughness: 0.8,
+          metalness: 1,
+          roughness: 0.25,
         })
       }
     })
@@ -427,7 +427,7 @@ function buildStileRail(
   return pieces
 }
 
-function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, height = 30, glassMat, glassPanelRule = 'top', glbSlab, ...props }: {
+function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, height = 30, glassMat, glassPanelRule = 'top', glbSlab, roughness = 0.25, ...props }: {
   color?: string
   mouldingColor?: string
   panels?: PanelConfig[]
@@ -436,6 +436,7 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, heigh
   glassMat?: GlassMat
   glassPanelRule?: 'top' | 'all' | 'none'
   glbSlab?: string
+  roughness?: number
   [key: string]: any
 }) {
   const DOOR_D = 0.25
@@ -470,13 +471,13 @@ function Door({ color = '#2c2c2c', mouldingColor, panels = [], width = 12, heigh
   return (
     <group {...props}>
       {glbSlab ? (
-        <GlbDoorSlab path={glbSlab} color={color} width={width} height={height} />
+        <GlbDoorSlab path={glbSlab} color={color} width={width} height={height} roughness={roughness} />
       ) : stilePieces ? (
         stilePieces.map((p, i) => (
-          <SteelMesh key={i} args={[p.w, p.h, DOOR_D]} color={color} position={[p.cx, p.cy, 0]} />
+          <SteelMesh key={i} args={[p.w, p.h, DOOR_D]} color={color} roughness={roughness} position={[p.cx, p.cy, 0]} />
         ))
       ) : (
-        <SteelMesh args={[width, height, DOOR_D]} color={color} />
+        <SteelMesh args={[width, height, DOOR_D]} color={color} roughness={roughness} />
       )}
 
       {panels.map((panel, i) => {
@@ -544,11 +545,12 @@ function GlassPane({ width, height, z, mat }: { width: number; height: number; z
   )
 }
 
-function SideLite({ color = '#2c2c2c', width = 4.5, height = 30, glassMat, ...props }: {
+function SideLite({ color = '#2c2c2c', width = 4.5, height = 30, glassMat, roughness = 0.25, ...props }: {
   color?: string
   width?: number
   height?: number
   glassMat?: GlassMat
+  roughness?: number
   [key: string]: any
 }) {
   const RAIL = 0.5
@@ -560,20 +562,21 @@ function SideLite({ color = '#2c2c2c', width = 4.5, height = 30, glassMat, ...pr
 
   return (
     <group {...props}>
-      <SteelMesh args={[RAIL, height, D]} color={color} position={[-hw + RAIL / 2, 0, Z]} />
-      <SteelMesh args={[RAIL, height, D]} color={color} position={[hw - RAIL / 2, 0, Z]} />
-      <SteelMesh args={[width, RAIL, D]} color={color} position={[0, hh - RAIL / 2, Z]} />
-      <SteelMesh args={[width, RAIL, D]} color={color} position={[0, -hh + RAIL / 2, Z]} />
+      <SteelMesh args={[RAIL, height, D]} color={color} roughness={roughness} position={[-hw + RAIL / 2, 0, Z]} />
+      <SteelMesh args={[RAIL, height, D]} color={color} roughness={roughness} position={[hw - RAIL / 2, 0, Z]} />
+      <SteelMesh args={[width, RAIL, D]} color={color} roughness={roughness} position={[0, hh - RAIL / 2, Z]} />
+      <SteelMesh args={[width, RAIL, D]} color={color} roughness={roughness} position={[0, -hh + RAIL / 2, Z]} />
       <GlassPane width={width - 2 * RAIL} height={height - 2 * RAIL} z={Z} mat={gm} />
     </group>
   )
 }
 
-function Transom({ color = '#2c2c2c', width = 12, height = 5, glassMat, ...props }: {
+function Transom({ color = '#2c2c2c', width = 12, height = 5, glassMat, roughness = 0.25, ...props }: {
   color?: string
   width?: number
   height?: number
   glassMat?: GlassMat
+  roughness?: number
   [key: string]: any
 }) {
   const RAIL = 0.5
@@ -585,21 +588,22 @@ function Transom({ color = '#2c2c2c', width = 12, height = 5, glassMat, ...props
 
   return (
     <group {...props}>
-      <SteelMesh args={[RAIL, height, D]} color={color} position={[-hw + RAIL / 2, 0, Z]} />
-      <SteelMesh args={[RAIL, height, D]} color={color} position={[hw - RAIL / 2, 0, Z]} />
-      <SteelMesh args={[width, RAIL, D]} color={color} position={[0, hh - RAIL / 2, Z]} />
-      <SteelMesh args={[width, RAIL, D]} color={color} position={[0, -hh + RAIL / 2, Z]} />
+      <SteelMesh args={[RAIL, height, D]} color={color} roughness={roughness} position={[-hw + RAIL / 2, 0, Z]} />
+      <SteelMesh args={[RAIL, height, D]} color={color} roughness={roughness} position={[hw - RAIL / 2, 0, Z]} />
+      <SteelMesh args={[width, RAIL, D]} color={color} roughness={roughness} position={[0, hh - RAIL / 2, Z]} />
+      <SteelMesh args={[width, RAIL, D]} color={color} roughness={roughness} position={[0, -hh + RAIL / 2, Z]} />
       <GlassPane width={width - 2 * RAIL} height={height - 2 * RAIL} z={Z} mat={gm} />
     </group>
   )
 }
 
-function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single', glassMat, ...props }: {
+function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single', glassMat, roughness = 0.25, ...props }: {
   color?: string
   width?: number
   height?: number
   style?: string
   glassMat?: GlassMat
+  roughness?: number
   [key: string]: any
 }) {
   const T = 0.5   // frame thickness
@@ -647,19 +651,19 @@ function FrameDoor({ color = '#2c2c2c', width = 12, height = 30, style = 'single
   return (
     <group {...props}>
       {pieces.map(([px, py, pw, ph], i) => (
-        <SteelMesh key={i} args={[pw, ph, D]} color={color} position={[px, py, Z]} />
+        <SteelMesh key={i} args={[pw, ph, D]} color={color} roughness={roughness} position={[px, py, Z]} />
       ))}
 
       {/* Side lite panels */}
       {hasRight && (
-        <SideLite color={color} width={LITE_W} height={height} glassMat={glassMat} position={[hw + T + LITE_W / 2, 0, 0]} />
+        <SideLite color={color} roughness={roughness} width={LITE_W} height={height} glassMat={glassMat} position={[hw + T + LITE_W / 2, 0, 0]} />
       )}
       {hasLeft && (
-        <SideLite color={color} width={LITE_W} height={height} glassMat={glassMat} position={[-(hw + T + LITE_W / 2), 0, 0]} />
+        <SideLite color={color} roughness={roughness} width={LITE_W} height={height} glassMat={glassMat} position={[-(hw + T + LITE_W / 2), 0, 0]} />
       )}
 
       {hasTransom && (
-        <Transom color={color} width={aWidth - 2 * T} height={TRANSOM_H} glassMat={glassMat} position={[aCenterX, hh + T + TRANSOM_H / 2, 0]} />
+        <Transom color={color} roughness={roughness} width={aWidth - 2 * T} height={TRANSOM_H} glassMat={glassMat} position={[aCenterX, hh + T + TRANSOM_H / 2, 0]} />
       )}
     </group>
   )
@@ -701,7 +705,7 @@ function FrontWall({ visible = true, doorWidth, doorHeight, style }: {
   }, [xLeft, xRight, yBottom, yTop])
 
   return (
-    <mesh geometry={geometry} position={[0, 0, 0]} visible={visible}>
+    <mesh rotation={[0, Math.PI / 16, 0]} geometry={geometry} position={[0, 0, 0]} visible={visible}>
       <meshBasicMaterial color='#ffffff' />
     </mesh>
   )
@@ -905,31 +909,32 @@ type DoorModelDef = {
   panels: PanelConfig[]
   glassOnly?: boolean
   glbSlab?: string
+  roughness?: number
 }
 
 const DOOR_MODELS: DoorModelDef[] = [
   {
-    id: 'orleans', label: 'Orleans', sub: '2 panels · top + bottom', color: '#2c2c2c',
+    id: 'orleans', label: 'Orleans', sub: '2 panels · top + bottom', color: '#4e4d4d', roughness: 0.25,
     panels: [{ y: 4.0, moldScale: 112, moldScale2: 50 }, { y: -7.5, moldScale: 19, moldScale2: 50 }],
   },
   {
-    id: 'uno', label: 'Uno', sub: '1 large panel', color: '#e86253', glassOnly: true,
+    id: 'uno', label: 'Uno', sub: '1 large panel', color: '#e86253', roughness: 0.4, glassOnly: true,
     panels: [{ y: 1, moldScale: 150.0, moldScale2: 50.0 }],
   },
   {
-    id: 'london', label: 'London', sub: '2 equal panels', color: '#f0ede5',
+    id: 'london', label: 'London', sub: '2 equal panels', color: '#f0ede5', roughness: 0.4,
     panels: [{ y: 4, moldScale: 90, moldScale2: 50 }, { y: -7, moldScale: 35, moldScale2: 50 }],
   },
   {
-    id: 'victoria', label: 'Victoria', sub: '3 panels', color: '#9dbfb2',
+    id: 'victoria', label: 'Victoria', sub: '3 panels', color: '#9dbfb2', roughness: 0.4,
     panels: [{ y: 10, moldScale: 35, moldScale2: 50 }, { y: -2, x: 2.7, moldScale: 110, moldScale2: 10 }, { y: -2, x: -2.7, moldScale: 110, moldScale2: 10 }],
   },
   {
-    id: 'soho', label: 'Soho', sub: '4 panels', color: '#2d5448',
+    id: 'soho', label: 'Soho', sub: '4 panels', color: '#2d5448', roughness: 0.4,
     panels: [{ y: 10, moldScale: 30, moldScale2: 45 }, { y: 3, moldScale: 30, moldScale2: 45 }, { y: -4, moldScale: 30, moldScale2: 45 }, { y: -11, moldScale: 30, moldScale2: 45 }],
   },
   {
-    id: 'vog', label: 'Vog', sub: 'Solid · no panels', color: '#3d3d3d',
+    id: 'vog', label: 'Vog', sub: 'Solid · no panels', color: '#3d3d3d', roughness: 0.25,
     glbSlab: '/assets/models/vog-door.glb',
     panels: [],
   },
@@ -1392,7 +1397,7 @@ export default function App() {
             {cfg.productType === 'front' ? (
               <Canvas shadows gl={{ alpha: true }}>
                 <Suspense fallback={null}>
-                  <Environment files="/assets/hdr/empty_warehouse_01_2k.hdr" />
+                  <Environment files="/assets/hdr/sundowner_overlook_1k.hdr" environmentIntensity={2} />
                   <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 0, 30]} fov={60} />
                   {/* <directionalLight position={[0, 5, 90]} intensity={1.5} /> */}
                   {/* <directionalLight position={[0, 5, -90]} intensity={1.5} /> */}
@@ -1423,8 +1428,10 @@ export default function App() {
                     return (
                       <>
                         <Rotator isRotating={isRotating}>
-                          <FrameDoor color={frameColor} width={doorW3d} height={doorH3d} style={cfg.style} glassMat={frameGlassMat} />
-                          <Door color={frameColor} width={doorW3d} height={doorH3d} panels={panels} glassMat={glassMat} glassPanelRule={glassPanelRule} glbSlab={model.glbSlab} />
+                          <group rotation={[0, Math.PI / 16, 0]}>
+                            <FrameDoor color={frameColor} roughness={model.roughness} width={doorW3d} height={doorH3d} style={cfg.style} glassMat={frameGlassMat} />
+                            <Door color={frameColor} roughness={model.roughness} width={doorW3d} height={doorH3d} panels={panels} glassMat={glassMat} glassPanelRule={glassPanelRule} glbSlab={model.glbSlab} />
+                          </group>
                         </Rotator>
                         <FrontWall doorWidth={doorW3d} doorHeight={doorH3d} style={cfg.style} visible={true} />
                       </>

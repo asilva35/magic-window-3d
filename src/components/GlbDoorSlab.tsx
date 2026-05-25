@@ -2,7 +2,7 @@ import { useGLTF } from '@react-three/drei'
 import { useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 
-export function GlbDoorSlab({ path, color, width, height }: { path: string; color: string; width: number; height: number }) {
+export function GlbDoorSlab({ path, color, width, height, roughness = 0.25 }: { path: string; color: string; width: number; height: number; roughness?: number }) {
   const { scene } = useGLTF(path)
   const clone = useMemo(() => scene.clone(), [scene])
   useEffect(() => {
@@ -11,7 +11,7 @@ export function GlbDoorSlab({ path, color, width, height }: { path: string; colo
         const mesh = child as THREE.Mesh
         mesh.material = new THREE.MeshStandardMaterial({
           color,
-          roughness: 0.25,
+          roughness,
           metalness: 1,
           envMapIntensity: 1.0,
         })
