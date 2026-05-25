@@ -29,17 +29,6 @@ const STOP_THICKNESS = 0.4   // depth (Z) of the stop
 // Z position: the stop sits just behind where the door slab face would be
 const STOP_Z = (DOOR_D / 2 + STOP_THICKNESS / 2)
 
-// ─── Architrave (Casing) ─────────────────────────────────────────────────────
-// Purely decorative trim applied flat on the wall face, on both sides of the
-// frame. It covers the joint between the jamb edge and the plasterboard/wall
-// finish. The "reveal" is the intentional gap left between the inner edge of
-// the architrave and the door opening — it exposes a thin strip of jamb face
-// and gives the installation a clean, shadow-line look.
-const ARCH_W = 2.5   // face width of the casing
-const ARCH_THICKNESS = 0.35  // how far it stands proud of the wall face
-const ARCH_REVEAL = 0.3   // setback from door-opening edge to casing inner edge
-const ARCH_Z = ARCH_THICKNESS / 2  // centered proud of jamb front face (Z=0)
-
 // ─── Threshold / Sill ────────────────────────────────────────────────────────
 // The bottom horizontal member that sits in the opening at floor level.
 // On exterior doors it provides weather-sealing and bridging over the
