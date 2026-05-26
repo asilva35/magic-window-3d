@@ -7,6 +7,7 @@ import './design-system/components.css'
 import './design-system/configurator.css'
 import App from './App.tsx'
 import TestPage from './TestPage.tsx'
+import TestRedDoorPage from './TestRedDoorPage.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -14,6 +15,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/test" element={<TestPage />} />
+        <Route path="/test-red-door" element={<TestRedDoorPage />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
