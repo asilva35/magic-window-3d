@@ -88,8 +88,8 @@ export default function TestPage() {
             <Canvas shadows gl={{ alpha: true, toneMapping: ACESFilmicToneMapping, antialias: true }}>
                 <Suspense fallback={null}>
                     <PerspectiveCamera makeDefault position={[0, 0, 120]} fov={50} />
-                    <ambientLight intensity={0.7} />
-                    <directionalLight position={[5, 10, 5]} intensity={1.5} castShadow />
+                    {/* <ambientLight intensity={0.0} /> */}
+                    {/* <directionalLight position={[5, 10, 5]} intensity={0.5} castShadow /> */}
                     <Environment files="/assets/hdr/suburban_garden_1k.hdr" environmentIntensity={1} />
 
                     {/* Left: with AO + lightmap */}
