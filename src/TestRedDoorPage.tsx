@@ -19,9 +19,9 @@ function RedDoor({ positionX = 0, aoMapIntensity = 1.0, lightMapIntensity = 4.0,
     const scene = useMemo(() => gltfScene.clone(), [gltfScene])
 
     const [aoMapTexture, lightMapTexture, lightMapTextureNoHdri] = useTexture([
-        '/assets/textures/test-red-door/door_AO_bake.png',
-        '/assets/textures/test-red-door/door_lightmap_bake.png',
-        '/assets/textures/test-red-door/door_lightmap_bake-no-hdri-02.png'
+        '/assets/textures/test-red-door/door_AO_bake.webp',
+        '/assets/textures/test-red-door/door_lightmap_bake.webp',
+        '/assets/textures/test-red-door/door_lightmap_bake-no-hdri-02.webp'
     ])
 
     aoMapTexture.flipY = false
