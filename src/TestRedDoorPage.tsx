@@ -1,9 +1,9 @@
 import { Canvas } from '@react-three/fiber'
 import { ACESFilmicToneMapping } from 'three'
-import { OrbitControls, Environment, PerspectiveCamera, useGLTF, useTexture } from '@react-three/drei'
+import { OrbitControls, Environment, PerspectiveCamera, useGLTF, useTexture, Stats } from '@react-three/drei'
 import { Suspense, useEffect, useMemo } from 'react'
 import { Mesh, MeshStandardMaterial, MeshPhysicalMaterial } from 'three'
-import { LayerMaterial, Depth, Fresnel } from 'lamina/vanilla'
+import { LayerMaterial, Depth } from 'lamina/vanilla'
 
 interface RedDoorProps {
     positionX?: number
@@ -11,17 +11,17 @@ interface RedDoorProps {
     lightMapIntensity?: number
     lightMapToUse?: 'baked' | 'no-hdri'
     doorMaterial?: { roughness: number; metalness: number, useLamina?: boolean }
-    frameMaterial?: { roughness: number; metalness: number }
+    frameMaterial?: { roughness: number; metalness: number, useLamina?: boolean }
 }
 
-function RedDoor({ positionX = 0, aoMapIntensity = 1.0, lightMapIntensity = 4.0, lightMapToUse = 'baked', doorMaterial = { roughness: 0.4, metalness: 0.6, useLamina: false }, frameMaterial = { roughness: 0.6, metalness: 0.3 } }: RedDoorProps) {
+function RedDoor({ positionX = 0, aoMapIntensity = 1.0, lightMapIntensity = 4.0, lightMapToUse = 'baked', doorMaterial = { roughness: 0.4, metalness: 0.6, useLamina: false }, frameMaterial = { roughness: 0.6, metalness: 0.3, useLamina: false } }: RedDoorProps) {
     const { scene: gltfScene } = useGLTF('/assets/models/test-red-door.glb')
     const scene = useMemo(() => gltfScene.clone(), [gltfScene])
 
     const [aoMapTexture, lightMapTexture, lightMapTextureNoHdri] = useTexture([
         '/assets/textures/test-red-door/door_AO_bake.png',
         '/assets/textures/test-red-door/door_lightmap_bake.png',
-        '/assets/textures/test-red-door/door_lightmap_bake-no-hdri.png'
+        '/assets/textures/test-red-door/door_lightmap_bake-no-hdri-02.png'
     ])
 
     aoMapTexture.flipY = false
@@ -46,30 +46,21 @@ function RedDoor({ positionX = 0, aoMapIntensity = 1.0, lightMapIntensity = 4.0,
                         aoMap: aoMapTexture,
                         aoMapIntensity: aoMapIntensity,
                         lightMap: lightMapToUse === 'baked' ? lightMapTexture : lightMapTextureNoHdri,
-                        lightMapIntensity: lightMapIntensity,
+                        lightMapIntensity: lightMapIntensity * 2,
 
                         // 3. ¡La magia de Lamina! Apilamos los shaders
                         layers: [
                             // Capa A: El brillo superior (Top edge highlight)
                             new Depth({
-                                colorA: '#ffffff', // Luz blanca pura arriba
-                                colorB: '#5c0505', // Rojo neutro abajo
-                                alpha: 0.35,       // Intensidad del efecto (ajusta al gusto)
+                                colorA: '#767202', // Luz blanca pura arriba
+                                colorB: '#ff0000', // Rojo neutro abajo
+                                alpha: 0.25,       // Intensidad del efecto (ajusta al gusto)
                                 mode: 'screen',    // Modo de mezcla (screen o add iluminan)
                                 //mapping: 'local',  // Usa las dimensiones del propio mesh
                                 near: 0,           // Inicio del gradiente
-                                far: 5.5,          // Fin del gradiente (ajustar según la altura en Y de tu puerta)
-                                origin: [0, -1, 0] // Desplazamiento del gradiente por si tu punto de pivote está en el centro
+                                far: 30.0,          // Fin del gradiente (ajustar según la altura en Y de tu puerta)
+                                origin: [5, 30, -3] // Desplazamiento del gradiente por si tu punto de pivote está en el centro
                             }),
-
-                            // Capa B: El "pop" en los bordes y normales laterales
-                            new Fresnel({
-                                color: '#dbaba8',
-                                alpha: 0.25,       // Sutileza del brillo lateral
-                                power: 2.5,        // Grosor del borde (valores altos = borde más fino y afilado)
-                                intensity: 1.0,
-                                mode: 'add'
-                            })
                         ]
                     })
                 } else {
@@ -86,17 +77,44 @@ function RedDoor({ positionX = 0, aoMapIntensity = 1.0, lightMapIntensity = 4.0,
             }
 
             if (name.includes('frame')) {
-                child.material = new MeshStandardMaterial({
-                    color: '#ac9990',
-                    roughness: frameMaterial.roughness,
-                    metalness: frameMaterial.metalness,
-                    aoMap: aoMapTexture,
-                    aoMapIntensity,
-                    lightMap: lightMapToUse === 'baked' ? lightMapTexture : lightMapTextureNoHdri,
-                    lightMapIntensity,
-                })
-            }
+                if (frameMaterial.useLamina) {
+                    child.material = new LayerMaterial({
+                        color: '#dbd8d8',
+                        roughness: frameMaterial.roughness,
+                        metalness: frameMaterial.metalness,
+                        aoMap: aoMapTexture,
+                        aoMapIntensity: aoMapIntensity,
+                        lightMap: lightMapToUse === 'baked' ? lightMapTexture : lightMapTextureNoHdri,
+                        lightMapIntensity: lightMapIntensity * 2,
 
+                        // 3. ¡La magia de Lamina! Apilamos los shaders
+                        layers: [
+                            // Capa A: El brillo superior (Top edge highlight)
+                            new Depth({
+                                colorA: '#bcb70a', // Luz blanca pura arriba
+                                colorB: '#ac9990', // Rojo neutro abajo
+                                alpha: 0.45,       // Intensidad del efecto (ajusta al gusto)
+                                mode: 'screen',    // Modo de mezcla (screen o add iluminan)
+                                //mapping: 'local',  // Usa las dimensiones del propio mesh
+                                near: 0,           // Inicio del gradiente
+                                far: 30.0,          // Fin del gradiente (ajustar según la altura en Y de tu puerta)
+                                origin: [5, 30, -3] // Desplazamiento del gradiente por si tu punto de pivote está en el centro
+                            }),
+                        ]
+                    })
+                } else {
+                    child.material = new MeshStandardMaterial({
+                        color: '#ac9990',
+                        roughness: frameMaterial.roughness,
+                        metalness: frameMaterial.metalness,
+                        aoMap: aoMapTexture,
+                        aoMapIntensity,
+                        lightMap: lightMapToUse === 'baked' ? lightMapTexture : lightMapTextureNoHdri,
+                        lightMapIntensity,
+                    })
+                }
+
+            }
             if (name.includes('handle')) {
                 child.material = new MeshStandardMaterial({
                     color: '#969490',
@@ -108,7 +126,7 @@ function RedDoor({ positionX = 0, aoMapIntensity = 1.0, lightMapIntensity = 4.0,
             if (name.includes('glass')) {
                 child.material = new MeshPhysicalMaterial({
                     color: '#ffffff',
-                    roughness: 0.05,
+                    roughness: 0.025,
                     metalness: 0.9,
                     transmission: 1,
                     thickness: 0.1,
@@ -131,7 +149,7 @@ export default function TestPage() {
                 <Suspense fallback={null}>
                     <PerspectiveCamera makeDefault position={[0, 0, 120]} fov={50} />
                     {/* <ambientLight intensity={0.0} /> */}
-                    <directionalLight position={[60, 10, 0]} intensity={1.5} castShadow />
+                    {/* <directionalLight position={[0, 2, 1]} intensity={1.5} castShadow /> */}
                     <Environment files="/assets/hdr/suburban_garden_1k.hdr" environmentIntensity={1} />
 
 
@@ -142,13 +160,14 @@ export default function TestPage() {
                     <RedDoor positionX={-40} />
 
 
-                    <RedDoor positionX={10} lightMapToUse='no-hdri' aoMapIntensity={0.9} lightMapIntensity={1.0} doorMaterial={{ roughness: 0.4, metalness: 0.1 }} frameMaterial={{ roughness: 0.4, metalness: 0.01 }} />
+                    <RedDoor positionX={10} lightMapToUse='no-hdri' aoMapIntensity={0.9} lightMapIntensity={3.0} doorMaterial={{ roughness: 0.4, metalness: 0.1 }} frameMaterial={{ roughness: 0.4, metalness: 0.01 }} />
 
-                    <RedDoor positionX={60} lightMapToUse='no-hdri' aoMapIntensity={0.9} lightMapIntensity={1.0} doorMaterial={{ roughness: 0.4, metalness: 0.1, useLamina: true }} frameMaterial={{ roughness: 0.4, metalness: 0.01 }} />
+                    <RedDoor positionX={60} lightMapToUse='no-hdri' aoMapIntensity={0.9} lightMapIntensity={1.9} doorMaterial={{ roughness: 0.4, metalness: 0.1, useLamina: true }} frameMaterial={{ roughness: 0.4, metalness: 0.01, useLamina: true }} />
 
                     <OrbitControls />
                 </Suspense>
             </Canvas>
+            <Stats />
         </div>
     )
 }
