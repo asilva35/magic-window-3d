@@ -8,19 +8,24 @@ interface RedDoorProps {
     positionX?: number
     aoMapIntensity?: number
     lightMapIntensity?: number
+    lightMapToUse?: 'baked' | 'no-hdri'
+    doorMaterial?: { roughness: number; metalness: number }
+    frameMaterial?: { roughness: number; metalness: number }
 }
 
-function RedDoor({ positionX = 0, aoMapIntensity = 1.0, lightMapIntensity = 4.0 }: RedDoorProps) {
+function RedDoor({ positionX = 0, aoMapIntensity = 1.0, lightMapIntensity = 4.0, lightMapToUse = 'baked', doorMaterial = { roughness: 0.4, metalness: 0.6 }, frameMaterial = { roughness: 0.6, metalness: 0.3 } }: RedDoorProps) {
     const { scene: gltfScene } = useGLTF('/assets/models/test-red-door.glb')
     const scene = useMemo(() => gltfScene.clone(), [gltfScene])
 
-    const [aoMapTexture, lightMapTexture] = useTexture([
+    const [aoMapTexture, lightMapTexture, lightMapTextureNoHdri] = useTexture([
         '/assets/textures/test-red-door/door_AO_bake.png',
-        '/assets/textures/test-red-door/door_lightmap_bake.png'
+        '/assets/textures/test-red-door/door_lightmap_bake.png',
+        '/assets/textures/test-red-door/door_lightmap_bake-no-hdri.png'
     ])
 
     aoMapTexture.flipY = false
     lightMapTexture.flipY = false
+    lightMapTextureNoHdri.flipY = false
 
     useEffect(() => {
         scene.traverse((child) => {
@@ -34,11 +39,11 @@ function RedDoor({ positionX = 0, aoMapIntensity = 1.0, lightMapIntensity = 4.0 
             if (name.includes('door')) {
                 child.material = new MeshStandardMaterial({
                     color: '#ff0000',
-                    roughness: 0.4,
-                    metalness: 0.6,
+                    roughness: doorMaterial.roughness,
+                    metalness: doorMaterial.metalness,
                     aoMap: aoMapTexture,
                     aoMapIntensity,
-                    lightMap: lightMapTexture,
+                    lightMap: lightMapToUse === 'baked' ? lightMapTexture : lightMapTextureNoHdri,
                     lightMapIntensity,
                 })
             }
@@ -46,11 +51,11 @@ function RedDoor({ positionX = 0, aoMapIntensity = 1.0, lightMapIntensity = 4.0 
             if (name.includes('frame')) {
                 child.material = new MeshStandardMaterial({
                     color: '#ac9990',
-                    roughness: 0.6,
-                    metalness: 0.3,
+                    roughness: frameMaterial.roughness,
+                    metalness: frameMaterial.metalness,
                     aoMap: aoMapTexture,
                     aoMapIntensity,
-                    lightMap: lightMapTexture,
+                    lightMap: lightMapToUse === 'baked' ? lightMapTexture : lightMapTextureNoHdri,
                     lightMapIntensity,
                 })
             }
@@ -77,7 +82,7 @@ function RedDoor({ positionX = 0, aoMapIntensity = 1.0, lightMapIntensity = 4.0 
                 })
             }
         })
-    }, [scene, aoMapTexture, lightMapTexture, aoMapIntensity, lightMapIntensity])
+    }, [scene, aoMapTexture, lightMapTexture, lightMapTextureNoHdri, aoMapIntensity, lightMapIntensity, lightMapToUse])
 
     return <primitive object={scene} position={[positionX, 0, 0]} />
 }
@@ -92,11 +97,15 @@ export default function TestPage() {
                     {/* <directionalLight position={[5, 10, 5]} intensity={0.5} castShadow /> */}
                     <Environment files="/assets/hdr/suburban_garden_1k.hdr" environmentIntensity={1} />
 
-                    {/* Left: with AO + lightmap */}
-                    <RedDoor positionX={-18} />
 
                     {/* Right: without AO + lightmap (aoMapIntensity=0, lightMapIntensity=0) */}
-                    <RedDoor positionX={18} aoMapIntensity={0} lightMapIntensity={0} />
+                    <RedDoor positionX={-90} aoMapIntensity={0} lightMapIntensity={0} />
+
+                    {/* Left: with AO + lightmap */}
+                    <RedDoor positionX={-40} />
+
+
+                    <RedDoor positionX={10} lightMapToUse='no-hdri' aoMapIntensity={0.9} lightMapIntensity={1.0} doorMaterial={{ roughness: 0.4, metalness: 0.1 }} frameMaterial={{ roughness: 0.4, metalness: 0.01 }} />
 
                     <OrbitControls />
                 </Suspense>
