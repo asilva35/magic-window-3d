@@ -7,7 +7,8 @@ import { useControls, Leva, button, folder } from 'leva'
 
 const DEBUG = true
 
-useGLTF.preload('/assets/models/uno-door.glb')
+useGLTF.preload('/assets/models/uno-door-80x36-20x64.glb')
+useGLTF.preload('/assets/models/uno-door-80x36-22x64.glb')
 
 const HDR_OPTIONS = {
     'Suburban Garden': '/assets/hdr/suburban_garden_1k.hdr',
@@ -90,14 +91,17 @@ function loadCustomPresets(): Record<string, MaterialPreset> {
     }
 }
 
+type GlassConfig = '20x64' | '22x64'
+
 function UnoDoor({
+    modelVariant,
     slabColor, slabRoughness, slabMetalness,
     stopJamColor, stopJamRoughness, stopJamMetalness,
     sealTopColor, sealTopRoughness, sealTopMetalness,
     sealBotColor, sealBotRoughness, sealBotMetalness,
     glassColor, glassRoughness, glassMetalness, glassTransmission, glassThickness, glassOpacity,
-}: MaterialPreset) {
-    const { scene } = useGLTF('/assets/models/uno-door.glb')
+}: MaterialPreset & { modelVariant: GlassConfig }) {
+    const { scene } = useGLTF(`/assets/models/uno-door-80x36-${modelVariant}.glb`)
     const aoMap = useTexture('/assets/textures/doors/uno/uno-80x36-20x64-AO.png', (t) => {
         t.colorSpace = NoColorSpace
         t.channel = 0
@@ -255,9 +259,54 @@ function PresetMaterialPicker({ presets, selected, onSelect, onDelete }: {
     )
 }
 
+function GlassConfigPicker({ selected, onSelect }: { selected: GlassConfig; onSelect: (c: GlassConfig) => void }) {
+    const options: GlassConfig[] = ['20x64', '22x64']
+    return (
+        <div style={{
+            position: 'absolute',
+            bottom: 24,
+            right: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+            background: 'rgba(0,0,0,0.55)',
+            backdropFilter: 'blur(6px)',
+            borderRadius: 10,
+            padding: '12px 14px',
+            zIndex: 10,
+        }}>
+            <span style={{ color: '#aaa', fontSize: 10, fontFamily: 'sans-serif', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 2 }}>
+                Glass Configuration
+            </span>
+            {options.map((opt) => (
+                <button
+                    key={opt}
+                    onClick={() => onSelect(opt)}
+                    style={{
+                        background: selected === opt ? '#fff' : 'rgba(255,255,255,0.1)',
+                        color: selected === opt ? '#111' : '#ddd',
+                        border: 'none',
+                        borderRadius: 6,
+                        padding: '6px 14px',
+                        fontFamily: 'sans-serif',
+                        fontSize: 13,
+                        fontWeight: selected === opt ? 700 : 400,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'background 0.15s, color 0.15s',
+                    }}
+                >
+                    {opt}
+                </button>
+            ))}
+        </div>
+    )
+}
+
 export default function TestUnoDoorPage() {
     const [selectedPreset, setSelectedPreset] = useState<string>('Silver')
     const [customPresets, setCustomPresets] = useState<Record<string, MaterialPreset>>(loadCustomPresets)
+    const [glassConfig, setGlassConfig] = useState<GlassConfig>('20x64')
 
     const allPresets = useMemo(() => ({ ...DEFAULT_PRESETS, ...customPresets }), [customPresets])
 
@@ -355,6 +404,8 @@ export default function TestUnoDoorPage() {
                         <directionalLight position={[0, 25, 100]} intensity={1} color="#ffffff" />
                         <directionalLight position={[0, 25, -100]} intensity={1} color="#ffffff" />
                         <UnoDoor
+                            key={glassConfig}
+                            modelVariant={glassConfig}
                             slabColor={slabColor}
                             slabRoughness={slabRoughness}
                             slabMetalness={slabMetalness}
@@ -384,6 +435,7 @@ export default function TestUnoDoorPage() {
                     onSelect={setSelectedPreset}
                     onDelete={handleDeletePreset}
                 />}
+                <GlassConfigPicker selected={glassConfig} onSelect={setGlassConfig} />
             </div>
         </>
     )
