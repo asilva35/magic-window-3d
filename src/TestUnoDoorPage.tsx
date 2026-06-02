@@ -1,11 +1,11 @@
 import { Canvas } from '@react-three/fiber'
-import { ACESFilmicToneMapping, MeshStandardMaterial, Mesh, NoColorSpace, MeshPhysicalMaterial } from 'three'
+import { ACESFilmicToneMapping, MeshStandardMaterial, MeshBasicMaterial, Mesh, NoColorSpace, MeshPhysicalMaterial } from 'three'
 import { OrbitControls, Environment, PerspectiveCamera, Stats, useGLTF, useTexture } from '@react-three/drei'
-import { Suspense, useMemo, useState, useEffect } from 'react'
+import { Suspense, useMemo, useState, useEffect, useRef } from 'react'
 import { DoorHandle } from './components/DoorHandle'
-import { useControls, Leva } from 'leva'
+import { useControls, Leva, button, folder } from 'leva'
 
-const DEBUG = false
+const DEBUG = true
 
 useGLTF.preload('/assets/models/uno-door.glb')
 
@@ -23,20 +23,86 @@ const HDR_OPTIONS = {
     'Sundowner Overlook': '/assets/hdr/sundowner_overlook_1k.hdr',
 }
 
-function UnoDoor({ slabColor, stopJamColor, sealTopColor, sealBotColor, glassColor }: {
+type MaterialPreset = {
     slabColor: string
+    slabRoughness: number
+    slabMetalness: number
     stopJamColor: string
+    stopJamRoughness: number
+    stopJamMetalness: number
     sealTopColor: string
+    sealTopRoughness: number
+    sealTopMetalness: number
     sealBotColor: string
+    sealBotRoughness: number
+    sealBotMetalness: number
     glassColor: string
-}) {
+    glassRoughness: number
+    glassMetalness: number
+    glassTransmission: number
+    glassThickness: number
+    glassOpacity: number
+}
+
+const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
+    'Silver': {
+        slabColor: '#b4b1ac', slabRoughness: 0.7, slabMetalness: 0.7,
+        stopJamColor: '#d5d3d1', stopJamRoughness: 0.9, stopJamMetalness: 0.8,
+        sealTopColor: '#fffdfd', sealTopRoughness: 0.2, sealTopMetalness: 0.9,
+        sealBotColor: '#2a2121', sealBotRoughness: 0.2, sealBotMetalness: 0.9,
+        glassColor: '#dedede', glassRoughness: 0.025, glassMetalness: 0.9,
+        glassTransmission: 1, glassThickness: 0.1, glassOpacity: 0.2,
+    },
+    'Dark': {
+        slabColor: '#484747', slabRoughness: 0.7, slabMetalness: 0.7,
+        stopJamColor: '#867a7a', stopJamRoughness: 0.9, stopJamMetalness: 0.8,
+        sealTopColor: '#fffdfd', sealTopRoughness: 0.2, sealTopMetalness: 0.9,
+        sealBotColor: '#2a2121', sealBotRoughness: 0.2, sealBotMetalness: 0.9,
+        glassColor: '#dedede', glassRoughness: 0.025, glassMetalness: 0.9,
+        glassTransmission: 1, glassThickness: 0.1, glassOpacity: 0.2,
+    },
+    'Red': {
+        slabColor: '#ef1313', slabRoughness: 0.7, slabMetalness: 0.7,
+        stopJamColor: '#ffffff', stopJamRoughness: 0.9, stopJamMetalness: 0.8,
+        sealTopColor: '#fffdfd', sealTopRoughness: 0.2, sealTopMetalness: 0.9,
+        sealBotColor: '#2a2121', sealBotRoughness: 0.2, sealBotMetalness: 0.9,
+        glassColor: '#dedede', glassRoughness: 0.025, glassMetalness: 0.9,
+        glassTransmission: 1, glassThickness: 0.1, glassOpacity: 0.2,
+    },
+    'Gold': {
+        slabColor: '#867a28', slabRoughness: 0.7, slabMetalness: 0.7,
+        stopJamColor: '#ebe3ac', stopJamRoughness: 0.9, stopJamMetalness: 0.8,
+        sealTopColor: '#fffdfd', sealTopRoughness: 0.2, sealTopMetalness: 0.9,
+        sealBotColor: '#2a2121', sealBotRoughness: 0.2, sealBotMetalness: 0.9,
+        glassColor: '#dedede', glassRoughness: 0.025, glassMetalness: 0.9,
+        glassTransmission: 1, glassThickness: 0.1, glassOpacity: 0.2,
+    },
+}
+
+const STORAGE_KEY = 'uno-door-presets'
+
+function loadCustomPresets(): Record<string, MaterialPreset> {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY)
+        return raw ? JSON.parse(raw) : {}
+    } catch {
+        return {}
+    }
+}
+
+function UnoDoor({
+    slabColor, slabRoughness, slabMetalness,
+    stopJamColor, stopJamRoughness, stopJamMetalness,
+    sealTopColor, sealTopRoughness, sealTopMetalness,
+    sealBotColor, sealBotRoughness, sealBotMetalness,
+    glassColor, glassRoughness, glassMetalness, glassTransmission, glassThickness, glassOpacity,
+}: MaterialPreset) {
     const { scene } = useGLTF('/assets/models/uno-door.glb')
     const aoMap = useTexture('/assets/textures/doors/uno/uno-80x36-20x64-AO.png', (t) => {
         t.colorSpace = NoColorSpace
         t.channel = 0
         t.flipY = false
     })
-
     const aoMapLight = useTexture('/assets/textures/doors/uno/uno-80x36-20x64-Light.png', (t) => {
         t.colorSpace = NoColorSpace
         t.channel = 0
@@ -45,10 +111,24 @@ function UnoDoor({ slabColor, stopJamColor, sealTopColor, sealBotColor, glassCol
 
     const clone = useMemo(() => scene.clone(true), [scene])
 
-    const slabMaterial = useMemo(() => new MeshStandardMaterial({ color: slabColor, metalness: 0.7, roughness: 0.425 }), [slabColor])
-    const stopJamMaterial = useMemo(() => new MeshStandardMaterial({ color: stopJamColor, metalness: 0.8, roughness: 0.9 }), [stopJamColor])
-    const sealTopMaterial = useMemo(() => new MeshStandardMaterial({ color: sealTopColor, metalness: 0.9, roughness: 0.2 }), [sealTopColor])
-    const sealBotMaterial = useMemo(() => new MeshStandardMaterial({ color: sealBotColor, metalness: 0.9, roughness: 0.2 }), [sealBotColor])
+    const slabMaterial = useMemo(() => new MeshStandardMaterial({ color: slabColor, metalness: slabMetalness, roughness: slabRoughness }), [slabColor, slabMetalness, slabRoughness])
+    const stopJamMaterial = useMemo(() => new MeshStandardMaterial({ color: stopJamColor, metalness: stopJamMetalness, roughness: stopJamRoughness }), [stopJamColor, stopJamMetalness, stopJamRoughness])
+    const sealTopMaterial = useMemo(() => new MeshStandardMaterial({ color: sealTopColor, metalness: sealTopMetalness, roughness: sealTopRoughness }), [sealTopColor, sealTopMetalness, sealTopRoughness])
+    const sealBotMaterial = useMemo(() => new MeshStandardMaterial({ color: sealBotColor, metalness: sealBotMetalness, roughness: sealBotRoughness }), [sealBotColor, sealBotMetalness, sealBotRoughness])
+    const glassMaterial = useMemo(() => new MeshPhysicalMaterial({
+        color: glassColor,
+        roughness: glassRoughness,
+        metalness: glassMetalness,
+        transmission: glassTransmission,
+        thickness: glassThickness,
+        ior: 1.5,
+        transparent: true,
+        opacity: glassOpacity,
+        envMapIntensity: 1,
+    }), [glassColor, glassRoughness, glassMetalness, glassTransmission, glassThickness, glassOpacity])
+    const rubberMaterial = useMemo(() => new MeshBasicMaterial({
+        color: slabColor,
+    }), [slabColor])
 
     useMemo(() => {
         clone.traverse((child) => {
@@ -79,17 +159,9 @@ function UnoDoor({ slabColor, stopJamColor, sealTopColor, sealBotColor, glassCol
                 applyAOMap = true
                 applyLightMap = true
             } else if (name.includes('glass')) {
-                mesh.material = new MeshPhysicalMaterial({
-                    color: glassColor,
-                    roughness: 0.025,
-                    metalness: 0.9,
-                    transmission: 1,
-                    thickness: 0.1,
-                    ior: 1.5,
-                    transparent: true,
-                    opacity: 0.2,
-                    envMapIntensity: 1,
-                })
+                mesh.material = glassMaterial
+            } else if (name.includes('rubber')) {
+                mesh.material = rubberMaterial
             }
 
             if (applyAOMap) {
@@ -106,7 +178,7 @@ function UnoDoor({ slabColor, stopJamColor, sealTopColor, sealBotColor, glassCol
                 mat.needsUpdate = true
             }
         })
-    }, [clone, aoMap, slabMaterial, stopJamMaterial, sealTopMaterial, sealBotMaterial, glassColor])
+    }, [clone, aoMap, aoMapLight, slabMaterial, stopJamMaterial, sealTopMaterial, sealBotMaterial, glassMaterial])
 
     return <>
         <primitive object={clone} />
@@ -114,40 +186,12 @@ function UnoDoor({ slabColor, stopJamColor, sealTopColor, sealBotColor, glassCol
     </>
 }
 
-const PresetColors = {
-    'Silver': {
-        slabColor: '#b4b1ac',
-        stopJamColor: '#d5d3d1',
-        sealTopColor: '#fffdfd',
-        sealBotColor: '#2a2121',
-        glassColor: '#dedede',
-    },
-    'Dark': {
-        slabColor: '#483939',
-        stopJamColor: '#867a7a',
-        sealTopColor: '#fffdfd',
-        sealBotColor: '#2a2121',
-        glassColor: '#dedede',
-    },
-    'Red Light': {
-        slabColor: '#c19d9d',
-        stopJamColor: '#d58f8f',
-        sealTopColor: '#fffdfd',
-        sealBotColor: '#2a2121',
-        glassColor: '#dedede',
-    },
-    'Gold': {
-        slabColor: '#867a28',
-        stopJamColor: '#ebe3ac',
-        sealTopColor: '#fffdfd',
-        sealBotColor: '#2a2121',
-        glassColor: '#dedede',
-    },
-}
-
-type PresetKey = keyof typeof PresetColors
-
-function PresetPicker({ selected, onSelect }: { selected: PresetKey; onSelect: (p: PresetKey) => void }) {
+function PresetMaterialPicker({ presets, selected, onSelect, onDelete }: {
+    presets: Record<string, MaterialPreset>
+    selected: string
+    onSelect: (p: string) => void
+    onDelete: (p: string) => void
+}) {
     return (
         <div style={{
             position: 'absolute',
@@ -163,52 +207,140 @@ function PresetPicker({ selected, onSelect }: { selected: PresetKey; onSelect: (
             zIndex: 10,
         }}>
             <span style={{ color: '#aaa', fontSize: 10, fontFamily: 'sans-serif', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 2 }}>
-                Color Preset
+                Material Preset
             </span>
-            {(Object.keys(PresetColors) as PresetKey[]).map((key) => (
-                <button
-                    key={key}
-                    onClick={() => onSelect(key)}
-                    style={{
-                        background: selected === key ? '#fff' : 'rgba(255,255,255,0.1)',
-                        color: selected === key ? '#111' : '#ddd',
-                        border: 'none',
-                        borderRadius: 6,
-                        padding: '6px 14px',
-                        fontFamily: 'sans-serif',
-                        fontSize: 13,
-                        fontWeight: selected === key ? 700 : 400,
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'background 0.15s, color 0.15s',
-                    }}
-                >
-                    {key}
-                </button>
+            {Object.keys(presets).map((key) => (
+                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <button
+                        onClick={() => onSelect(key)}
+                        style={{
+                            flex: 1,
+                            background: selected === key ? '#fff' : 'rgba(255,255,255,0.1)',
+                            color: selected === key ? '#111' : '#ddd',
+                            border: 'none',
+                            borderRadius: 6,
+                            padding: '6px 14px',
+                            fontFamily: 'sans-serif',
+                            fontSize: 13,
+                            fontWeight: selected === key ? 700 : 400,
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            transition: 'background 0.15s, color 0.15s',
+                        }}
+                    >
+                        {key}
+                    </button>
+                    {!DEFAULT_PRESETS[key] && (
+                        <button
+                            onClick={() => onDelete(key)}
+                            title="Delete preset"
+                            style={{
+                                background: 'rgba(255,80,80,0.2)',
+                                color: '#ff9090',
+                                border: 'none',
+                                borderRadius: 4,
+                                padding: '4px 8px',
+                                fontFamily: 'sans-serif',
+                                fontSize: 13,
+                                lineHeight: 1,
+                                cursor: 'pointer',
+                            }}
+                        >
+                            ×
+                        </button>
+                    )}
+                </div>
             ))}
         </div>
     )
 }
 
 export default function TestUnoDoorPage() {
-    const [selectedPreset, setSelectedPreset] = useState<PresetKey>('Silver')
+    const [selectedPreset, setSelectedPreset] = useState<string>('Silver')
+    const [customPresets, setCustomPresets] = useState<Record<string, MaterialPreset>>(loadCustomPresets)
 
-    const [{ hdr, slabColor, stopJamColor, sealTopColor, sealBotColor, glassColor }, set] = useControls(() => ({
+    const allPresets = useMemo(() => ({ ...DEFAULT_PRESETS, ...customPresets }), [customPresets])
+
+    // Ref kept in sync each render so the Leva button handler always reads the latest values
+    const materialsRef = useRef<MaterialPreset>(DEFAULT_PRESETS['Silver'])
+
+    const init = DEFAULT_PRESETS['Silver']
+
+    const [{ hdr,
+        slabColor, slabRoughness, slabMetalness,
+        stopJamColor, stopJamRoughness, stopJamMetalness,
+        sealTopColor, sealTopRoughness, sealTopMetalness,
+        sealBotColor, sealBotRoughness, sealBotMetalness,
+        glassColor, glassRoughness, glassMetalness, glassTransmission, glassThickness, glassOpacity,
+    }, set] = useControls(() => ({
         hdr: {
             label: 'Environment',
             value: 'Suburban Garden',
             options: Object.keys(HDR_OPTIONS),
         },
-        slabColor: { label: 'Slab / Frame Color', value: '#483939' },
-        stopJamColor: { label: 'Stop / Jam Color', value: '#867a7a' },
-        sealTopColor: { label: 'Seal Top Color', value: '#fffdfd' },
-        sealBotColor: { label: 'Seal Bottom Color', value: '#2a2121' },
-        glassColor: { label: 'Glass Color', value: '#dedede' },
+        'Slab / Frame': folder({
+            slabColor: { label: 'Color', value: init.slabColor },
+            slabRoughness: { label: 'Roughness', value: init.slabRoughness, min: 0, max: 1, step: 0.01 },
+            slabMetalness: { label: 'Metalness', value: init.slabMetalness, min: 0, max: 1, step: 0.01 },
+        }),
+        'Stop / Jam': folder({
+            stopJamColor: { label: 'Color', value: init.stopJamColor },
+            stopJamRoughness: { label: 'Roughness', value: init.stopJamRoughness, min: 0, max: 1, step: 0.01 },
+            stopJamMetalness: { label: 'Metalness', value: init.stopJamMetalness, min: 0, max: 1, step: 0.01 },
+        }),
+        'Seal Top': folder({
+            sealTopColor: { label: 'Color', value: init.sealTopColor },
+            sealTopRoughness: { label: 'Roughness', value: init.sealTopRoughness, min: 0, max: 1, step: 0.01 },
+            sealTopMetalness: { label: 'Metalness', value: init.sealTopMetalness, min: 0, max: 1, step: 0.01 },
+        }),
+        'Seal Bottom': folder({
+            sealBotColor: { label: 'Color', value: init.sealBotColor },
+            sealBotRoughness: { label: 'Roughness', value: init.sealBotRoughness, min: 0, max: 1, step: 0.01 },
+            sealBotMetalness: { label: 'Metalness', value: init.sealBotMetalness, min: 0, max: 1, step: 0.01 },
+        }),
+        'Glass': folder({
+            glassColor: { label: 'Color', value: init.glassColor },
+            glassRoughness: { label: 'Roughness', value: init.glassRoughness, min: 0, max: 1, step: 0.001 },
+            glassMetalness: { label: 'Metalness', value: init.glassMetalness, min: 0, max: 1, step: 0.01 },
+            glassTransmission: { label: 'Transmission', value: init.glassTransmission, min: 0, max: 1, step: 0.01 },
+            glassThickness: { label: 'Thickness', value: init.glassThickness, min: 0, max: 5, step: 0.01 },
+            glassOpacity: { label: 'Opacity', value: init.glassOpacity, min: 0, max: 1, step: 0.01 },
+        }),
+        'Save as Preset': button(() => {
+            const name = window.prompt('Enter preset name')
+            if (!name || !name.trim()) return
+            const trimmed = name.trim()
+            setCustomPresets(prev => {
+                const updated = { ...prev, [trimmed]: { ...materialsRef.current } }
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+                return updated
+            })
+        }),
     }))
 
+    // Keep ref current so the Save button closure always captures the latest control values
+    materialsRef.current = {
+        slabColor, slabRoughness, slabMetalness,
+        stopJamColor, stopJamRoughness, stopJamMetalness,
+        sealTopColor, sealTopRoughness, sealTopMetalness,
+        sealBotColor, sealBotRoughness, sealBotMetalness,
+        glassColor, glassRoughness, glassMetalness, glassTransmission, glassThickness, glassOpacity,
+    }
+
     useEffect(() => {
-        set(PresetColors[selectedPreset])
+        const preset = allPresets[selectedPreset]
+        if (preset) set(preset)
     }, [selectedPreset])
+
+    const handleDeletePreset = (key: string) => {
+        setCustomPresets(prev => {
+            const updated = { ...prev }
+            delete updated[key]
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+            return updated
+        })
+        if (selectedPreset === key) setSelectedPreset('Silver')
+    }
 
     const hdrFile = HDR_OPTIONS[hdr as keyof typeof HDR_OPTIONS]
 
@@ -224,16 +356,34 @@ export default function TestUnoDoorPage() {
                         <directionalLight position={[0, 25, -100]} intensity={1} color="#ffffff" />
                         <UnoDoor
                             slabColor={slabColor}
+                            slabRoughness={slabRoughness}
+                            slabMetalness={slabMetalness}
                             stopJamColor={stopJamColor}
+                            stopJamRoughness={stopJamRoughness}
+                            stopJamMetalness={stopJamMetalness}
                             sealTopColor={sealTopColor}
+                            sealTopRoughness={sealTopRoughness}
+                            sealTopMetalness={sealTopMetalness}
                             sealBotColor={sealBotColor}
+                            sealBotRoughness={sealBotRoughness}
+                            sealBotMetalness={sealBotMetalness}
                             glassColor={glassColor}
+                            glassRoughness={glassRoughness}
+                            glassMetalness={glassMetalness}
+                            glassTransmission={glassTransmission}
+                            glassThickness={glassThickness}
+                            glassOpacity={glassOpacity}
                         />
                         <OrbitControls />
                     </Suspense>
                 </Canvas>
                 {DEBUG && <Stats />}
-                {DEBUG && <PresetPicker selected={selectedPreset} onSelect={setSelectedPreset} />}
+                {DEBUG && <PresetMaterialPicker
+                    presets={allPresets}
+                    selected={selectedPreset}
+                    onSelect={setSelectedPreset}
+                    onDelete={handleDeletePreset}
+                />}
             </div>
         </>
     )
