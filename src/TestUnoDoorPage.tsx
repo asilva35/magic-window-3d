@@ -1,12 +1,15 @@
 import { Canvas } from '@react-three/fiber'
 import { ACESFilmicToneMapping, MeshStandardMaterial, MeshBasicMaterial, Mesh, NoColorSpace, MeshPhysicalMaterial } from 'three'
-import { OrbitControls, Environment, PerspectiveCamera, Stats, useGLTF, useTexture } from '@react-three/drei'
+import { OrbitControls, Environment, PerspectiveCamera, useGLTF, useTexture } from '@react-three/drei'
 import { Suspense, useMemo, useState, useEffect, useRef } from 'react'
 import { DoorHandle } from './components/DoorHandle'
 import { useControls, Leva, button, folder } from 'leva'
 
 const DEBUG = true
 
+useGLTF.preload('/assets/models/uno-door-80x32.glb')
+useGLTF.preload('/assets/models/uno-door-80x34.glb')
+useGLTF.preload('/assets/models/uno-door-80x36-no-glass.glb')
 useGLTF.preload('/assets/models/uno-door-80x36-20x64.glb')
 useGLTF.preload('/assets/models/uno-door-80x36-22x64.glb')
 
@@ -23,6 +26,71 @@ const HDR_OPTIONS = {
     'Qwantani Dusk': '/assets/hdr/qwantani_dusk_2_puresky_1k.hdr',
     'Sundowner Overlook': '/assets/hdr/sundowner_overlook_1k.hdr',
 }
+
+// ─── Door size & glass types ───────────────────────────────────────────────────
+
+type DoorHeight = '80' | '95'
+type DoorWidth = '32' | '34' | '36'
+
+type GlassConfig =
+    | 'no-glass'
+    | '20x64'
+    | '22x64'
+    | '22x17-3x'
+    | '22x12-4x'
+    | '12x12-4x'
+    | '7x64-right'
+    | '7x64-left'
+    | '20x80'
+    | '22x80'
+    | '22x14-7-16-4x'
+    | '22x9-5x'
+
+const GLASS_CONFIG_LABELS: Record<GlassConfig, string> = {
+    'no-glass': 'No Glass',
+    '20x64': '20" × 64"',
+    '22x64': '22" × 64"',
+    '22x17-3x': '22" × 17" (3×)',
+    '22x12-4x': '22" × 12" (4×)',
+    '12x12-4x': '12" × 12" (4×)',
+    '7x64-right': '7" × 64" Right',
+    '7x64-left': '7" × 64" Left',
+    '20x80': '20" × 80"',
+    '22x80': '22" × 80"',
+    '22x14-7-16-4x': '22" × 14 7/16" (4×)',
+    '22x9-5x': '22" × 9" (5×)',
+}
+
+// ─── Asset map ────────────────────────────────────────────────────────────────
+
+type DoorAssets = { glb: string; aoMap: string; lightMap: string }
+
+const DEFAULT_DOOR_ASSETS: DoorAssets = {
+    glb: '/assets/models/uno-door-80x32-no-glass.glb',
+    aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png',
+    lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png',
+}
+
+const _def = DEFAULT_DOOR_ASSETS
+
+// Key format: "{height}-{width}-{glass}"
+const DOOR_ASSETS: Partial<Record<string, DoorAssets>> = {
+    '80-32-no-glass': { glb: '/assets/models/uno-door-80x32-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },
+    '80-34-no-glass': { glb: '/assets/models/uno-door-80x34-no-glass.glb', aoMap: _def.aoMap, lightMap: _def.lightMap },
+    '80-36-no-glass': { glb: '/assets/models/uno-door-80x36-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-no-glass-Light.png' },
+    '80-36-20x64': { glb: '/assets/models/uno-door-80x36-20x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png' },
+    '80-36-22x64': { glb: '/assets/models/uno-door-80x36-22x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png' },
+    '95-32-no-glass': { glb: '/assets/models/uno-door-95x32-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
+    '95-34-no-glass': { glb: '/assets/models/uno-door-95x34-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
+    '95-36-no-glass': { glb: '/assets/models/uno-door-95x36-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
+    // remaining combinations fall back to DEFAULT_DOOR_ASSETS until assets are available
+}
+
+function getDoorAssets(height: DoorHeight, width: DoorWidth, glass: GlassConfig): DoorAssets {
+    return DOOR_ASSETS[`${height}-${width}-${glass}`] ?? DEFAULT_DOOR_ASSETS
+}
+
+// ─── Material preset ──────────────────────────────────────────────────────────
 
 type MaterialPreset = {
     slabColor: string
@@ -91,23 +159,27 @@ function loadCustomPresets(): Record<string, MaterialPreset> {
     }
 }
 
-type GlassConfig = '20x64' | '22x64'
+// ─── 3D component ─────────────────────────────────────────────────────────────
 
 function UnoDoor({
-    modelVariant,
+    doorHeight, doorWidth, glassConfig, onReady,
     slabColor, slabRoughness, slabMetalness,
     stopJamColor, stopJamRoughness, stopJamMetalness,
     sealTopColor, sealTopRoughness, sealTopMetalness,
     sealBotColor, sealBotRoughness, sealBotMetalness,
     glassColor, glassRoughness, glassMetalness, glassTransmission, glassThickness, glassOpacity,
-}: MaterialPreset & { modelVariant: GlassConfig }) {
-    const { scene } = useGLTF(`/assets/models/uno-door-80x36-${modelVariant}.glb`)
-    const aoMap = useTexture('/assets/textures/doors/uno/uno-80x36-20x64-AO.png', (t) => {
+}: MaterialPreset & { doorHeight: DoorHeight; doorWidth: DoorWidth; glassConfig: GlassConfig; onReady?: () => void }) {
+    const assets = getDoorAssets(doorHeight, doorWidth, glassConfig)
+
+    useEffect(() => { onReady?.() }, [])
+
+    const { scene } = useGLTF(assets.glb)
+    const aoMap = useTexture(assets.aoMap, (t) => {
         t.colorSpace = NoColorSpace
         t.channel = 0
         t.flipY = false
     })
-    const aoMapLight = useTexture('/assets/textures/doors/uno/uno-80x36-20x64-Light.png', (t) => {
+    const aoMapLight = useTexture(assets.lightMap, (t) => {
         t.colorSpace = NoColorSpace
         t.channel = 0
         t.flipY = false
@@ -130,9 +202,7 @@ function UnoDoor({
         opacity: glassOpacity,
         envMapIntensity: 1,
     }), [glassColor, glassRoughness, glassMetalness, glassTransmission, glassThickness, glassOpacity])
-    const rubberMaterial = useMemo(() => new MeshBasicMaterial({
-        color: slabColor,
-    }), [slabColor])
+    const rubberMaterial = useMemo(() => new MeshBasicMaterial({ color: slabColor }), [slabColor])
 
     useMemo(() => {
         clone.traverse((child) => {
@@ -142,16 +212,12 @@ function UnoDoor({
             let applyAOMap = false
             let applyLightMap = false
 
-            if (name.includes('slab')) {
+            if (name.includes('slab') || name.includes('mold')) {
                 mesh.material = slabMaterial
                 applyAOMap = true
                 applyLightMap = true
             } else if (name.includes('stop') || name.includes('jam')) {
                 mesh.material = stopJamMaterial
-                applyAOMap = true
-                applyLightMap = true
-            } else if (name.includes('mold')) {
-                mesh.material = slabMaterial
                 applyAOMap = true
                 applyLightMap = true
             } else if (name === 'seal-top') {
@@ -171,7 +237,7 @@ function UnoDoor({
             if (applyAOMap) {
                 const mat = mesh.material as MeshStandardMaterial
                 mat.aoMap = aoMap
-                mat.aoMapIntensity = 0.5
+                mat.aoMapIntensity = glassConfig === 'no-glass' ? 0 : 0.5
                 mat.needsUpdate = true
             }
 
@@ -182,12 +248,87 @@ function UnoDoor({
                 mat.needsUpdate = true
             }
         })
-    }, [clone, aoMap, aoMapLight, slabMaterial, stopJamMaterial, sealTopMaterial, sealBotMaterial, glassMaterial])
+    }, [clone, aoMap, aoMapLight, glassConfig, slabMaterial, stopJamMaterial, sealTopMaterial, sealBotMaterial, glassMaterial])
 
     return <>
         <primitive object={clone} />
-        <DoorHandle position={[0, 0, 0]} scale={1} roughness={0.5} metalness={0.8} color='silver' />
+        <DoorHandle position={[assets.glb === DEFAULT_DOOR_ASSETS.glb && doorWidth !== '32' ? 4 : ({ '32': 4, '34': 2, '36': 0 }[doorWidth] ?? 4), 0, 0]} scale={1} roughness={0.5} metalness={0.8} color='silver' />
     </>
+}
+
+// ─── UI pickers ───────────────────────────────────────────────────────────────
+
+const PICKER_STYLE: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+    background: 'rgba(0,0,0,0.55)',
+    backdropFilter: 'blur(6px)',
+    borderRadius: 10,
+    padding: '12px 14px',
+    zIndex: 10,
+}
+
+const PICKER_LABEL_STYLE: React.CSSProperties = {
+    color: '#aaa',
+    fontSize: 10,
+    fontFamily: 'sans-serif',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    marginBottom: 2,
+}
+
+function pickerBtn(selected: boolean): React.CSSProperties {
+    return {
+        background: selected ? '#fff' : 'rgba(255,255,255,0.1)',
+        color: selected ? '#111' : '#ddd',
+        border: 'none',
+        borderRadius: 6,
+        padding: '6px 14px',
+        fontFamily: 'sans-serif',
+        fontSize: 13,
+        fontWeight: selected ? 700 : 400,
+        cursor: 'pointer',
+        textAlign: 'left',
+        transition: 'background 0.15s, color 0.15s',
+    }
+}
+
+function DoorSizePicker({ height, width, onHeightSelect, onWidthSelect }: {
+    height: DoorHeight
+    width: DoorWidth
+    onHeightSelect: (h: DoorHeight) => void
+    onWidthSelect: (w: DoorWidth) => void
+}) {
+    const heights: DoorHeight[] = ['80', '95']
+    const widths: DoorWidth[] = ['32', '34', '36']
+    return (
+        <div style={{ position: 'absolute', top: 24, left: 24, width: 140, ...PICKER_STYLE }}>
+            <span style={PICKER_LABEL_STYLE}>Door Size</span>
+            <span style={{ ...PICKER_LABEL_STYLE, marginBottom: 0 }}>Height</span>
+            {heights.map(h => (
+                <button key={h} onClick={() => onHeightSelect(h)} style={pickerBtn(height === h)}>{h}"</button>
+            ))}
+            <span style={{ ...PICKER_LABEL_STYLE, marginTop: 4, marginBottom: 0 }}>Width</span>
+            {widths.map(w => (
+                <button key={w} onClick={() => onWidthSelect(w)} style={pickerBtn(width === w)}>{w}"</button>
+            ))}
+        </div>
+    )
+}
+
+function GlassConfigPicker({ selected, onSelect }: { selected: GlassConfig; onSelect: (c: GlassConfig) => void }) {
+    const options = Object.keys(GLASS_CONFIG_LABELS) as GlassConfig[]
+    return (
+        <div style={{ position: 'absolute', top: 24, left: 180, width: 160, ...PICKER_STYLE }}>
+            <span style={PICKER_LABEL_STYLE}>Glass Configuration</span>
+            {options.map((opt) => (
+                <button key={opt} onClick={() => onSelect(opt)} style={pickerBtn(selected === opt)}>
+                    {GLASS_CONFIG_LABELS[opt]}
+                </button>
+            ))}
+        </div>
+    )
 }
 
 function PresetMaterialPicker({ presets, selected, onSelect, onDelete }: {
@@ -197,41 +338,11 @@ function PresetMaterialPicker({ presets, selected, onSelect, onDelete }: {
     onDelete: (p: string) => void
 }) {
     return (
-        <div style={{
-            position: 'absolute',
-            bottom: 24,
-            left: 24,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-            background: 'rgba(0,0,0,0.55)',
-            backdropFilter: 'blur(6px)',
-            borderRadius: 10,
-            padding: '12px 14px',
-            zIndex: 10,
-        }}>
-            <span style={{ color: '#aaa', fontSize: 10, fontFamily: 'sans-serif', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 2 }}>
-                Material Preset
-            </span>
+        <div style={{ position: 'absolute', top: 300, left: 24, ...PICKER_STYLE }}>
+            <span style={PICKER_LABEL_STYLE}>Material Preset</span>
             {Object.keys(presets).map((key) => (
                 <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <button
-                        onClick={() => onSelect(key)}
-                        style={{
-                            flex: 1,
-                            background: selected === key ? '#fff' : 'rgba(255,255,255,0.1)',
-                            color: selected === key ? '#111' : '#ddd',
-                            border: 'none',
-                            borderRadius: 6,
-                            padding: '6px 14px',
-                            fontFamily: 'sans-serif',
-                            fontSize: 13,
-                            fontWeight: selected === key ? 700 : 400,
-                            cursor: 'pointer',
-                            textAlign: 'left',
-                            transition: 'background 0.15s, color 0.15s',
-                        }}
-                    >
+                    <button onClick={() => onSelect(key)} style={{ flex: 1, ...pickerBtn(selected === key) }}>
                         {key}
                     </button>
                     {!DEFAULT_PRESETS[key] && (
@@ -259,58 +370,18 @@ function PresetMaterialPicker({ presets, selected, onSelect, onDelete }: {
     )
 }
 
-function GlassConfigPicker({ selected, onSelect }: { selected: GlassConfig; onSelect: (c: GlassConfig) => void }) {
-    const options: GlassConfig[] = ['20x64', '22x64']
-    return (
-        <div style={{
-            position: 'absolute',
-            bottom: 24,
-            right: 24,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-            background: 'rgba(0,0,0,0.55)',
-            backdropFilter: 'blur(6px)',
-            borderRadius: 10,
-            padding: '12px 14px',
-            zIndex: 10,
-        }}>
-            <span style={{ color: '#aaa', fontSize: 10, fontFamily: 'sans-serif', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 2 }}>
-                Glass Configuration
-            </span>
-            {options.map((opt) => (
-                <button
-                    key={opt}
-                    onClick={() => onSelect(opt)}
-                    style={{
-                        background: selected === opt ? '#fff' : 'rgba(255,255,255,0.1)',
-                        color: selected === opt ? '#111' : '#ddd',
-                        border: 'none',
-                        borderRadius: 6,
-                        padding: '6px 14px',
-                        fontFamily: 'sans-serif',
-                        fontSize: 13,
-                        fontWeight: selected === opt ? 700 : 400,
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'background 0.15s, color 0.15s',
-                    }}
-                >
-                    {opt}
-                </button>
-            ))}
-        </div>
-    )
-}
+// ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default function TestUnoDoorPage() {
     const [selectedPreset, setSelectedPreset] = useState<string>('Silver')
     const [customPresets, setCustomPresets] = useState<Record<string, MaterialPreset>>(loadCustomPresets)
-    const [glassConfig, setGlassConfig] = useState<GlassConfig>('20x64')
+    const [doorHeight, setDoorHeight] = useState<DoorHeight>('80')
+    const [doorWidth, setDoorWidth] = useState<DoorWidth>('32')
+    const [glassConfig, setGlassConfig] = useState<GlassConfig>('no-glass')
+    const [isLoading, setIsLoading] = useState(true)
 
     const allPresets = useMemo(() => ({ ...DEFAULT_PRESETS, ...customPresets }), [customPresets])
 
-    // Ref kept in sync each render so the Leva button handler always reads the latest values
     const materialsRef = useRef<MaterialPreset>(DEFAULT_PRESETS['Silver'])
 
     const init = DEFAULT_PRESETS['Silver']
@@ -367,7 +438,6 @@ export default function TestUnoDoorPage() {
         }),
     }))
 
-    // Keep ref current so the Save button closure always captures the latest control values
     materialsRef.current = {
         slabColor, slabRoughness, slabMetalness,
         stopJamColor, stopJamRoughness, stopJamMetalness,
@@ -392,6 +462,10 @@ export default function TestUnoDoorPage() {
     }
 
     const hdrFile = HDR_OPTIONS[hdr as keyof typeof HDR_OPTIONS]
+    const doorKey = `${doorHeight}-${doorWidth}-${glassConfig}`
+    const isUsingDefault = !DOOR_ASSETS[doorKey]
+
+    useEffect(() => { setIsLoading(true) }, [doorKey])
 
     return (
         <>
@@ -399,13 +473,16 @@ export default function TestUnoDoorPage() {
             <div style={{ position: 'relative', width: '100vw', height: '100vh', background: '#ffffff' }}>
                 <Canvas shadows gl={{ alpha: true, toneMapping: ACESFilmicToneMapping, antialias: true }}>
                     <Suspense fallback={null}>
-                        <PerspectiveCamera makeDefault position={[0, 0, 200]} fov={50} />
+                        <PerspectiveCamera makeDefault position={[0, 0, doorHeight === '95' ? 250 : 200]} fov={50} />
                         <Environment files={hdrFile} environmentIntensity={1} background={false} />
                         <directionalLight position={[0, 25, 100]} intensity={1} color="#ffffff" />
                         <directionalLight position={[0, 25, -100]} intensity={1} color="#ffffff" />
                         <UnoDoor
-                            key={glassConfig}
-                            modelVariant={glassConfig}
+                            key={doorKey}
+                            doorHeight={doorHeight}
+                            doorWidth={doorWidth}
+                            glassConfig={glassConfig}
+                            onReady={() => setIsLoading(false)}
                             slabColor={slabColor}
                             slabRoughness={slabRoughness}
                             slabMetalness={slabMetalness}
@@ -428,7 +505,27 @@ export default function TestUnoDoorPage() {
                         <OrbitControls />
                     </Suspense>
                 </Canvas>
-                {DEBUG && <Stats />}
+                {isLoading && (
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 20 }}>
+                        <div style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)', color: '#fff', fontFamily: 'sans-serif', fontSize: 15, borderRadius: 10, padding: '12px 24px' }}>
+                            Loading…
+                        </div>
+                    </div>
+                )}
+                {!isLoading && isUsingDefault && (
+                    <div style={{ position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)', pointerEvents: 'none', zIndex: 20 }}>
+                        <div style={{ background: 'rgba(180,100,0,0.85)', backdropFilter: 'blur(6px)', color: '#fff', fontFamily: 'sans-serif', fontSize: 13, borderRadius: 10, padding: '10px 20px', whiteSpace: 'nowrap' }}>
+                            The 3D Model for this combination is not ready yet — showing default 3D model
+                        </div>
+                    </div>
+                )}
+                {/* {DEBUG && <Stats />} */}
+                <DoorSizePicker
+                    height={doorHeight}
+                    width={doorWidth}
+                    onHeightSelect={setDoorHeight}
+                    onWidthSelect={setDoorWidth}
+                />
                 {DEBUG && <PresetMaterialPicker
                     presets={allPresets}
                     selected={selectedPreset}
