@@ -63,7 +63,7 @@ const GLASS_CONFIG_LABELS: Record<GlassConfig, string> = {
 
 // ─── Asset map ────────────────────────────────────────────────────────────────
 
-type DoorAssets = { glb: string; aoMap: string; lightMap: string }
+type DoorAssets = { glb: string; aoMap: string | null; lightMap: string | null }
 
 const DEFAULT_DOOR_ASSETS: DoorAssets = {
     glb: '/assets/models/uno-door-80x32-no-glass.glb',
@@ -78,8 +78,15 @@ const DOOR_ASSETS: Partial<Record<string, DoorAssets>> = {
     '80-32-no-glass': { glb: '/assets/models/uno-door-80x32-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },
     '80-34-no-glass': { glb: '/assets/models/uno-door-80x34-no-glass.glb', aoMap: _def.aoMap, lightMap: _def.lightMap },
     '80-36-no-glass': { glb: '/assets/models/uno-door-80x36-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-no-glass-Light.png' },
+    '80-32-20x64': { glb: '/assets/models/uno-door-80x32-20x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png' },//AO AND LIGHT MAP IS PENDING
+    '80-34-20x64': { glb: '/assets/models/uno-door-80x34-20x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png' },//AO AND LIGHT MAP IS PENDING
     '80-36-20x64': { glb: '/assets/models/uno-door-80x36-20x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png' },
+    '80-32-22x64': { glb: '/assets/models/uno-door-80x32-22x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png' },//AO AND LIGHT MAP IS PENDING
+    '80-34-22x64': { glb: '/assets/models/uno-door-80x34-22x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png' },//AO AND LIGHT MAP IS PENDING
     '80-36-22x64': { glb: '/assets/models/uno-door-80x36-22x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png' },
+    '80-32-22x17-3x': { glb: '/assets/models/uno-door-80x32-22x17-3x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-34-22x17-3x': { glb: '/assets/models/uno-door-80x34-22x17-3x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-36-22x17-3x': { glb: '/assets/models/uno-door-80x36-22x17-3x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
     '95-32-no-glass': { glb: '/assets/models/uno-door-95x32-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
     '95-34-no-glass': { glb: '/assets/models/uno-door-95x34-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
     '95-36-no-glass': { glb: '/assets/models/uno-door-95x36-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
@@ -174,12 +181,14 @@ function UnoDoor({
     useEffect(() => { onReady?.() }, [])
 
     const { scene } = useGLTF(assets.glb)
-    const aoMap = useTexture(assets.aoMap, (t) => {
+    const aoMapPath = assets.aoMap ?? DEFAULT_DOOR_ASSETS.aoMap!
+    const lightMapPath = assets.lightMap ?? DEFAULT_DOOR_ASSETS.lightMap!
+    const aoMap = useTexture(aoMapPath, (t) => {
         t.colorSpace = NoColorSpace
         t.channel = 0
         t.flipY = false
     })
-    const aoMapLight = useTexture(assets.lightMap, (t) => {
+    const aoMapLight = useTexture(lightMapPath, (t) => {
         t.colorSpace = NoColorSpace
         t.channel = 0
         t.flipY = false
@@ -234,14 +243,14 @@ function UnoDoor({
                 mesh.material = rubberMaterial
             }
 
-            if (applyAOMap) {
+            if (applyAOMap && assets.aoMap) {
                 const mat = mesh.material as MeshStandardMaterial
                 mat.aoMap = aoMap
                 mat.aoMapIntensity = glassConfig === 'no-glass' ? 0 : 0.5
                 mat.needsUpdate = true
             }
 
-            if (applyLightMap) {
+            if (applyLightMap && assets.lightMap) {
                 const mat = mesh.material as MeshStandardMaterial
                 mat.lightMap = aoMapLight
                 mat.lightMapIntensity = 1
