@@ -87,6 +87,18 @@ const DOOR_ASSETS: Partial<Record<string, DoorAssets>> = {
     '80-32-22x17-3x': { glb: '/assets/models/uno-door-80x32-22x17-3x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
     '80-34-22x17-3x': { glb: '/assets/models/uno-door-80x34-22x17-3x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
     '80-36-22x17-3x': { glb: '/assets/models/uno-door-80x36-22x17-3x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-32-22x12-4x': { glb: '/assets/models/uno-door-80x32-22x12-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-34-22x12-4x': { glb: '/assets/models/uno-door-80x34-22x12-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-36-22x12-4x': { glb: '/assets/models/uno-door-80x36-22x12-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-32-12x12-4x': { glb: '/assets/models/uno-door-80x32-12x12-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-34-12x12-4x': { glb: '/assets/models/uno-door-80x34-12x12-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-36-12x12-4x': { glb: '/assets/models/uno-door-80x36-12x12-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-32-7x64-right': { glb: '/assets/models/uno-door-80x32-7x64-right.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-34-7x64-right': { glb: '/assets/models/uno-door-80x34-7x64-right.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-36-7x64-right': { glb: '/assets/models/uno-door-80x36-7x64-right.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-32-7x64-left': { glb: '/assets/models/uno-door-80x32-7x64-left.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-34-7x64-left': { glb: '/assets/models/uno-door-80x34-7x64-left.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-36-7x64-left': { glb: '/assets/models/uno-door-80x36-7x64-left.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
     '95-32-no-glass': { glb: '/assets/models/uno-door-95x32-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
     '95-34-no-glass': { glb: '/assets/models/uno-door-95x34-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
     '95-36-no-glass': { glb: '/assets/models/uno-door-95x36-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
