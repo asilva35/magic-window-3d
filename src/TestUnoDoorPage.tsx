@@ -102,7 +102,18 @@ const DOOR_ASSETS: Partial<Record<string, DoorAssets>> = {
     '95-32-no-glass': { glb: '/assets/models/uno-door-95x32-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
     '95-34-no-glass': { glb: '/assets/models/uno-door-95x34-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
     '95-36-no-glass': { glb: '/assets/models/uno-door-95x36-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
-    // remaining combinations fall back to DEFAULT_DOOR_ASSETS until assets are available
+    '95-32-20x80': { glb: '/assets/models/uno-door-95x32-20x80.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-34-20x80': { glb: '/assets/models/uno-door-95x34-20x80.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-36-20x80': { glb: '/assets/models/uno-door-95x36-20x80.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-32-22x80': { glb: '/assets/models/uno-door-95x32-22x80.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-34-22x80': { glb: '/assets/models/uno-door-95x34-22x80.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-36-22x80': { glb: '/assets/models/uno-door-95x36-22x80.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-32-22x14-7-16-4x': { glb: '/assets/models/uno-door-95x32-22x14-7-16-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-34-22x14-7-16-4x': { glb: '/assets/models/uno-door-95x34-22x14-7-16-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-36-22x14-7-16-4x': { glb: '/assets/models/uno-door-95x36-22x14-7-16-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-32-22x9-5x': { glb: '/assets/models/uno-door-95x32-22x9-5x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-34-22x9-5x': { glb: '/assets/models/uno-door-95x34-22x9-5x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-36-22x9-5x': { glb: '/assets/models/uno-door-95x36-22x9-5x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
 }
 
 function getDoorAssets(height: DoorHeight, width: DoorWidth, glass: GlassConfig): DoorAssets {
@@ -273,7 +284,7 @@ function UnoDoor({
 
     return <>
         <primitive object={clone} />
-        <DoorHandle position={[assets.glb === DEFAULT_DOOR_ASSETS.glb && doorWidth !== '32' ? 4 : ({ '32': 4, '34': 2, '36': 0 }[doorWidth] ?? 4), 0, 0]} scale={1} roughness={0.5} metalness={0.8} color='silver' />
+        <DoorHandle position={[assets.glb === DEFAULT_DOOR_ASSETS.glb && doorWidth !== '32' ? 4 : ({ '32': 5, '34': 3, '36': 1 }[doorWidth] ?? 4), 0, 0]} scale={1} roughness={0.5} metalness={0.8} color='silver' />
     </>
 }
 
