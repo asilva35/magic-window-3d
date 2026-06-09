@@ -14,6 +14,7 @@ useGLTF.preload('/assets/models/uno-door-80x36-20x64.glb')
 useGLTF.preload('/assets/models/uno-door-80x36-22x64.glb')
 
 const HDR_OPTIONS = {
+    'Debris Basement Corridor': '/assets/hdr/debris_basement_corridor_1k.hdr',
     'Suburban Garden': '/assets/hdr/suburban_garden_1k.hdr',
     'Braustuble Alley': '/assets/hdr/braustuble_alley_1k.hdr',
     'Church Meeting Room': '/assets/hdr/church_meeting_room_1k.hdr',
@@ -144,33 +145,25 @@ type MaterialPreset = {
 }
 
 const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
-    'Silver': {
-        slabColor: '#b4b1ac', slabRoughness: 0.7, slabMetalness: 0.7,
-        stopJamColor: '#d5d3d1', stopJamRoughness: 0.9, stopJamMetalness: 0.8,
+    'Black(525-15)': {
+        slabColor: '#1a1a1a', slabRoughness: 0.30, slabMetalness: 0.75,
+        stopJamColor: '#1a1a1a', stopJamRoughness: 0.22, stopJamMetalness: 0.75,
         sealTopColor: '#fffdfd', sealTopRoughness: 0.2, sealTopMetalness: 0.9,
         sealBotColor: '#2a2121', sealBotRoughness: 0.2, sealBotMetalness: 0.9,
         glassColor: '#dedede', glassRoughness: 0.025, glassMetalness: 0.9,
         glassTransmission: 1, glassThickness: 0.1, glassOpacity: 0.2,
     },
-    'Dark': {
-        slabColor: '#484747', slabRoughness: 0.7, slabMetalness: 0.7,
-        stopJamColor: '#867a7a', stopJamRoughness: 0.9, stopJamMetalness: 0.8,
+    'White(298)': {
+        slabColor: '#ffffff', slabRoughness: 1.0, slabMetalness: 0.0,
+        stopJamColor: '#ffffff', stopJamRoughness: 1.0, stopJamMetalness: 0.0,
         sealTopColor: '#fffdfd', sealTopRoughness: 0.2, sealTopMetalness: 0.9,
         sealBotColor: '#2a2121', sealBotRoughness: 0.2, sealBotMetalness: 0.9,
         glassColor: '#dedede', glassRoughness: 0.025, glassMetalness: 0.9,
         glassTransmission: 1, glassThickness: 0.1, glassOpacity: 0.2,
     },
-    'Red': {
-        slabColor: '#ef1313', slabRoughness: 0.7, slabMetalness: 0.7,
-        stopJamColor: '#ffffff', stopJamRoughness: 0.9, stopJamMetalness: 0.8,
-        sealTopColor: '#fffdfd', sealTopRoughness: 0.2, sealTopMetalness: 0.9,
-        sealBotColor: '#2a2121', sealBotRoughness: 0.2, sealBotMetalness: 0.9,
-        glassColor: '#dedede', glassRoughness: 0.025, glassMetalness: 0.9,
-        glassTransmission: 1, glassThickness: 0.1, glassOpacity: 0.2,
-    },
-    'Gold': {
-        slabColor: '#867a28', slabRoughness: 0.7, slabMetalness: 0.7,
-        stopJamColor: '#ebe3ac', stopJamRoughness: 0.9, stopJamMetalness: 0.8,
+    'Bright Red(322)': {
+        slabColor: '#ca1921', slabRoughness: 0.86, slabMetalness: 1.0,
+        stopJamColor: '#ffffff', stopJamRoughness: 1.0, stopJamMetalness: 0.0,
         sealTopColor: '#fffdfd', sealTopRoughness: 0.2, sealTopMetalness: 0.9,
         sealBotColor: '#2a2121', sealBotRoughness: 0.2, sealBotMetalness: 0.9,
         glassColor: '#dedede', glassRoughness: 0.025, glassMetalness: 0.9,
@@ -349,8 +342,13 @@ function DoorSizePicker({ height, width, onHeightSelect, onWidthSelect }: {
     )
 }
 
-function GlassConfigPicker({ selected, onSelect }: { selected: GlassConfig; onSelect: (c: GlassConfig) => void }) {
-    const options = Object.keys(GLASS_CONFIG_LABELS) as GlassConfig[]
+const GLASS_OPTIONS_BY_HEIGHT: Record<DoorHeight, GlassConfig[]> = {
+    '80': ['no-glass', '20x64', '22x64', '22x17-3x', '22x12-4x', '12x12-4x', '7x64-right', '7x64-left'],
+    '95': ['no-glass', '20x80', '22x80', '22x14-7-16-4x', '22x9-5x'],
+}
+
+function GlassConfigPicker({ selected, onSelect, doorHeight }: { selected: GlassConfig; onSelect: (c: GlassConfig) => void; doorHeight: DoorHeight }) {
+    const options = GLASS_OPTIONS_BY_HEIGHT[doorHeight]
     return (
         <div style={{ position: 'absolute', top: 24, left: 180, width: 160, ...PICKER_STYLE }}>
             <span style={PICKER_LABEL_STYLE}>Glass Configuration</span>
@@ -405,7 +403,7 @@ function PresetMaterialPicker({ presets, selected, onSelect, onDelete }: {
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default function TestUnoDoorPage() {
-    const [selectedPreset, setSelectedPreset] = useState<string>('Silver')
+    const [selectedPreset, setSelectedPreset] = useState<string>('Black(525-15)')
     const [customPresets, setCustomPresets] = useState<Record<string, MaterialPreset>>(loadCustomPresets)
     const [doorHeight, setDoorHeight] = useState<DoorHeight>('80')
     const [doorWidth, setDoorWidth] = useState<DoorWidth>('32')
@@ -414,9 +412,9 @@ export default function TestUnoDoorPage() {
 
     const allPresets = useMemo(() => ({ ...DEFAULT_PRESETS, ...customPresets }), [customPresets])
 
-    const materialsRef = useRef<MaterialPreset>(DEFAULT_PRESETS['Silver'])
+    const materialsRef = useRef<MaterialPreset>(DEFAULT_PRESETS['Black(525-15)'])
 
-    const init = DEFAULT_PRESETS['Silver']
+    const init = DEFAULT_PRESETS['Black(525-15)']
 
     const [{ hdr,
         slabColor, slabRoughness, slabMetalness,
@@ -427,7 +425,7 @@ export default function TestUnoDoorPage() {
     }, set] = useControls(() => ({
         hdr: {
             label: 'Environment',
-            value: 'Suburban Garden',
+            value: 'Debris Basement Corridor',
             options: Object.keys(HDR_OPTIONS),
         },
         'Slab / Frame': folder({
@@ -490,8 +488,14 @@ export default function TestUnoDoorPage() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
             return updated
         })
-        if (selectedPreset === key) setSelectedPreset('Silver')
+        if (selectedPreset === key) setSelectedPreset('Black(525-15)')
     }
+
+    useEffect(() => {
+        if (!GLASS_OPTIONS_BY_HEIGHT[doorHeight].includes(glassConfig)) {
+            setGlassConfig('no-glass')
+        }
+    }, [doorHeight])
 
     const hdrFile = HDR_OPTIONS[hdr as keyof typeof HDR_OPTIONS]
     const doorKey = `${doorHeight}-${doorWidth}-${glassConfig}`
@@ -564,7 +568,7 @@ export default function TestUnoDoorPage() {
                     onSelect={setSelectedPreset}
                     onDelete={handleDeletePreset}
                 />}
-                <GlassConfigPicker selected={glassConfig} onSelect={setGlassConfig} />
+                <GlassConfigPicker selected={glassConfig} onSelect={setGlassConfig} doorHeight={doorHeight} />
             </div>
         </>
     )
