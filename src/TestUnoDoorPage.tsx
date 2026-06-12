@@ -72,57 +72,58 @@ const GLASS_CONFIG_LABELS: Record<GlassConfig, string> = {
 
 // ─── Asset map ────────────────────────────────────────────────────────────────
 
-type DoorAssets = { glb: string; aoMap: string | null; lightMap: string | null }
+type DoorAssets = { glb: string; aoMap: string | null; lightMap: string | null, normalMap: string | null, roughnessMap: string | null, diffuseMap: string | null }
 
 const DEFAULT_DOOR_ASSETS: DoorAssets = {
     glb: '/assets/models/uno-door-80x32-no-glass.glb',
     aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png',
     lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png',
+    normalMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Normal.png',
+    roughnessMap: '/assets/textures/doors/uno/uno-80x32-no-glass-ROU.png',
+    diffuseMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Diffuse.png',
 }
-
-const _def = DEFAULT_DOOR_ASSETS
 
 // Key format: "{height}-{width}-{glass}"
 const DOOR_ASSETS: Partial<Record<string, DoorAssets>> = {
-    '80-32-no-glass': { glb: '/assets/models/uno-door-80x32-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },
-    '80-34-no-glass': { glb: '/assets/models/uno-door-80x34-no-glass.glb', aoMap: _def.aoMap, lightMap: _def.lightMap },
-    '80-36-no-glass': { glb: '/assets/models/uno-door-80x36-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-no-glass-Light.png' },
-    '80-32-20x64': { glb: '/assets/models/uno-door-80x32-20x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png' },//AO AND LIGHT MAP IS PENDING
-    '80-34-20x64': { glb: '/assets/models/uno-door-80x34-20x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png' },//AO AND LIGHT MAP IS PENDING
-    '80-36-20x64': { glb: '/assets/models/uno-door-80x36-20x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png' },
-    '80-32-22x64': { glb: '/assets/models/uno-door-80x32-22x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png' },//AO AND LIGHT MAP IS PENDING
-    '80-34-22x64': { glb: '/assets/models/uno-door-80x34-22x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png' },//AO AND LIGHT MAP IS PENDING
-    '80-36-22x64': { glb: '/assets/models/uno-door-80x36-22x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png' },
-    '80-32-22x17-3x': { glb: '/assets/models/uno-door-80x32-22x17-3x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '80-34-22x17-3x': { glb: '/assets/models/uno-door-80x34-22x17-3x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '80-36-22x17-3x': { glb: '/assets/models/uno-door-80x36-22x17-3x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '80-32-22x12-4x': { glb: '/assets/models/uno-door-80x32-22x12-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '80-34-22x12-4x': { glb: '/assets/models/uno-door-80x34-22x12-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '80-36-22x12-4x': { glb: '/assets/models/uno-door-80x36-22x12-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '80-32-12x12-4x': { glb: '/assets/models/uno-door-80x32-12x12-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '80-34-12x12-4x': { glb: '/assets/models/uno-door-80x34-12x12-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '80-36-12x12-4x': { glb: '/assets/models/uno-door-80x36-12x12-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '80-32-7x64-right': { glb: '/assets/models/uno-door-80x32-7x64-right.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '80-34-7x64-right': { glb: '/assets/models/uno-door-80x34-7x64-right.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '80-36-7x64-right': { glb: '/assets/models/uno-door-80x36-7x64-right.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '80-32-7x64-left': { glb: '/assets/models/uno-door-80x32-7x64-left.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '80-34-7x64-left': { glb: '/assets/models/uno-door-80x34-7x64-left.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '80-36-7x64-left': { glb: '/assets/models/uno-door-80x36-7x64-left.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '95-32-no-glass': { glb: '/assets/models/uno-door-95x32-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
-    '95-34-no-glass': { glb: '/assets/models/uno-door-95x34-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
-    '95-36-no-glass': { glb: '/assets/models/uno-door-95x36-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png' },//AO AND LIGHT MAP IS PENDING
-    '95-32-20x80': { glb: '/assets/models/uno-door-95x32-20x80.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '95-34-20x80': { glb: '/assets/models/uno-door-95x34-20x80.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '95-36-20x80': { glb: '/assets/models/uno-door-95x36-20x80.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '95-32-22x80': { glb: '/assets/models/uno-door-95x32-22x80.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '95-34-22x80': { glb: '/assets/models/uno-door-95x34-22x80.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '95-36-22x80': { glb: '/assets/models/uno-door-95x36-22x80.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '95-32-22x14-7-16-4x': { glb: '/assets/models/uno-door-95x32-22x14-7-16-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '95-34-22x14-7-16-4x': { glb: '/assets/models/uno-door-95x34-22x14-7-16-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '95-36-22x14-7-16-4x': { glb: '/assets/models/uno-door-95x36-22x14-7-16-4x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '95-32-22x9-5x': { glb: '/assets/models/uno-door-95x32-22x9-5x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '95-34-22x9-5x': { glb: '/assets/models/uno-door-95x34-22x9-5x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
-    '95-36-22x9-5x': { glb: '/assets/models/uno-door-95x36-22x9-5x.glb', aoMap: null, lightMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-32-no-glass': { glb: '/assets/models/uno-door-80x32-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png', normalMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Normal.png', roughnessMap: '/assets/textures/doors/uno/uno-80x32-no-glass-ROU.png', diffuseMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Diffuse.png' },
+    '80-34-no-glass': { glb: '/assets/models/uno-door-80x34-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x34-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x34-no-glass-Light.png', normalMap: '/assets/textures/doors/uno/uno-80x34-no-glass-Normal.png', roughnessMap: '/assets/textures/doors/uno/uno-80x34-no-glass-ROU.png', diffuseMap: '/assets/textures/doors/uno/uno-80x34-no-glass-Diffuse.png' },
+    '80-36-no-glass': { glb: '/assets/models/uno-door-80x36-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-no-glass-Light.png', normalMap: null, roughnessMap: null, diffuseMap: null },
+    '80-32-20x64': { glb: '/assets/models/uno-door-80x32-20x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png', normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-34-20x64': { glb: '/assets/models/uno-door-80x34-20x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png', normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-36-20x64': { glb: '/assets/models/uno-door-80x36-20x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png', normalMap: '/assets/textures/doors/uno/uno-80x36-20x64-Normal.png', roughnessMap: '/assets/textures/doors/uno/uno-80x36-20x64-ROU.png', diffuseMap: '/assets/textures/doors/uno/uno-80x36-20x64-Diffuse.png' },
+    '80-32-22x64': { glb: '/assets/models/uno-door-80x32-22x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png', normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-34-22x64': { glb: '/assets/models/uno-door-80x34-22x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png', normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-36-22x64': { glb: '/assets/models/uno-door-80x36-22x64.glb', aoMap: '/assets/textures/doors/uno/uno-80x36-20x64-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x36-20x64-Light.png', normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-32-22x17-3x': { glb: '/assets/models/uno-door-80x32-22x17-3x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-34-22x17-3x': { glb: '/assets/models/uno-door-80x34-22x17-3x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-36-22x17-3x': { glb: '/assets/models/uno-door-80x36-22x17-3x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-32-22x12-4x': { glb: '/assets/models/uno-door-80x32-22x12-4x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-34-22x12-4x': { glb: '/assets/models/uno-door-80x34-22x12-4x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-36-22x12-4x': { glb: '/assets/models/uno-door-80x36-22x12-4x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-32-12x12-4x': { glb: '/assets/models/uno-door-80x32-12x12-4x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-34-12x12-4x': { glb: '/assets/models/uno-door-80x34-12x12-4x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-36-12x12-4x': { glb: '/assets/models/uno-door-80x36-12x12-4x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-32-7x64-right': { glb: '/assets/models/uno-door-80x32-7x64-right.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-34-7x64-right': { glb: '/assets/models/uno-door-80x34-7x64-right.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-36-7x64-right': { glb: '/assets/models/uno-door-80x36-7x64-right.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-32-7x64-left': { glb: '/assets/models/uno-door-80x32-7x64-left.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-34-7x64-left': { glb: '/assets/models/uno-door-80x34-7x64-left.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '80-36-7x64-left': { glb: '/assets/models/uno-door-80x36-7x64-left.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-32-no-glass': { glb: '/assets/models/uno-door-95x32-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png', normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-34-no-glass': { glb: '/assets/models/uno-door-95x34-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png', normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-36-no-glass': { glb: '/assets/models/uno-door-95x36-no-glass.glb', aoMap: '/assets/textures/doors/uno/uno-80x32-no-glass-AO.png', lightMap: '/assets/textures/doors/uno/uno-80x32-no-glass-Light.png', normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-32-20x80': { glb: '/assets/models/uno-door-95x32-20x80.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-34-20x80': { glb: '/assets/models/uno-door-95x34-20x80.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-36-20x80': { glb: '/assets/models/uno-door-95x36-20x80.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-32-22x80': { glb: '/assets/models/uno-door-95x32-22x80.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-34-22x80': { glb: '/assets/models/uno-door-95x34-22x80.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-36-22x80': { glb: '/assets/models/uno-door-95x36-22x80.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-32-22x14-7-16-4x': { glb: '/assets/models/uno-door-95x32-22x14-7-16-4x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-34-22x14-7-16-4x': { glb: '/assets/models/uno-door-95x34-22x14-7-16-4x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-36-22x14-7-16-4x': { glb: '/assets/models/uno-door-95x36-22x14-7-16-4x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-32-22x9-5x': { glb: '/assets/models/uno-door-95x32-22x9-5x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-34-22x9-5x': { glb: '/assets/models/uno-door-95x34-22x9-5x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
+    '95-36-22x9-5x': { glb: '/assets/models/uno-door-95x36-22x9-5x.glb', aoMap: null, lightMap: null, normalMap: null, roughnessMap: null, diffuseMap: null },//AO AND LIGHT MAP IS PENDING
 }
 
 function getDoorAssets(height: DoorHeight, width: DoorWidth, glass: GlassConfig): DoorAssets {
@@ -148,11 +149,11 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
     'Black(525-15)': {
         slab: { color: '#262626', roughness: 0.53, metalness: 0.75 },
         mold: { color: '#262626', roughness: 0.53, metalness: 0.75 },
-        stopJam: { color: '#262626', roughness: 0.73, metalness: 0.75 },
+        stopJam: { color: '#262626', roughness: 0.99, metalness: 0.75 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
-        lightSourceIntensity: 1,
+        lightSourceIntensity: 20,
     },
     'White(298)': {
         slab: { color: '#ffffff', roughness: 1.0, metalness: 0.0 },
@@ -161,11 +162,11 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
-        lightSourceIntensity: 5,
+        lightSourceIntensity: 0,
     },
     'Bright Red(322)': {
         slab: { color: '#ca1921', roughness: 0.86, metalness: 1.0 },
-        stopJam: { color: '#ca1921', roughness: 1.0, metalness: 0.0 },
+        stopJam: { color: '#ca1921', roughness: 1.0, metalness: 1.0 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
@@ -173,7 +174,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
     },
     'Brown(k-7390)': {
         slab: { color: '#593c2c', roughness: 0.86, metalness: 1.0 },
-        stopJam: { color: '#593c2c', roughness: 1.0, metalness: 0.0 },
+        stopJam: { color: '#593c2c', roughness: 1.0, metalness: 0.57 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
@@ -741,6 +742,9 @@ function UnoDoor({
     const { scene } = useGLTF(assets.glb)
     const aoMapPath = assets.aoMap ?? DEFAULT_DOOR_ASSETS.aoMap!
     const lightMapPath = assets.lightMap ?? DEFAULT_DOOR_ASSETS.lightMap!
+    const normalMapPath = assets.normalMap ?? DEFAULT_DOOR_ASSETS.normalMap!
+    const roughnessMapPath = assets.roughnessMap ?? DEFAULT_DOOR_ASSETS.roughnessMap!
+    const diffuseMapPath = assets.diffuseMap ?? DEFAULT_DOOR_ASSETS.diffuseMap!
     const aoMap = useTexture(aoMapPath, (t) => {
         t.colorSpace = NoColorSpace
         t.channel = 0
@@ -752,19 +756,19 @@ function UnoDoor({
         t.flipY = false
     })
 
-    const normalMap = useTexture('/assets/textures/doors/uno/uno-80x32-no-glass-Normal.png', (t) => {
+    const normalMap = useTexture(normalMapPath, (t) => {
         t.colorSpace = NoColorSpace
         t.channel = 0
         t.flipY = false
     });
 
-    const roughnessMap = useTexture('/assets/textures/doors/uno/uno-80x32-no-glass-ROU.png', (t) => {
+    const roughnessMap = useTexture(roughnessMapPath, (t) => {
         t.colorSpace = NoColorSpace
         t.channel = 0
         t.flipY = false
     });
 
-    const diffuseMap = useTexture('/assets/textures/doors/uno/uno-80x32-no-glass-Diffuse.png', (t) => {
+    const diffuseMap = useTexture(diffuseMapPath, (t) => {
         t.colorSpace = NoColorSpace
         t.channel = 0
         t.flipY = false
@@ -1121,9 +1125,9 @@ export default function TestUnoDoorPage() {
                     <Suspense fallback={null}>
                         <PerspectiveCamera makeDefault position={[0, 0, doorHeight === '95' ? 250 : 200]} fov={50} />
                         <Environment files={hdrFile} environmentIntensity={1} background={false} backgroundRotation={[0, 0, 0]} environmentRotation={[0, 0, 0]} />
-                        <directionalLight position={[12, 70, 100]} intensity={lightSourceIntensity} color="#ffffff" />
+                        {/* <directionalLight position={[12, 70, 100]} intensity={lightSourceIntensity} color="#ffffff" /> */}
                         {/* <directionalLight position={[12, 70, -100]} intensity={lightSourceIntensity} color="#ffffff" /> */}
-                        {/* <hemisphereLight position={[0, 50, 0]} intensity={1.0} color="#ffffff" groundColor="#444444" /> */}
+                        <hemisphereLight position={[0, 50, 0]} intensity={lightSourceIntensity} color="#ffffff" groundColor="#232872" />
                         <UnoDoor
                             key={doorKey}
                             doorHeight={doorHeight}
