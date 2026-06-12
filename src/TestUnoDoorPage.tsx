@@ -4,7 +4,6 @@ import { OrbitControls, Environment, PerspectiveCamera, useGLTF, useTexture } fr
 import { Suspense, useMemo, useState, useEffect, useRef } from 'react'
 import { DoorHandle } from './components/DoorHandle'
 import { useControls, Leva, button, folder } from 'leva'
-import * as THREE from 'three'
 
 const DEBUG = true
 
@@ -137,6 +136,7 @@ type GlassProps = MaterialProps & { transmission: number; thickness: number; opa
 
 type MaterialPreset = {
     slab: MaterialProps
+    mold?: MaterialProps
     stopJam: MaterialProps
     sealTop: MaterialProps
     sealBot: MaterialProps
@@ -146,15 +146,17 @@ type MaterialPreset = {
 
 const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
     'Black(525-15)': {
-        slab: { color: '#262626', roughness: 0.30, metalness: 0.75 },
-        stopJam: { color: '#262626', roughness: 0.52, metalness: 0.75 },
+        slab: { color: '#262626', roughness: 0.53, metalness: 0.75 },
+        mold: { color: '#262626', roughness: 0.53, metalness: 0.75 },
+        stopJam: { color: '#262626', roughness: 0.73, metalness: 0.75 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
-        lightSourceIntensity: 5,
+        lightSourceIntensity: 1,
     },
     'White(298)': {
         slab: { color: '#ffffff', roughness: 1.0, metalness: 0.0 },
+        mold: { color: '#ffffff', roughness: 0.44, metalness: 1.0 },
         stopJam: { color: '#ffffff', roughness: 1.0, metalness: 0.0 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
@@ -730,7 +732,7 @@ function loadCustomPresets(): Record<string, MaterialPreset> {
 
 function UnoDoor({
     doorHeight, doorWidth, glassConfig, onReady,
-    slab, stopJam, sealTop, sealBot, glass,
+    slab, mold = slab, stopJam, sealTop, sealBot, glass,
 }: MaterialPreset & { doorHeight: DoorHeight; doorWidth: DoorWidth; glassConfig: GlassConfig; onReady?: () => void }) {
     const assets = getDoorAssets(doorHeight, doorWidth, glassConfig)
 
@@ -750,11 +752,28 @@ function UnoDoor({
         t.flipY = false
     })
 
-    const normalMap = useTexture('/assets/textures/normal.jpg')
+    const normalMap = useTexture('/assets/textures/doors/uno/uno-80x32-no-glass-Normal.png', (t) => {
+        t.colorSpace = NoColorSpace
+        t.channel = 0
+        t.flipY = false
+    });
+
+    const roughnessMap = useTexture('/assets/textures/doors/uno/uno-80x32-no-glass-ROU.png', (t) => {
+        t.colorSpace = NoColorSpace
+        t.channel = 0
+        t.flipY = false
+    });
+
+    const diffuseMap = useTexture('/assets/textures/doors/uno/uno-80x32-no-glass-Diffuse.png', (t) => {
+        t.colorSpace = NoColorSpace
+        t.channel = 0
+        t.flipY = false
+    });
 
     const clone = useMemo(() => scene.clone(true), [scene])
 
     const slabMaterial = useMemo(() => new MeshStandardMaterial({ color: slab.color, metalness: slab.metalness, roughness: slab.roughness }), [slab.color, slab.metalness, slab.roughness])
+    const moldMaterial = useMemo(() => new MeshStandardMaterial({ color: mold.color, metalness: mold.metalness, roughness: mold.roughness }), [mold.color, mold.metalness, mold.roughness])
     const stopJamMaterial = useMemo(() => new MeshStandardMaterial({ color: stopJam.color, metalness: stopJam.metalness, roughness: stopJam.roughness }), [stopJam.color, stopJam.metalness, stopJam.roughness])
     const sealTopMaterial = useMemo(() => new MeshStandardMaterial({ color: sealTop.color, metalness: sealTop.metalness, roughness: sealTop.roughness }), [sealTop.color, sealTop.metalness, sealTop.roughness])
     const sealBotMaterial = useMemo(() => new MeshStandardMaterial({ color: sealBot.color, metalness: sealBot.metalness, roughness: sealBot.roughness }), [sealBot.color, sealBot.metalness, sealBot.roughness])
@@ -777,28 +796,41 @@ function UnoDoor({
             const mesh = child as Mesh
             const name = mesh.name
             let applyAOMap = false
-            let applyLightMap = false
+            let applyLightMap = false;
 
-            if (name.includes('slab') || name.includes('mold')) {
+            if (name.includes('slab')) {
                 slabMaterial.normalMap = normalMap
-                const scaleX = 0.01
-                const scaleY = 0.01
-                slabMaterial.normalScale = new THREE.Vector2(scaleX, scaleY)
+                slabMaterial.roughnessMap = roughnessMap
+                slabMaterial.map = diffuseMap
                 mesh.material = slabMaterial
+                applyAOMap = true
+                applyLightMap = true
+            }
+            else if (name.includes('mold')) {
+                moldMaterial.normalMap = normalMap
+                moldMaterial.roughnessMap = roughnessMap
+                moldMaterial.map = diffuseMap
+                mesh.material = moldMaterial
                 applyAOMap = true
                 applyLightMap = true
             } else if (name.includes('stop') || name.includes('jam')) {
                 stopJamMaterial.normalMap = normalMap
-                const scale = 0.0
-                stopJamMaterial.normalScale = new THREE.Vector2(scale, scale)
+                stopJamMaterial.roughnessMap = roughnessMap
+                stopJamMaterial.map = diffuseMap
                 mesh.material = stopJamMaterial
                 applyAOMap = true
                 applyLightMap = true
             } else if (name === 'seal-top') {
+                sealTopMaterial.roughnessMap = roughnessMap
+                sealTopMaterial.normalMap = normalMap
+                sealTopMaterial.map = diffuseMap
                 mesh.material = sealTopMaterial
                 applyAOMap = true
                 applyLightMap = true
             } else if (name === 'seal-bottom') {
+                sealBotMaterial.roughnessMap = roughnessMap
+                sealBotMaterial.normalMap = normalMap
+                sealBotMaterial.map = diffuseMap
                 mesh.material = sealBotMaterial
                 applyAOMap = true
                 applyLightMap = true
@@ -811,7 +843,7 @@ function UnoDoor({
             if (applyAOMap && assets.aoMap) {
                 const mat = mesh.material as MeshStandardMaterial
                 mat.aoMap = aoMap
-                mat.aoMapIntensity = glassConfig === 'no-glass' ? 0 : 0.5
+                mat.aoMapIntensity = glassConfig === 'no-glass' ? 0.5 : 0.5
                 mat.needsUpdate = true
             }
 
@@ -822,11 +854,11 @@ function UnoDoor({
                 mat.needsUpdate = true
             }
         })
-    }, [clone, aoMap, aoMapLight, glassConfig, slabMaterial, stopJamMaterial, sealTopMaterial, sealBotMaterial, glassMaterial])
+    }, [clone, aoMap, aoMapLight, glassConfig, slabMaterial, moldMaterial, stopJamMaterial, sealTopMaterial, sealBotMaterial, glassMaterial])
 
     return <>
         <primitive object={clone} />
-        <DoorHandle position={[assets.glb === DEFAULT_DOOR_ASSETS.glb && doorWidth !== '32' ? 4 : ({ '32': 5, '34': 3, '36': 1 }[doorWidth] ?? 4), 0, 0]} scale={1} roughness={0.5} metalness={0.8} color='silver' />
+        <DoorHandle position={[assets.glb === DEFAULT_DOOR_ASSETS.glb && doorWidth !== '32' ? 4 : ({ '32': 5, '34': 3, '36': 1 }[doorWidth] ?? 4), 0, 0]} scale={1} roughness={0.4} metalness={0.8} color='#777777' />
     </>
 }
 
@@ -977,6 +1009,7 @@ export default function TestUnoDoorPage() {
 
     const [{ hdr,
         slabColor, slabRoughness, slabMetalness,
+        moldColor, moldRoughness, moldMetalness,
         stopJamColor, stopJamRoughness, stopJamMetalness,
         sealTopColor, sealTopRoughness, sealTopMetalness,
         sealBotColor, sealBotRoughness, sealBotMetalness,
@@ -992,6 +1025,11 @@ export default function TestUnoDoorPage() {
             slabColor: { label: 'Color', value: init.slab.color },
             slabRoughness: { label: 'Roughness', value: init.slab.roughness, min: 0, max: 1, step: 0.01 },
             slabMetalness: { label: 'Metalness', value: init.slab.metalness, min: 0, max: 1, step: 0.01 },
+        }),
+        'Mold': folder({
+            moldColor: { label: 'Color', value: init.slab.color },
+            moldRoughness: { label: 'Roughness', value: init.slab.roughness, min: 0, max: 1, step: 0.01 },
+            moldMetalness: { label: 'Metalness', value: init.slab.metalness, min: 0, max: 1, step: 0.01 },
         }),
         'Stop / Jam': folder({
             stopJamColor: { label: 'Color', value: init.stopJam.color },
@@ -1031,6 +1069,7 @@ export default function TestUnoDoorPage() {
 
     materialsRef.current = {
         slab: { color: slabColor, roughness: slabRoughness, metalness: slabMetalness },
+        mold: { color: moldColor, roughness: moldRoughness, metalness: moldMetalness },
         stopJam: { color: stopJamColor, roughness: stopJamRoughness, metalness: stopJamMetalness },
         sealTop: { color: sealTopColor, roughness: sealTopRoughness, metalness: sealTopMetalness },
         sealBot: { color: sealBotColor, roughness: sealBotRoughness, metalness: sealBotMetalness },
@@ -1042,6 +1081,7 @@ export default function TestUnoDoorPage() {
         const preset = allPresets[selectedPreset]
         if (preset) set({
             slabColor: preset.slab.color, slabRoughness: preset.slab.roughness, slabMetalness: preset.slab.metalness,
+            moldColor: (preset.mold ?? preset.slab).color, moldRoughness: (preset.mold ?? preset.slab).roughness, moldMetalness: (preset.mold ?? preset.slab).metalness,
             stopJamColor: preset.stopJam.color, stopJamRoughness: preset.stopJam.roughness, stopJamMetalness: preset.stopJam.metalness,
             sealTopColor: preset.sealTop.color, sealTopRoughness: preset.sealTop.roughness, sealTopMetalness: preset.sealTop.metalness,
             sealBotColor: preset.sealBot.color, sealBotRoughness: preset.sealBot.roughness, sealBotMetalness: preset.sealBot.metalness,
@@ -1076,13 +1116,14 @@ export default function TestUnoDoorPage() {
     return (
         <>
             <Leva hidden={!DEBUG} />
-            <div style={{ position: 'relative', width: '100vw', height: '100vh', background: '#ffffff' }}>
-                <Canvas shadows gl={{ alpha: true, toneMapping: ACESFilmicToneMapping, antialias: true }}>
+            <div style={{ position: 'relative', width: '100vw', height: '100vh', background: '#e1e1e1' }}>
+                <Canvas shadows gl={{ alpha: true, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.0, antialias: true }}>
                     <Suspense fallback={null}>
                         <PerspectiveCamera makeDefault position={[0, 0, doorHeight === '95' ? 250 : 200]} fov={50} />
-                        <Environment files={hdrFile} environmentIntensity={1} background={false} />
+                        <Environment files={hdrFile} environmentIntensity={1} background={false} backgroundRotation={[0, 0, 0]} environmentRotation={[0, 0, 0]} />
                         <directionalLight position={[12, 70, 100]} intensity={lightSourceIntensity} color="#ffffff" />
-                        <directionalLight position={[12, 70, -100]} intensity={lightSourceIntensity} color="#ffffff" />
+                        {/* <directionalLight position={[12, 70, -100]} intensity={lightSourceIntensity} color="#ffffff" /> */}
+                        {/* <hemisphereLight position={[0, 50, 0]} intensity={1.0} color="#ffffff" groundColor="#444444" /> */}
                         <UnoDoor
                             key={doorKey}
                             doorHeight={doorHeight}
@@ -1090,6 +1131,7 @@ export default function TestUnoDoorPage() {
                             glassConfig={glassConfig}
                             onReady={() => setIsLoading(false)}
                             slab={{ color: slabColor, roughness: slabRoughness, metalness: slabMetalness }}
+                            mold={{ color: moldColor, roughness: moldRoughness, metalness: moldMetalness }}
                             stopJam={{ color: stopJamColor, roughness: stopJamRoughness, metalness: stopJamMetalness }}
                             sealTop={{ color: sealTopColor, roughness: sealTopRoughness, metalness: sealTopMetalness }}
                             sealBot={{ color: sealBotColor, roughness: sealBotRoughness, metalness: sealBotMetalness }}
