@@ -153,7 +153,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         stopJam: { color: '#262626', roughness: 0.92, metalness: 0.91 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
-        glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
+        glass: { color: '#dedede', roughness: 0.1, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1.5,
         hdrIntensity: 0.59,
     },
@@ -163,7 +163,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         stopJam: { color: '#ffffff', roughness: 1.0, metalness: 0.0 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
-        glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
+        glass: { color: '#dedede', roughness: 0.1, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 0,
         hdrIntensity: 0.73,
     },
@@ -173,7 +173,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         stopJam: { color: '#ca1921', roughness: 1.0, metalness: 1.0 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
-        glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
+        glass: { color: '#dedede', roughness: 0.1, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 0.6,
         hdrIntensity: 0.72,
     },
@@ -183,7 +183,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         stopJam: { color: '#593c2c', roughness: 1.0, metalness: 0.57 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
-        glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
+        glass: { color: '#dedede', roughness: 0.1, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1.1,
         hdrIntensity: 0.46,
     },
@@ -193,7 +193,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         stopJam: { color: '#a29b89', roughness: 1.0, metalness: 0.73 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
-        glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
+        glass: { color: '#dedede', roughness: 0.1, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 0.7,
         hdrIntensity: 0.29,
     },
@@ -204,7 +204,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         stopJam: { color: '#FCF3D2', roughness: 1.0, metalness: 0.0 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
-        glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
+        glass: { color: '#dedede', roughness: 0.1, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1.4,
         hdrIntensity: 0.05,
     },
@@ -919,8 +919,7 @@ function UnoDoor({
                 applyAOMap = true
                 applyLightMap = true
             } else if (name.includes('glass')) {
-                //mesh.material = glassMaterial
-                mesh.visible = false
+                mesh.material = glassMaterial
             } else if (name.includes('rubber')) {
                 mesh.material = rubberMaterial
             }
