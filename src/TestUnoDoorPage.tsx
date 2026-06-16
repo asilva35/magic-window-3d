@@ -143,19 +143,21 @@ type MaterialPreset = {
     sealBot: MaterialProps
     glass: GlassProps
     lightSourceIntensity: number
+    hdrIntensity: number
 }
 
 const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
-    'Black(525-15)': {
-        slab: { color: '#262626', roughness: 0.53, metalness: 0.75 },
-        mold: { color: '#262626', roughness: 0.53, metalness: 0.49 },
-        stopJam: { color: '#262626', roughness: 0.99, metalness: 0.75 },
+    'Black': {
+        slab: { color: '#262626', roughness: 0.85, metalness: 0.99 },
+        mold: { color: '#262626', roughness: 0.81, metalness: 0.74 },
+        stopJam: { color: '#262626', roughness: 0.92, metalness: 0.91 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
-        lightSourceIntensity: 20,
+        lightSourceIntensity: 1.5,
+        hdrIntensity: 0.59,
     },
-    'White(298)': {
+    'White': {
         slab: { color: '#ffffff', roughness: 1.0, metalness: 0.0 },
         mold: { color: '#f2f2f2', roughness: 1.0, metalness: 0.0 },
         stopJam: { color: '#ffffff', roughness: 1.0, metalness: 0.0 },
@@ -163,44 +165,50 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 0,
+        hdrIntensity: 0.73,
     },
-    'Bright Red(322)': {
-        slab: { color: '#ca1921', roughness: 0.86, metalness: 1.0 },
-        mold: { color: '#ca1921', roughness: 0.86, metalness: 0.88 },
+    'Bright Red': {
+        slab: { color: '#ca1921', roughness: 0.86, metalness: 0.68 },
+        mold: { color: '#ca1921', roughness: 0.84, metalness: 0.56 },
         stopJam: { color: '#ca1921', roughness: 1.0, metalness: 1.0 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
-        lightSourceIntensity: 1,
+        lightSourceIntensity: 0.6,
+        hdrIntensity: 0.72,
     },
-    'Brown(k-7390)': {
-        slab: { color: '#593c2c', roughness: 0.86, metalness: 1.0 },
-        mold: { color: '#593c2c', roughness: 0.86, metalness: 0.80 },
+    'Commercial Brown': {
+        slab: { color: '#593c2c', roughness: 0.82, metalness: 0.76 },
+        mold: { color: '#593c2c', roughness: 0.74, metalness: 0.64 },
         stopJam: { color: '#593c2c', roughness: 1.0, metalness: 0.57 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
-        lightSourceIntensity: 1,
+        lightSourceIntensity: 1.1,
+        hdrIntensity: 0.46,
     },
-    'Window Bronze(415)': {
-        slab: { color: '#a29b89', roughness: 0.86, metalness: 1.0 },
-        mold: { color: '#a29b89', roughness: 0.86, metalness: 0.80 },
-        stopJam: { color: '#a29b89', roughness: 1.0, metalness: 0.0 },
+    'Window Bronze': {
+        slab: { color: '#a29b89', roughness: 0.90, metalness: 0.48 },
+        mold: { color: '#a29b89', roughness: 0.80, metalness: 0.44 },
+        stopJam: { color: '#a29b89', roughness: 1.0, metalness: 0.73 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
-        lightSourceIntensity: 1,
+        lightSourceIntensity: 0.7,
+        hdrIntensity: 0.29,
     },
-    'Maize(502)': {
-        slab: { color: '#FCF3D2', roughness: 1.0, metalness: 0.33 },
-        mold: { color: '#FCF3D2', roughness: 1.0, metalness: 0.40 },
+    //BEST COLORS: #fff1bd / #ffeca9
+    'Maize': {
+        slab: { color: '#FCF3D2', roughness: 0.94, metalness: 0.27 },
+        mold: { color: '#FCF3D2', roughness: 0.9, metalness: 0.33 },
         stopJam: { color: '#FCF3D2', roughness: 1.0, metalness: 0.0 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
-        lightSourceIntensity: 1,
+        lightSourceIntensity: 1.4,
+        hdrIntensity: 0.05,
     },
-    'Windswept Smoke(506)': {
+    /*'Windswept Smoke': {
         slab: { color: '#696C65', roughness: 1.0, metalness: 1.0 },
         mold: { color: '#696C65', roughness: 1.0, metalness: 0.80 },
         stopJam: { color: '#696C65', roughness: 1.0, metalness: 0.0 },
@@ -208,14 +216,16 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
-    'Canyon Clay(510)': {
+    'Canyon Clay': {
         slab: { color: '#C4C1AE', roughness: 0.86, metalness: 1.0 },
         stopJam: { color: '#C4C1AE', roughness: 1.0, metalness: 0.0 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Slate(523)': {
         slab: { color: '#6B7074', roughness: 0.86, metalness: 1.0 },
@@ -224,6 +234,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Cedar XL(527)': {
         slab: { color: '#A26A37', roughness: 0.86, metalness: 1.0 },
@@ -232,6 +243,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Almond(532)': {
         slab: { color: '#ECE5D3', roughness: 0.86, metalness: 1.0 },
@@ -240,6 +252,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Wedgewood Blue(535)': {
         slab: { color: '#667787', roughness: 0.86, metalness: 1.0 },
@@ -248,6 +261,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Dover Gray(536)': {
         slab: { color: '#BFC7CA', roughness: 0.86, metalness: 1.0 },
@@ -256,6 +270,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Venitian Red(539)': {
         slab: { color: '#794A3A', roughness: 0.86, metalness: 1.0 },
@@ -264,6 +279,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Old World Blue(542)': {
         slab: { color: '#2F3C4D', roughness: 0.86, metalness: 1.0 },
@@ -272,6 +288,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Chesnut Brown(554)': {
         slab: { color: '#402923', roughness: 0.86, metalness: 1.0 },
@@ -280,6 +297,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Pebble(559)': {
         slab: { color: '#837B6E', roughness: 0.86, metalness: 1.0 },
@@ -288,6 +306,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Juniper Grove(580)': {
         slab: { color: '#AFB091', roughness: 0.86, metalness: 1.0 },
@@ -296,6 +315,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Mountain Harbor(5P1)': {
         slab: { color: '#7E8059', roughness: 0.86, metalness: 1.0 },
@@ -304,6 +324,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Metallic Gray(5P4)': {
         slab: { color: '#AFAFAF', roughness: 0.86, metalness: 1.0 },
@@ -312,6 +333,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Iron Ore(5P6)': {
         slab: { color: '#333C39', roughness: 0.86, metalness: 1.0 },
@@ -320,6 +342,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Sandalwood L/G(11)': {
         slab: { color: '#9A9182', roughness: 0.86, metalness: 1.0 },
@@ -328,6 +351,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Antique Brown(265)': {
         slab: { color: '#292621', roughness: 0.86, metalness: 1.0 },
@@ -336,6 +360,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Clay 403(403)': {
         slab: { color: '#8F8B80', roughness: 0.86, metalness: 1.0 },
@@ -344,6 +369,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Sandalwood 411(411)': {
         slab: { color: '#B1A79B', roughness: 0.86, metalness: 1.0 },
@@ -352,6 +378,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Cream L/G(492)': {
         slab: { color: '#E9DCBC', roughness: 0.86, metalness: 1.0 },
@@ -360,6 +387,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Lambeth Beige(501)': {
         slab: { color: '#CCC5B3', roughness: 0.86, metalness: 1.0 },
@@ -368,6 +396,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Tan(507)': {
         slab: { color: '#B5A395', roughness: 0.86, metalness: 1.0 },
@@ -376,6 +405,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Sandalwood(508)': {
         slab: { color: '#D4C8BA', roughness: 0.86, metalness: 1.0 },
@@ -384,6 +414,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Midnight Surf(509)': {
         slab: { color: '#6A717B', roughness: 0.86, metalness: 1.0 },
@@ -392,6 +423,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Moonlit Moss(513)': {
         slab: { color: '#606B5B', roughness: 0.86, metalness: 1.0 },
@@ -400,6 +432,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Cashmere(514)': {
         slab: { color: '#E5E2DD', roughness: 0.86, metalness: 1.0 },
@@ -408,6 +441,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Amber(516)': {
         slab: { color: '#CFB886', roughness: 0.86, metalness: 1.0 },
@@ -416,6 +450,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Sage(517)': {
         slab: { color: '#A8AC9D', roughness: 0.86, metalness: 1.0 },
@@ -424,6 +459,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Ivy Green(522)': {
         slab: { color: '#66797D', roughness: 0.86, metalness: 1.0 },
@@ -432,6 +468,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Antique Ivory(533)': {
         slab: { color: '#EFE0C3', roughness: 0.86, metalness: 1.0 },
@@ -440,6 +477,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Pearl(534)': {
         slab: { color: '#DADFE2', roughness: 0.86, metalness: 1.0 },
@@ -448,6 +486,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Wicker(538)': {
         slab: { color: '#C9C0AF', roughness: 0.86, metalness: 1.0 },
@@ -456,6 +495,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Sandstone(540)': {
         slab: { color: '#FFFCED', roughness: 0.86, metalness: 1.0 },
@@ -464,6 +504,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Khaki XL(541)': {
         slab: { color: '#776F64', roughness: 0.86, metalness: 1.0 },
@@ -472,6 +513,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Harvest Wheat(543)': {
         slab: { color: '#B39B6F', roughness: 0.86, metalness: 1.0 },
@@ -480,6 +522,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Dutch Green XL(545)': {
         slab: { color: '#272928', roughness: 0.86, metalness: 1.0 },
@@ -488,6 +531,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Sable(547)': {
         slab: { color: '#655B51', roughness: 0.86, metalness: 1.0 },
@@ -496,6 +540,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Country Red XL(551)': {
         slab: { color: '#4E312B', roughness: 0.86, metalness: 1.0 },
@@ -504,6 +549,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'River Rock XL(555)': {
         slab: { color: '#AAA69A', roughness: 0.86, metalness: 1.0 },
@@ -512,6 +558,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Forest Green(556)': {
         slab: { color: '#254536', roughness: 0.86, metalness: 1.0 },
@@ -520,6 +567,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Dark Drift(557)': {
         slab: { color: '#63554C', roughness: 0.86, metalness: 1.0 },
@@ -528,6 +576,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Commercial Brown(562)': {
         slab: { color: '#494136', roughness: 0.86, metalness: 1.0 },
@@ -536,6 +585,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Burgundy(567)': {
         slab: { color: '#612332', roughness: 0.86, metalness: 1.0 },
@@ -544,6 +594,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Nutmeg(568)': {
         slab: { color: '#564241', roughness: 0.86, metalness: 1.0 },
@@ -552,6 +603,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Saddle Brown(569)': {
         slab: { color: '#837062', roughness: 0.86, metalness: 1.0 },
@@ -560,6 +612,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Storm(570)': {
         slab: { color: '#919594', roughness: 0.86, metalness: 1.0 },
@@ -568,6 +621,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Brownstone(571)': {
         slab: { color: '#B3A797', roughness: 0.86, metalness: 1.0 },
@@ -576,6 +630,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Acadia XL(572)': {
         slab: { color: '#7E7C70', roughness: 0.86, metalness: 1.0 },
@@ -584,6 +639,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Yellowstone(573)': {
         slab: { color: '#836A4C', roughness: 0.86, metalness: 1.0 },
@@ -592,6 +648,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Alu Copper(575)': {
         slab: { color: '#8C5421', roughness: 0.86, metalness: 1.0 },
@@ -600,6 +657,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Mist Grey XL(576)': {
         slab: { color: '#AEAFA9', roughness: 0.86, metalness: 1.0 },
@@ -608,6 +666,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Sierra XL(577)': {
         slab: { color: '#614E40', roughness: 0.86, metalness: 1.0 },
@@ -616,6 +675,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Scotia Blue XL(583)': {
         slab: { color: '#919499', roughness: 0.86, metalness: 1.0 },
@@ -624,6 +684,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Forest XL(586)': {
         slab: { color: '#5D5F4A', roughness: 0.86, metalness: 1.0 },
@@ -632,6 +693,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Sand XL(587)': {
         slab: { color: '#A79A8A', roughness: 0.86, metalness: 1.0 },
@@ -640,6 +702,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Autumn Gold XL(591)': {
         slab: { color: '#A88952', roughness: 0.86, metalness: 1.0 },
@@ -648,6 +711,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Walnut XL(593)': {
         slab: { color: '#4B4336', roughness: 0.86, metalness: 1.0 },
@@ -656,6 +720,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Green 598(598)': {
         slab: { color: '#252C24', roughness: 0.86, metalness: 1.0 },
@@ -664,6 +729,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Rockwell Blue(5P2)': {
         slab: { color: '#768698', roughness: 0.86, metalness: 1.0 },
@@ -672,6 +738,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Espresso(5P3)': {
         slab: { color: '#66543B', roughness: 0.86, metalness: 1.0 },
@@ -680,6 +747,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Graphite(5P5)': {
         slab: { color: '#535955', roughness: 0.86, metalness: 1.0 },
@@ -688,6 +756,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Monterey Sand(5P8)': {
         slab: { color: '#D6CBB7', roughness: 0.86, metalness: 1.0 },
@@ -696,6 +765,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Coastal Blue(5P9)': {
         slab: { color: '#385E73', roughness: 0.86, metalness: 1.0 },
@@ -704,6 +774,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Midnight Blue XL(P31)': {
         slab: { color: '#1C2029', roughness: 0.86, metalness: 1.0 },
@@ -712,6 +783,7 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
+        hdrIntensity: 1.0,
     },
     'Cream XL(P32)': {
         slab: { color: '#E4CFA0', roughness: 0.86, metalness: 1.0 },
@@ -720,7 +792,8 @@ const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },
         glass: { color: '#dedede', roughness: 0.025, metalness: 0.9, transmission: 1, thickness: 0.1, opacity: 0.2 },
         lightSourceIntensity: 1,
-    },
+        hdrIntensity: 1.0,
+    },*/
 }
 
 const STORAGE_KEY = 'uno-door-presets'
@@ -846,7 +919,8 @@ function UnoDoor({
                 applyAOMap = true
                 applyLightMap = true
             } else if (name.includes('glass')) {
-                mesh.material = glassMaterial
+                //mesh.material = glassMaterial
+                mesh.visible = false
             } else if (name.includes('rubber')) {
                 mesh.material = rubberMaterial
             }
@@ -861,7 +935,7 @@ function UnoDoor({
             if (applyLightMap && assets.lightMap) {
                 const mat = mesh.material as MeshStandardMaterial
                 mat.lightMap = aoMapLight
-                mat.lightMapIntensity = 1
+                mat.lightMapIntensity = 0.4
                 mat.needsUpdate = true
             }
         })
@@ -1005,7 +1079,7 @@ function PresetMaterialPicker({ presets, selected, onSelect, onDelete }: {
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default function TestUnoDoorPage() {
-    const [selectedPreset, setSelectedPreset] = useState<string>('Black(525-15)')
+    const [selectedPreset, setSelectedPreset] = useState<string>('Black')
     const [customPresets, setCustomPresets] = useState<Record<string, MaterialPreset>>(loadCustomPresets)
     const [doorHeight, setDoorHeight] = useState<DoorHeight>('80')
     const [doorWidth, setDoorWidth] = useState<DoorWidth>('32')
@@ -1014,9 +1088,9 @@ export default function TestUnoDoorPage() {
 
     const allPresets = useMemo(() => ({ ...DEFAULT_PRESETS, ...customPresets }), [customPresets])
 
-    const materialsRef = useRef<MaterialPreset>(DEFAULT_PRESETS['Black(525-15)'])
+    const materialsRef = useRef<MaterialPreset>(DEFAULT_PRESETS['Black'])
 
-    const init = DEFAULT_PRESETS['Black(525-15)']
+    const init = DEFAULT_PRESETS['Black']
 
     const [{ hdr,
         slabColor, slabRoughness, slabMetalness,
@@ -1025,13 +1099,15 @@ export default function TestUnoDoorPage() {
         sealTopColor, sealTopRoughness, sealTopMetalness,
         sealBotColor, sealBotRoughness, sealBotMetalness,
         glassColor, glassRoughness, glassMetalness, glassTransmission, glassThickness, glassOpacity,
-        lightSourceIntensity,
+        lightSourceIntensity, hdrIntensity,
     }, set] = useControls(() => ({
         hdr: {
             label: 'Environment',
             value: 'Passendorf Snow',
             options: Object.keys(HDR_OPTIONS),
         },
+        lightSourceIntensity: { label: 'Light Intensity', value: init.lightSourceIntensity, min: 0, max: 20, step: 0.1 },
+        hdrIntensity: { label: 'HDR Intensity', value: init.hdrIntensity, min: 0, max: 3, step: 0.01 },
         'Slab / Frame': folder({
             slabColor: { label: 'Color', value: init.slab.color },
             slabRoughness: { label: 'Roughness', value: init.slab.roughness, min: 0, max: 1, step: 0.01 },
@@ -1065,7 +1141,6 @@ export default function TestUnoDoorPage() {
             glassThickness: { label: 'Thickness', value: init.glass.thickness, min: 0, max: 5, step: 0.01 },
             glassOpacity: { label: 'Opacity', value: init.glass.opacity, min: 0, max: 1, step: 0.01 },
         }),
-        lightSourceIntensity: { label: 'Light Intensity', value: init.lightSourceIntensity, min: 0, max: 20, step: 0.1 },
         'Save as Preset': button(() => {
             const name = window.prompt('Enter preset name')
             if (!name || !name.trim()) return
@@ -1086,6 +1161,7 @@ export default function TestUnoDoorPage() {
         sealBot: { color: sealBotColor, roughness: sealBotRoughness, metalness: sealBotMetalness },
         glass: { color: glassColor, roughness: glassRoughness, metalness: glassMetalness, transmission: glassTransmission, thickness: glassThickness, opacity: glassOpacity },
         lightSourceIntensity,
+        hdrIntensity,
     }
 
     useEffect(() => {
@@ -1099,6 +1175,7 @@ export default function TestUnoDoorPage() {
             glassColor: preset.glass.color, glassRoughness: preset.glass.roughness, glassMetalness: preset.glass.metalness,
             glassTransmission: preset.glass.transmission, glassThickness: preset.glass.thickness, glassOpacity: preset.glass.opacity,
             lightSourceIntensity: preset.lightSourceIntensity,
+            hdrIntensity: preset.hdrIntensity,
         })
     }, [selectedPreset])
 
@@ -1109,7 +1186,7 @@ export default function TestUnoDoorPage() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
             return updated
         })
-        if (selectedPreset === key) setSelectedPreset('Black(525-15)')
+        if (selectedPreset === key) setSelectedPreset('Black')
     }
 
     useEffect(() => {
@@ -1131,8 +1208,8 @@ export default function TestUnoDoorPage() {
                 <Canvas shadows gl={{ alpha: true, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.0, antialias: true }}>
                     <Suspense fallback={null}>
                         <PerspectiveCamera makeDefault position={[0, 0, doorHeight === '95' ? 250 : 200]} fov={50} />
-                        <Environment files={hdrFile} environmentIntensity={1} background={false} backgroundRotation={[0, 0, 0]} environmentRotation={[0, 0, 0]} />
-                        {/* <directionalLight position={[12, 70, 100]} intensity={lightSourceIntensity} color="#ffffff" /> */}
+                        <Environment files={hdrFile} environmentIntensity={hdrIntensity} background={false} backgroundRotation={[0, 0, 0]} environmentRotation={[0, 0, 0]} />
+                        <directionalLight position={[12, 50, 200]} intensity={lightSourceIntensity} color="#ffffff" />
                         {/* <directionalLight position={[12, 70, -100]} intensity={lightSourceIntensity} color="#ffffff" /> */}
                         <hemisphereLight position={[0, 50, 0]} intensity={lightSourceIntensity} color="#ffffff" groundColor="#232872" />
                         <UnoDoor
@@ -1148,6 +1225,7 @@ export default function TestUnoDoorPage() {
                             sealBot={{ color: sealBotColor, roughness: sealBotRoughness, metalness: sealBotMetalness }}
                             glass={{ color: glassColor, roughness: glassRoughness, metalness: glassMetalness, transmission: glassTransmission, thickness: glassThickness, opacity: glassOpacity }}
                             lightSourceIntensity={lightSourceIntensity}
+                            hdrIntensity={hdrIntensity}
                         />
                         <OrbitControls />
                     </Suspense>
