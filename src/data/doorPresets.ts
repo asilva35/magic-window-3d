@@ -25,7 +25,7 @@ export const DEFAULT_PRESETS: Record<string, MaterialPreset> = {
     },
     'White': {
         slab: { color: '#ffffff', roughness: 0.79, metalness: 0.0 },
-        mold: { color: '#f2f2f2', roughness: 1.0, metalness: 0.44 },
+        mold: { color: '#f2f2f2', roughness: 1.0, metalness: 0.08 },
         stopJam: { color: '#ffffff', roughness: 1.0, metalness: 0.0 },
         sealTop: { color: '#fffdfd', roughness: 0.2, metalness: 0.9 },
         sealBot: { color: '#2a2121', roughness: 0.2, metalness: 0.9 },

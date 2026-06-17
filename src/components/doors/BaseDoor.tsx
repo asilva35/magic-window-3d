@@ -65,12 +65,12 @@ export function BaseDoor({
                 applyAOMap = true
                 applyLightMap = true
             } else if (name.includes('mold')) {
-                moldMaterial.normalMap = normalMap
-                moldMaterial.roughnessMap = roughnessMap
+                //moldMaterial.normalMap = normalMap
+                //moldMaterial.roughnessMap = roughnessMap
                 mesh.material = moldMaterial
-                applyAOMap = true
-                applyLightMap = true
-                mapAoIntensity = 0.3
+                //applyAOMap = true
+                //applyLightMap = true
+                //mapAoIntensity = 0.3
             } else if (name.includes('stop') || name.includes('jam')) {
                 stopJamMaterial.normalMap = normalMap
                 stopJamMaterial.roughnessMap = roughnessMap
