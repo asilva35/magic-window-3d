@@ -1,0 +1,18 @@
+export const HDR_OPTIONS = {
+    'Passendorf Snow': '/assets/hdr/passendorf_snow_1k.hdr',
+    'Snowy Park': '/assets/hdr/snowy_park_01_1k.hdr',
+    'Horn Koppe Snow': '/assets/hdr/horn-koppe_snow_1k.hdr',
+    'Snowy Field': '/assets/hdr/snowy_field_1k.hdr',
+    'Birchwood': '/assets/hdr/birchwood_1k.hdr',
+    'Snowy Forest Path': '/assets/hdr/snowy_forest_path_01_1k.hdr',
+    'Stierberg Sunrise': '/assets/hdr/stierberg_sunrise_1k.hdr',
+    'Furstenstein Castle': '/assets/hdr/furstenstein_1k.hdr',
+    'Suburban Garden': '/assets/hdr/suburban_garden_1k.hdr',
+    'Braustuble Alley': '/assets/hdr/braustuble_alley_1k.hdr',
+    'Citrus Orchard Road': '/assets/hdr/citrus_orchard_road_puresky_1k.hdr',
+    'Goegap Road': '/assets/hdr/goegap_road_1k.hdr',
+    'Kloofendal Cloudy': '/assets/hdr/kloofendal_48d_partly_cloudy_puresky_1k.hdr',
+    'Meadow': '/assets/hdr/meadow_1k.hdr',
+    'Qwantani Dusk': '/assets/hdr/qwantani_dusk_2_puresky_1k.hdr',
+    'Sundowner Overlook': '/assets/hdr/sundowner_overlook_1k.hdr',
+}
