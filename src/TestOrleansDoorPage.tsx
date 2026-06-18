@@ -6,19 +6,19 @@ import { useControls, Leva, button, folder } from 'leva'
 import type { MaterialPreset } from './data/doorPresets'
 import { DEFAULT_PRESETS } from './data/doorPresets'
 import { HDR_OPTIONS } from './data/hdrOptions'
-import type { DoorHeight, DoorWidth } from './data/doors/UNO/doorSizes'
-import type { GlassConfig } from './data/doors/UNO/glassTypes'
-import { DOOR_ASSETS } from './data/doors/UNO/assets'
-import { UnoDoor } from './components/doors/UnoDoor'
-import { UnoDoorSizePicker, UnoGlassConfigPicker, GlobalPresetMaterialPicker, GLASS_OPTIONS_BY_HEIGHT } from './components/test/pickers/UnoPickers'
+import type { DoorHeight, DoorWidth } from './data/doors/ORLEANS/doorSizes'
+import type { GlassConfig } from './data/doors/ORLEANS/glassTypes'
+import { DOOR_ASSETS } from './data/doors/ORLEANS/assets'
+import { OrleansDoor } from './components/doors/OrleansDoor'
+import { OrleansDoorSizePicker, OrleansGlassConfigPicker, GlobalPresetMaterialPicker, GLASS_OPTIONS_BY_HEIGHT } from './components/test/pickers/OrleansPickers'
 
 const DEBUG = true
 
-useGLTF.preload('/assets/models/uno-door-80x32-no-glass.glb')
+useGLTF.preload('/assets/models/orleans-door-80x32-no-glass.glb')
 
 // ─── Material preset ──────────────────────────────────────────────────────────
 
-const STORAGE_KEY = 'uno-door-presets'
+const STORAGE_KEY = 'orleans-door-presets'
 
 function loadCustomPresets(): Record<string, MaterialPreset> {
     try {
@@ -31,7 +31,7 @@ function loadCustomPresets(): Record<string, MaterialPreset> {
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
-export default function TestUnoDoorPage() {
+export default function TestOrleansDoorPage() {
     const [selectedPreset, setSelectedPreset] = useState<string>('Black')
     const [customPresets, setCustomPresets] = useState<Record<string, MaterialPreset>>(loadCustomPresets)
     const [doorHeight, setDoorHeight] = useState<DoorHeight>('80')
@@ -163,9 +163,9 @@ export default function TestUnoDoorPage() {
                         <PerspectiveCamera makeDefault position={[0, 0, doorHeight === '95' ? 250 : 200]} fov={50} />
                         <Environment files={hdrFile} environmentIntensity={hdrIntensity} background={false} backgroundRotation={[0, 0, 0]} environmentRotation={[0, 0, 0]} />
                         <directionalLight position={[12, 50, 200]} intensity={lightSourceIntensity} color="#ffffff" />
-                        {/* <directionalLight position={[12, 70, -100]} intensity={lightSourceIntensity} color="#ffffff" /> */}
+                        <directionalLight position={[12, 50, -200]} intensity={lightSourceIntensity} color="#ffffff" />
                         <hemisphereLight position={[0, 50, 0]} intensity={lightSourceIntensity} color="#ffffff" groundColor="#232872" />
-                        <UnoDoor
+                        <OrleansDoor
                             key={doorKey}
                             doorHeight={doorHeight}
                             doorWidth={doorWidth}
@@ -197,8 +197,7 @@ export default function TestUnoDoorPage() {
                         </div>
                     </div>
                 )}
-                {/* {DEBUG && <Stats />} */}
-                <UnoDoorSizePicker
+                <OrleansDoorSizePicker
                     height={doorHeight}
                     width={doorWidth}
                     onHeightSelect={setDoorHeight}
@@ -210,7 +209,7 @@ export default function TestUnoDoorPage() {
                     onSelect={setSelectedPreset}
                     onDelete={handleDeletePreset}
                 />}
-                <UnoGlassConfigPicker selected={glassConfig} onSelect={setGlassConfig} doorHeight={doorHeight} />
+                <OrleansGlassConfigPicker selected={glassConfig} onSelect={setGlassConfig} doorHeight={doorHeight} />
             </div>
         </>
     )

@@ -9,6 +9,7 @@ import App from './App.tsx'
 import TestPage from './TestPage.tsx'
 import TestRedDoorPage from './TestRedDoorPage.tsx'
 import TestUnoDoorPage from './TestUnoDoorPage.tsx'
+import TestOrleansDoorPage from './TestOrleansDoorPage.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/test" element={<TestPage />} />
         <Route path="/test-red-door" element={<TestRedDoorPage />} />
         <Route path="/test-uno-door" element={<TestUnoDoorPage />} />
+        <Route path="/test-orleans-door" element={<TestOrleansDoorPage />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
